@@ -1,0 +1,51 @@
+# التبعيات
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ملفات البيئة
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ملفات التشغيل
+*.pid
+*.seed
+*.pid.lock
+
+# مجلدات البناء
+dist/
+build/
+.out/
+
+# مجلدات التطوير
+coverage/
+.nyc_output/
+
+# مجلدات التحميل
+uploads/
+temp/
+
+# نظام التشغيل
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# السجلات
+logs/
+*.log
+
+# قاعدة البيانات المحلية
+*.db
+*.sqlite
+
+# اختبارات
+*.pem
