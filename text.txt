@@ -1,13 +1,41 @@
-circl-chat-pro/
-├── server.js              # خادم Node.js الأساسي
-├── package.json          # ملف الإعدادات
-├── .env                 # متغيرات البيئة
-├── public/              # واجهة المستخدم
-│   ├── index.html       # الصفحة الرئيسية
-│   ├── style.css        # أنماط CSS
-│   └── app.js           # منطق التطبيق
-├── src/                 # كود الخادم
-│   ├── models/          # نماذج MongoDB
-│   ├── routes/          # مسارات API
-│   └── utils/           # أدوات مساعدة
-└── uploads/             # الملفات المرفوعة
+
+### **7. 📄 setup.bat** (للمستخدمين على Windows)
+```batch
+@echo off
+echo ========================================
+echo    تشغيل Circl Chat Pro على Windows
+echo ========================================
+echo.
+
+echo 1. التحقق من تثبيت Node.js...
+node --version
+if errorlevel 1 (
+    echo ❌ Node.js غير مثبت!
+    echo يرجى تثبيت Node.js من https://nodejs.org
+    pause
+    exit
+)
+
+echo 2. تثبيت التبعيات...
+npm install
+if errorlevel 1 (
+    echo ❌ فشل تثبيت التبعيات!
+    pause
+    exit
+)
+
+echo 3. إنشاء مجلدات التخزين...
+if not exist "uploads" mkdir uploads
+if not exist "uploads\images" mkdir uploads\images
+if not exist "uploads\files" mkdir uploads\files
+if not exist "uploads\audio" mkdir uploads\audio
+
+echo 4. تشغيل التطبيق...
+echo.
+echo ✅ جاهز للتشغيل!
+echo 🌐 افتح المتصفح على: http://localhost:3000
+echo 🛑 لإيقاف التطبيق: اضغط Ctrl+C
+echo.
+pause
+
+node server.js
