@@ -1,30 +1,14 @@
+<!-- ------------ FRONTEND (public/index.html) ------------ -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circl - ابدأ دائرة تواصل جديدة</title>
+    <title>Circl Chat - دردشة مباشرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
-        :root {
-            --primary: #7C3AED;
-            --primary-dark: #5B21B6;
-            --primary-light: #8B5CF6;
-            --secondary: #10B981;
-            --accent: #F59E0B;
-            --danger: #EF4444;
-            --light: #F8FAFC;
-            --dark: #0F172A;
-            --gray: #64748B;
-            --gray-light: #E2E8F0;
-            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -32,1612 +16,1107 @@
         }
 
         body {
-            font-family: 'Tajawal', 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
-            color: var(--dark);
-            line-height: 1.6;
-            direction: rtl;
-            min-height: 100vh;
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .app-container {
-            display: flex;
-            min-height: 100vh;
+        .chat-container {
+            width: 100%;
+            max-width: 1400px;
+            height: 95vh;
+            background: white;
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
         }
 
         /* الشريط الجانبي */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            width: 350px;
+            background: #1a1f36;
             color: white;
             display: flex;
             flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            z-index: 1000;
-            transform: translateX(0);
-            transition: var(--transition);
-            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1);
         }
 
-        .logo-container {
-            padding: 1.8rem 1.5rem;
+        .user-profile {
+            padding: 25px;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid #2d3748;
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: white;
+        .user-avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-weight: 800;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: var(--transition);
-        }
-
-        .logo:hover .logo-icon {
-            transform: rotate(15deg) scale(1.1);
-        }
-
-        .logo-text {
-            font-size: 2.2rem;
-            background: linear-gradient(to right, #FFF, #E2E8F0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-container {
-            flex: 1;
-            padding: 2rem 0;
-            overflow-y: auto;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.8rem;
-            margin: 0.3rem 0.8rem;
-            color: rgba(255, 255, 255, 0.85);
-            text-decoration: none;
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            font-weight: 500;
+            overflow: hidden;
+            margin: 0 auto 15px;
+            border: 3px solid #667eea;
             position: relative;
-            overflow: hidden;
         }
 
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 0;
-            background: rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
-            border-radius: var(--radius-md);
-        }
-
-        .nav-item:hover::before, .nav-item.active::before {
-            width: 100%;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: white;
-            transform: translateX(-5px);
-        }
-
-        .nav-icon {
-            font-size: 1.3rem;
-            margin-left: 1rem;
-            width: 24px;
-            text-align: center;
-        }
-
-        .badge {
-            background: var(--accent);
-            color: var(--dark);
-            font-size: 0.75rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 50px;
-            font-weight: 700;
-            margin-right: auto;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-summary {
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-avatar {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-left: 1rem;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .profile-avatar img {
+        .user-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .profile-info h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .profile-info p {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            background: var(--secondary);
-            border-radius: 50%;
-            border: 2px solid var(--primary-dark);
+        .online-status {
             position: absolute;
             bottom: 5px;
             right: 5px;
-        }
-
-        /* المحتوى الرئيسي */
-        .main-content {
-            flex: 1;
-            margin-right: 280px;
-            padding: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 1.2rem 1.8rem;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-        }
-
-        .search-container {
-            display: flex;
-            align-items: center;
-            background: var(--light);
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
-            width: 40%;
-            border: 2px solid transparent;
-            transition: var(--transition);
-        }
-
-        .search-container:focus-within {
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-        }
-
-        .search-icon {
-            color: var(--gray);
-            margin-left: 0.8rem;
-            font-size: 1.1rem;
-        }
-
-        .search-input {
-            border: none;
-            background: transparent;
-            width: 100%;
-            padding: 0.3rem;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--dark);
-        }
-
-        .search-input:focus {
-            outline: none;
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .action-btn {
-            position: relative;
-            background: var(--light);
-            border: none;
-            width: 45px;
-            height: 45px;
+            width: 15px;
+            height: 15px;
+            background: #10b981;
             border-radius: 50%;
+            border: 2px solid #1a1f36;
+        }
+
+        .username {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        /* قائمة الغرف */
+        .rooms-section {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .room-list {
+            list-style: none;
+        }
+
+        .room-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .room-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .room-item.active {
+            background: #667eea;
+        }
+
+        .room-icon {
+            margin-left: 12px;
             font-size: 1.2rem;
-            color: var(--dark);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: #cbd5e0;
         }
 
-        .action-btn:hover {
-            background: var(--primary);
+        .room-item.active .room-icon {
             color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 7px 15px rgba(124, 58, 237, 0.3);
         }
 
-        .notification-count {
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            background: var(--danger);
-            color: white;
-            font-size: 0.7rem;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
-        }
-
-        .create-post-btn {
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 0.9rem 2rem;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
-        }
-
-        .create-post-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
-        }
-
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: var(--dark);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        /* محتوى الصفحة */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-
-        /* صندوق إنشاء منشور */
-        .create-post-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-light);
-        }
-
-        .post-creator-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .creator-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-left: 1.2rem;
-            border: 3px solid var(--primary-light);
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.15);
-        }
-
-        .creator-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .post-input-container {
+        .room-name {
             flex: 1;
-        }
-
-        .post-input {
-            width: 100%;
-            border: none;
-            background: var(--light);
-            border-radius: var(--radius-md);
-            padding: 1.2rem;
-            font-family: inherit;
-            font-size: 1.05rem;
-            resize: none;
-            height: 100px;
-            color: var(--dark);
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-
-        .post-input:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-        }
-
-        .post-input::placeholder {
-            color: var(--gray);
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .media-options {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .media-option {
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            color: var(--gray);
-            cursor: pointer;
-            padding: 0.7rem 1.2rem;
-            border-radius: var(--radius-md);
-            transition: var(--transition);
             font-weight: 500;
         }
 
-        .media-option:hover {
-            background: var(--light);
-            color: var(--primary);
-            transform: translateY(-2px);
+        .room-count {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
         }
 
-        .media-option i {
-            font-size: 1.3rem;
+        /* قائمة المستخدمين */
+        .users-section {
+            padding: 20px;
+            border-top: 1px solid #2d3748;
         }
 
-        .post-btn {
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 0.9rem 2.5rem;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        .user-list {
+            list-style: none;
         }
 
-        .post-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
-        }
-
-        /* البطاقات الجانبية */
-        .side-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-light);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .see-all {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .see-all:hover {
-            color: var(--primary-dark);
-        }
-
-        /* قائمة الأصدقاء */
-        .friend-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .friend-item {
+        .user-list-item {
             display: flex;
             align-items: center;
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            border: 1px solid transparent;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
         }
 
-        .friend-item:hover {
-            background: var(--light);
-            border-color: var(--gray-light);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        .user-list-item:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .friend-avatar {
-            width: 50px;
-            height: 50px;
+        .user-list-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             overflow: hidden;
-            margin-left: 1rem;
-            border: 3px solid var(--primary-light);
+            margin-left: 10px;
         }
 
-        .friend-avatar img {
+        .user-list-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .friend-info {
+        .user-list-info {
             flex: 1;
         }
 
-        .friend-name {
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            color: var(--dark);
-        }
-
-        .friend-mutual {
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-
-        .friend-action {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .friend-action:hover {
-            background: var(--primary-dark);
-            transform: scale(1.1);
-        }
-
-        /* أحداث */
-        .event-item {
-            display: flex;
-            align-items: center;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            background: var(--light);
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            border-left: 4px solid var(--primary);
-        }
-
-        .event-item:hover {
-            transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .event-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 1rem;
-            color: white;
-            font-size: 1.3rem;
-        }
-
-        .event-details {
-            flex: 1;
-        }
-
-        .event-title {
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            color: var(--dark);
-        }
-
-        .event-time {
-            font-size: 0.85rem;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* المنشورات */
-        .post-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-light);
-            transition: var(--transition);
-        }
-
-        .post-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .poster-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-left: 1.2rem;
-            border: 3px solid var(--primary-light);
-        }
-
-        .poster-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .poster-info {
-            flex: 1;
-        }
-
-        .poster-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 0.3rem;
-            color: var(--dark);
-        }
-
-        .post-time {
-            font-size: 0.9rem;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .post-options {
-            background: none;
-            border: none;
-            color: var(--gray);
-            font-size: 1.3rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-
-        .post-options:hover {
-            background: var(--light);
-            color: var(--dark);
-        }
-
-        .post-content {
-            margin-bottom: 1.5rem;
-        }
-
-        .post-text {
-            font-size: 1.05rem;
-            line-height: 1.7;
-            color: var(--dark);
-            margin-bottom: 1.5rem;
-        }
-
-        .post-image {
-            width: 100%;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-
-        .post-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: var(--transition);
-        }
-
-        .post-image img:hover {
-            transform: scale(1.02);
-        }
-
-        .post-stats {
-            display: flex;
-            justify-content: space-between;
-            padding: 1rem 0;
-            border-top: 1px solid var(--gray-light);
-            border-bottom: 1px solid var(--gray-light);
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .post-actions-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
-            padding-top: 1.5rem;
-        }
-
-        .post-action-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.7rem;
-            padding: 0.8rem;
-            border-radius: var(--radius-md);
-            background: none;
-            border: none;
-            color: var(--gray);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .post-action-btn:hover, .post-action-btn.active {
-            background: var(--light);
-            color: var(--primary);
-        }
-
-        .post-action-btn i {
-            font-size: 1.2rem;
-        }
-
-        /* ترندات */
-        .trend-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            margin-bottom: 0.8rem;
-        }
-
-        .trend-item:hover {
-            background: var(--light);
-            transform: translateX(-5px);
-        }
-
-        .trend-rank {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            margin-left: 1rem;
-        }
-
-        .trend-info {
-            flex: 1;
-        }
-
-        .trend-tag {
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            color: var(--dark);
-        }
-
-        .trend-count {
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-
-        /* نافذة الإشعارات */
-        .notification {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            background: white;
-            padding: 1.2rem 1.8rem;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            z-index: 10000;
-            transform: translateX(-150%);
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            border-left: 5px solid var(--primary);
-            max-width: 350px;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification-title {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .notification-message {
-            color: var(--gray);
+        .user-list-name {
+            font-weight: 500;
             font-size: 0.95rem;
         }
 
-        .notification-close {
-            position: absolute;
-            top: 0.8rem;
-            left: 0.8rem;
-            background: none;
+        .user-list-status {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
+        .user-list-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* منطقة الدردشة الرئيسية */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f7fafc;
+        }
+
+        /* شريط أعلى الدردشة */
+        .chat-header {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .current-room-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .room-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .room-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .room-desc {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             border: none;
-            color: var(--gray);
-            cursor: pointer;
+            background: #edf2f7;
+            color: #4a5568;
             font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-action-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* منطقة الرسائل */
+        .messages-container {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+            background: #f7fafc;
+        }
+
+        .message-date {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .date-line {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 5px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        /* الرسائل */
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 15px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            border-top-right-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            max-width: 70%;
+        }
+
+        .message.my-message {
+            flex-direction: row-reverse;
+        }
+
+        .message.my-message .message-avatar {
+            margin-left: 0;
+            margin-right: 15px;
+        }
+
+        .message.my-message .message-content {
+            background: #667eea;
+            color: white;
+            border-top-right-radius: 15px;
+            border-top-left-radius: 5px;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
+        .message.my-message .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-text {
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .typing-dots {
+            display: flex;
+            margin-right: 10px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #a0aec0;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* منطقة إدخال الرسالة */
+        .message-input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #edf2f7;
+            border-radius: 50px;
+            padding: 5px 5px 5px 20px;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 15px 0;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            color: #2d3748;
+            outline: none;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .input-action-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #4a5568;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .send-btn {
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+        }
+
+        .send-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        /* نافذة تسجيل الدخول */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .avatar-selection {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .avatar-option {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-option.selected {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .username-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .join-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
 
         /* تجاوب مع الشاشات */
-        @media (max-width: 1200px) {
-            .content-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 1100px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
             }
             
             .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-right: 0;
-            }
-            
-            .hamburger {
-                display: block;
+                width: 300px;
             }
         }
 
         @media (max-width: 768px) {
-            .top-nav {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1.2rem;
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                z-index: 100;
+                transition: left 0.3s ease;
             }
             
-            .search-container {
-                width: 100%;
+            .sidebar.active {
+                left: 0;
             }
             
-            .top-actions {
-                width: 100%;
-                justify-content: space-between;
+            .mobile-menu-btn {
+                display: block;
             }
-            
-            .media-options {
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-            
-            .post-actions-bar {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .notification {
-                left: 1rem;
-                right: 1rem;
-                max-width: calc(100% - 2rem);
-            }
-        }
-
-        /* تأثيرات وإضافات */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.5); }
-            70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
-        }
-
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        .float {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- الشريط الجانبي -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <div class="logo">
-                    <div class="logo-icon">C</div>
-                    <div class="logo-text">Circl</div>
+    <!-- نافذة تسجيل الدخول -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <div class="login-title">دخول إلى Circl Chat</div>
+            
+            <div class="avatar-selection">
+                <div class="avatar-option selected" data-avatar="1">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed" alt="صورة شخصية">
+                </div>
+                <div class="avatar-option" data-avatar="2">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="صورة شخصية">
+                </div>
+                <div class="avatar-option" data-avatar="3">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mohamed" alt="صورة شخصية">
                 </div>
             </div>
             
-            <div class="nav-container">
-                <a href="#" class="nav-item active">
-                    <i class="fas fa-home nav-icon"></i>
-                    <span>الرئيسية</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-user-friends nav-icon"></i>
-                    <span>دائرتي</span>
-                    <span class="badge">12</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-compass nav-icon"></i>
-                    <span>استكشف</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-bell nav-icon"></i>
-                    <span>الإشعارات</span>
-                    <span class="badge">8</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-comment-dots nav-icon"></i>
-                    <span>المحادثات</span>
-                    <span class="badge">3</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-video nav-icon"></i>
-                    <span>البث المباشر</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-calendar-alt nav-icon"></i>
-                    <span>الأحداث</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-bookmark nav-icon"></i>
-                    <span>المحفوظات</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-cog nav-icon"></i>
-                    <span>الإعدادات</span>
-                </a>
-            </div>
+            <input type="text" class="username-input" id="usernameInput" placeholder="أدخل اسمك..." maxlength="20" autocomplete="off">
             
-            <div class="profile-summary">
-                <div class="profile-avatar">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="صورة المستخدم">
-                    <div class="status-dot"></div>
-                </div>
-                <div class="profile-info">
-                    <h4>أحمد محمود</h4>
-                    <p>@ahmed_mahmoud</p>
-                </div>
-            </div>
-        </aside>
-
-        <!-- المحتوى الرئيسي -->
-        <main class="main-content">
-            <!-- شريط التنقل العلوي -->
-            <nav class="top-nav">
-                <button class="hamburger" id="hamburgerBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="ابحث في دائرة أصدقائك...">
-                </div>
-                
-                <div class="top-actions">
-                    <button class="create-post-btn">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>منشور جديد</span>
-                    </button>
-                    
-                    <button class="action-btn" id="notificationsBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-count">8</span>
-                    </button>
-                    
-                    <button class="action-btn" id="messagesBtn">
-                        <i class="fas fa-comment-dots"></i>
-                    </button>
-                    
-                    <button class="action-btn" id="themeToggle">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
-            </nav>
-
-            <!-- محتوى الصفحة -->
-            <div class="content-grid">
-                <!-- القسم الرئيسي -->
-                <div class="main-section">
-                    <!-- إنشاء منشور جديد -->
-                    <div class="create-post-card">
-                        <div class="post-creator-header">
-                            <div class="creator-avatar">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="صورة المستخدم">
-                            </div>
-                            <div class="post-input-container">
-                                <textarea class="post-input" id="newPostInput" placeholder="ماذا يدور في ذهنك اليوم؟ شاركه مع دائرة أصدقائك..."></textarea>
-                            </div>
-                        </div>
-                        <div class="post-actions">
-                            <div class="media-options">
-                                <div class="media-option" id="addPhoto">
-                                    <i class="fas fa-image"></i>
-                                    <span>صورة</span>
-                                </div>
-                                <div class="media-option" id="addVideo">
-                                    <i class="fas fa-video"></i>
-                                    <span>فيديو</span>
-                                </div>
-                                <div class="media-option" id="addEvent">
-                                    <i class="fas fa-calendar-check"></i>
-                                    <span>حدث</span>
-                                </div>
-                                <div class="media-option" id="addPoll">
-                                    <i class="fas fa-chart-bar"></i>
-                                    <span>استطلاع</span>
-                                </div>
-                            </div>
-                            <button class="post-btn" id="publishPostBtn">نشر</button>
-                        </div>
-                    </div>
-
-                    <!-- المنشورات -->
-                    <div class="post-card">
-                        <div class="post-header">
-                            <div class="poster-avatar">
-                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="صورة المستخدم">
-                            </div>
-                            <div class="poster-info">
-                                <div class="poster-name">سارة أحمد</div>
-                                <div class="post-time">
-                                    <i class="far fa-clock"></i>
-                                    <span>منذ 3 ساعات • <i class="fas fa-globe-asia"></i></span>
-                                </div>
-                            </div>
-                            <button class="post-options">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                        </div>
-                        <div class="post-content">
-                            <div class="post-text">
-                                أتمنى لكم جميعًا نهاية أسبوع سعيدة! قضيت اليوم في قراءة كتاب رائع عن التطوير الشخصي. أنصح به بشدة لمن يبحث عن تحسين مهاراتهم القيادية.
-                                
-                                #تطوير_الذات #قيادة #نمو
-                            </div>
-                            <div class="post-image">
-                                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="كتاب التطوير الشخصي">
-                            </div>
-                        </div>
-                        <div class="post-stats">
-                            <div class="post-likes">
-                                <i class="fas fa-heart" style="color: #EF4444;"></i> ١٤٨
-                            </div>
-                            <div class="post-comments">
-                                ٤٨ تعليقًا • ٢٤ مشاركة
-                            </div>
-                        </div>
-                        <div class="post-actions-bar">
-                            <button class="post-action-btn" data-action="like">
-                                <i class="far fa-heart"></i>
-                                <span>إعجاب</span>
-                            </button>
-                            <button class="post-action-btn" data-action="comment">
-                                <i class="far fa-comment"></i>
-                                <span>تعليق</span>
-                            </button>
-                            <button class="post-action-btn" data-action="share">
-                                <i class="fas fa-share"></i>
-                                <span>مشاركة</span>
-                            </button>
-                            <button class="post-action-btn" data-action="save">
-                                <i class="far fa-bookmark"></i>
-                                <span>حفظ</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="post-card">
-                        <div class="post-header">
-                            <div class="poster-avatar">
-                                <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="صورة المستخدم">
-                            </div>
-                            <div class="poster-info">
-                                <div class="poster-name">محمد خالد</div>
-                                <div class="post-time">
-                                    <i class="far fa-clock"></i>
-                                    <span>منذ ٦ ساعات • <i class="fas fa-user-friends"></i></span>
-                                </div>
-                            </div>
-                            <button class="post-options">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                        </div>
-                        <div class="post-content">
-                            <div class="post-text">
-                                شاركت اليوم في مؤتمر التكنولوجيا والابتكار. كانت تجربة رائعة واستفدت كثيرًا من المحاضرات وورش العمل. إليكم بعض الصور من الفعالية!
-                                
-                                #تقنية #ابتكار #مؤتمر
-                            </div>
-                            <div class="post-image">
-                                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="مؤتمر التكنولوجيا">
-                            </div>
-                        </div>
-                        <div class="post-stats">
-                            <div class="post-likes">
-                                <i class="fas fa-heart" style="color: #EF4444;"></i> ٢٣٤
-                            </div>
-                            <div class="post-comments">
-                                ٨٩ تعليقًا • ٤٢ مشاركة
-                            </div>
-                        </div>
-                        <div class="post-actions-bar">
-                            <button class="post-action-btn active" data-action="like">
-                                <i class="fas fa-heart"></i>
-                                <span>معجب</span>
-                            </button>
-                            <button class="post-action-btn" data-action="comment">
-                                <i class="far fa-comment"></i>
-                                <span>تعليق</span>
-                            </button>
-                            <button class="post-action-btn" data-action="share">
-                                <i class="fas fa-share"></i>
-                                <span>مشاركة</span>
-                            </button>
-                            <button class="post-action-btn" data-action="save">
-                                <i class="far fa-bookmark"></i>
-                                <span>حفظ</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- القسم الجانبي -->
-                <div class="sidebar-section">
-                    <!-- دائرة الأصدقاء -->
-                    <div class="side-card">
-                        <div class="card-header">
-                            <h3 class="card-title">دائرة الأصدقاء</h3>
-                            <a href="#" class="see-all">عرض الكل</a>
-                        </div>
-                        <div class="friend-list">
-                            <div class="friend-item">
-                                <div class="friend-avatar">
-                                    <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="صديق">
-                                </div>
-                                <div class="friend-info">
-                                    <div class="friend-name">فاطمة أحمد</div>
-                                    <div class="friend-mutual">١٥ صديق مشترك</div>
-                                </div>
-                                <button class="friend-action">
-                                    <i class="fas fa-user-plus"></i>
-                                </button>
-                            </div>
-                            <div class="friend-item">
-                                <div class="friend-avatar">
-                                    <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="صديق">
-                                </div>
-                                <div class="friend-info">
-                                    <div class="friend-name">يوسف مصطفى</div>
-                                    <div class="friend-mutual">٨ أصدقاء مشتركين</div>
-                                </div>
-                                <button class="friend-action">
-                                    <i class="fas fa-user-plus"></i>
-                                </button>
-                            </div>
-                            <div class="friend-item">
-                                <div class="friend-avatar">
-                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="صديق">
-                                </div>
-                                <div class="friend-info">
-                                    <div class="friend-name">نورا سعيد</div>
-                                    <div class="friend-mutual">٢٢ صديق مشترك</div>
-                                </div>
-                                <button class="friend-action">
-                                    <i class="fas fa-user-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- الأحداث القادمة -->
-                    <div class="side-card">
-                        <div class="card-header">
-                            <h3 class="card-title">أحداث قادمة</h3>
-                            <a href="#" class="see-all">عرض الكل</a>
-                        </div>
-                        <div class="event-item">
-                            <div class="event-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="event-details">
-                                <div class="event-title">لقاء خريجي الجامعة</div>
-                                <div class="event-time">
-                                    <i class="far fa-clock"></i>
-                                    <span>الجمعة، ١٥ سبتمبر • ٦:٠٠ مساءً</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="event-item">
-                            <div class="event-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="event-details">
-                                <div class="event-title">ورشة عمل التطوير</div>
-                                <div class="event-time">
-                                    <i class="far fa-clock"></i>
-                                    <span>السبت، ٢٣ سبتمبر • ١٠:٠٠ صباحًا</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="event-item">
-                            <div class="event-icon">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <div class="event-details">
-                                <div class="event-title">ندوة التقنية الحديثة</div>
-                                <div class="event-time">
-                                    <i class="far fa-clock"></i>
-                                    <span>الأحد، ١ أكتوبر • ٤:٠٠ مساءً</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ترندات -->
-                    <div class="side-card">
-                        <div class="card-header">
-                            <h3 class="card-title">ترندات اليوم</h3>
-                            <a href="#" class="see-all">عرض الكل</a>
-                        </div>
-                        <div class="trend-item">
-                            <div class="trend-rank">١</div>
-                            <div class="trend-info">
-                                <div class="trend-tag">#تطوير_الذات</div>
-                                <div class="trend-count">٢٫٣ ألف منشور</div>
-                            </div>
-                        </div>
-                        <div class="trend-item">
-                            <div class="trend-rank">٢</div>
-                            <div class="trend-info">
-                                <div class="trend-tag">#تقنية_المستقبل</div>
-                                <div class="trend-count">١٫٨ ألف منشور</div>
-                            </div>
-                        </div>
-                        <div class="trend-item">
-                            <div class="trend-rank">٣</div>
-                            <div class="trend-info">
-                                <div class="trend-tag">#ريادة_الأعمال</div>
-                                <div class="trend-count">٣٫١ ألف منشور</div>
-                            </div>
-                        </div>
-                        <div class="trend-item">
-                            <div class="trend-rank">٤</div>
-                            <div class="trend-info">
-                                <div class="trend-tag">#العمل_عن_بعد</div>
-                                <div class="trend-count">١٫٥ ألف منشور</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+            <button class="join-btn" id="joinBtn">
+                <i class="fas fa-sign-in-alt"></i> دخول إلى الدردشة
+            </button>
+        </div>
     </div>
 
-    <!-- إشعار -->
-    <div class="notification" id="notification">
-        <button class="notification-close" id="closeNotification">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="notification-title">مرحبًا بك في Circl!</div>
-        <div class="notification-message">انضم إلى دائرة التواصل وابدأ رحلتك الاجتماعية الآن.</div>
+    <!-- تطبيق الدردشة -->
+    <div class="chat-container" id="chatContainer" style="display: none;">
+        <!-- الشريط الجانبي -->
+        <div class="sidebar">
+            <!-- معلومات المستخدم -->
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img id="userAvatarImg" src="" alt="صورة المستخدم">
+                    <div class="online-status"></div>
+                </div>
+                <div class="username" id="userDisplayName"></div>
+                <div class="user-status" id="userStatus">متصل الآن</div>
+            </div>
+            
+            <!-- قائمة الغرف -->
+            <div class="rooms-section">
+                <div class="section-title">غرف الدردشة</div>
+                <ul class="room-list" id="roomList">
+                    <!-- سيتم ملؤها بالجافاسكريبت -->
+                </ul>
+            </div>
+            
+            <!-- قائمة المستخدمين -->
+            <div class="users-section">
+                <div class="section-title">المستخدمون المتصلون (<span id="onlineCount">0</span>)</div>
+                <ul class="user-list" id="userList">
+                    <!-- سيتم ملؤها بالجافاسكريبت -->
+                </ul>
+            </div>
+        </div>
+        
+        <!-- منطقة الدردشة الرئيسية -->
+        <div class="chat-main">
+            <!-- شريط أعلى الدردشة -->
+            <div class="chat-header">
+                <div class="current-room-info">
+                    <div class="room-avatar">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="room-title" id="currentRoomTitle">عام</div>
+                        <div class="room-desc" id="currentRoomDesc">الغرفة العامة للجميع</div>
+                    </div>
+                </div>
+                
+                <div class="chat-actions">
+                    <button class="chat-action-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="chat-action-btn" title="إعدادات">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="chat-action-btn" title="بحث">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- منطقة الرسائل -->
+            <div class="messages-container" id="messagesContainer">
+                <!-- الرسائل ستظهر هنا -->
+                <div class="welcome-message" style="text-align: center; padding: 40px 20px; color: #718096;">
+                    <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
+                    <h3 style="margin-bottom: 10px;">مرحباً بك في Circl Chat!</h3>
+                    <p>ابدأ المحادثة مع الأصدقاء في الغرفة.</p>
+                </div>
+            </div>
+            
+            <!-- مؤشر الكتابة -->
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span id="typingText">يكتب الآن...</span>
+            </div>
+            
+            <!-- منطقة إدخال الرسالة -->
+            <div class="message-input-container">
+                <div class="input-wrapper">
+                    <input type="text" class="message-input" id="messageInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+                    
+                    <div class="input-actions">
+                        <button class="input-action-btn" title="إضافة صورة">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="input-action-btn" title="إضافة ملف">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button class="input-action-btn" title="إضافة تعبير">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <button class="send-btn" id="sendBtn" title="إرسال">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
+            // متغيرات عامة
+            let socket;
+            let currentUser = {};
+            let currentRoom = 'عام';
+            let typingTimeout;
+            const typingUsers = new Set();
+            
             // عناصر DOM
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const loginOverlay = document.getElementById('loginOverlay');
+            const chatContainer = document.getElementById('chatContainer');
+            const usernameInput = document.getElementById('usernameInput');
+            const joinBtn = document.getElementById('joinBtn');
+            const avatarOptions = document.querySelectorAll('.avatar-option');
+            const userDisplayName = document.getElementById('userDisplayName');
+            const userAvatarImg = document.getElementById('userAvatarImg');
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const roomList = document.getElementById('roomList');
+            const userList = document.getElementById('userList');
+            const onlineCount = document.getElementById('onlineCount');
+            const currentRoomTitle = document.getElementById('currentRoomTitle');
+            const currentRoomDesc = document.getElementById('currentRoomDesc');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const typingText = document.getElementById('typingText');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const sidebar = document.querySelector('.sidebar');
-            const notification = document.getElementById('notification');
-            const closeNotificationBtn = document.getElementById('closeNotification');
-            const publishPostBtn = document.getElementById('publishPostBtn');
-            const newPostInput = document.getElementById('newPostInput');
-            const postActionBtns = document.querySelectorAll('.post-action-btn');
-            const mediaOptions = document.querySelectorAll('.media-option');
-            const actionBtns = document.querySelectorAll('.action-btn');
-            const friendActions = document.querySelectorAll('.friend-action');
-            const themeToggle = document.getElementById('themeToggle');
             
-            // عرض الإشعار بعد تحميل الصفحة
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 1000);
-            
-            // إغلاق الإشعار
-            closeNotificationBtn.addEventListener('click', () => {
-                notification.classList.remove('show');
+            // اختيار الصورة الشخصية
+            let selectedAvatar = 1;
+            avatarOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    avatarOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedAvatar = option.getAttribute('data-avatar');
+                });
             });
             
-            // إغلاق الإشعار تلقائيًا بعد 5 ثوانٍ
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 5000);
-            
-            // تبديل الشريط الجانبي
-            hamburgerBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-                hamburgerBtn.classList.toggle('shake');
-                setTimeout(() => hamburgerBtn.classList.remove('shake'), 500);
+            // الدخول إلى الدردشة
+            joinBtn.addEventListener('click', joinChat);
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') joinChat();
             });
             
-            // نشر منشور جديد
-            publishPostBtn.addEventListener('click', () => {
-                const postContent = newPostInput.value.trim();
-                
-                if (!postContent) {
-                    showNotification('اكتب شيئًا لمشاركته مع دائرة أصدقائك!', 'warning');
-                    newPostInput.focus();
-                    publishPostBtn.classList.add('shake');
-                    setTimeout(() => publishPostBtn.classList.remove('shake'), 500);
+            function joinChat() {
+                const username = usernameInput.value.trim();
+                if (!username) {
+                    usernameInput.style.borderColor = '#ef4444';
+                    setTimeout(() => usernameInput.style.borderColor = '#e2e8f0', 2000);
                     return;
                 }
                 
-                // محاكاة عملية النشر
-                publishPostBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري النشر...';
-                publishPostBtn.disabled = true;
+                // تخزين بيانات المستخدم
+                currentUser = {
+                    username: username,
+                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}${selectedAvatar}`,
+                    id: null
+                };
                 
+                // تحديث الواجهة
+                userDisplayName.textContent = username;
+                userAvatarImg.src = currentUser.avatar;
+                
+                // الاتصال بالسيرفر
+                connectToServer();
+                
+                // إخفاء نافذة الدخول
+                loginOverlay.style.opacity = '0';
                 setTimeout(() => {
-                    // استعادة حالة الزر
-                    publishPostBtn.innerHTML = 'نشر';
-                    publishPostBtn.disabled = false;
-                    
-                    // عرض إشعار النجاح
-                    showNotification('تم نشر منشورك بنجاح في دائرة أصدقائك!', 'success');
-                    
-                    // مسح محتوى النص
-                    newPostInput.value = '';
-                    
-                    // إضافة تأثير النجاح
-                    publishPostBtn.classList.add('pulse');
-                    setTimeout(() => publishPostBtn.classList.remove('pulse'), 2000);
-                    
-                    // في تطبيق حقيقي، سيتم إرسال المنشور إلى الخادم وإضافته إلى بداية القائمة
-                    console.log('تم نشر المنشور:', postContent);
-                }, 1500);
-            });
-            
-            // تفعيل أزرار تفاعل المنشورات
-            postActionBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const action = this.getAttribute('data-action');
-                    const postCard = this.closest('.post-card');
-                    
-                    // تأثير النقر
-                    this.classList.add('shake');
-                    setTimeout(() => this.classList.remove('shake'), 500);
-                    
-                    // تغيير حالة الزر
-                    if (action === 'like') {
-                        const icon = this.querySelector('i');
-                        const text = this.querySelector('span');
-                        const isActive = this.classList.contains('active');
-                        
-                        if (isActive) {
-                            this.classList.remove('active');
-                            icon.classList.remove('fas', 'fa-heart');
-                            icon.classList.add('far', 'fa-heart');
-                            text.textContent = 'إعجاب';
-                            
-                            // تحديث العداد
-                            updateLikeCount(postCard, -1);
-                        } else {
-                            this.classList.add('active');
-                            icon.classList.remove('far', 'fa-heart');
-                            icon.classList.add('fas', 'fa-heart');
-                            text.textContent = 'معجب';
-                            
-                            // تحديث العداد
-                            updateLikeCount(postCard, 1);
-                        }
-                    }
-                    
-                    // عرض إشعار حسب الإجراء
-                    const actionMessages = {
-                        'like': 'تم تسجيل إعجابك بالمنشور',
-                        'comment': 'تم فتح التعليقات',
-                        'share': 'تم فتح خيارات المشاركة',
-                        'save': 'تم حفظ المنشور في المحفوظات'
-                    };
-                    
-                    showNotification(actionMessages[action] || 'تم تنفيذ الإجراء', 'info');
-                });
-            });
-            
-            // تفعيل خيارات الوسائط
-            mediaOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const optionType = this.id;
-                    const optionNames = {
-                        'addPhoto': 'إضافة صورة',
-                        'addVideo': 'إضافة فيديو',
-                        'addEvent': 'إنشاء حدث',
-                        'addPoll': 'إنشاء استطلاع'
-                    };
-                    
-                    // تأثير النقر
-                    this.classList.add('shake');
-                    setTimeout(() => this.classList.remove('shake'), 500);
-                    
-                    // عرض إشعار
-                    showNotification(`تم فتح خيار ${optionNames[optionType]}`, 'info');
-                    
-                    // في تطبيق حقيقي، سيتم فتح نافذة أو نموذج مناسب
-                });
-            });
-            
-            // تفعيل أزرار الإجراءات العلوية
-            actionBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const btnId = this.id;
-                    
-                    // تأثير النقر
-                    this.classList.add('shake');
-                    setTimeout(() => this.classList.remove('shake'), 500);
-                    
-                    if (btnId === 'notificationsBtn') {
-                        showNotification('عرض جميع الإشعارات غير المقروءة', 'info');
-                    } else if (btnId === 'messagesBtn') {
-                        showNotification('فتح المحادثات النشطة', 'info');
-                    } else if (btnId === 'themeToggle') {
-                        toggleTheme();
-                    }
-                });
-            });
-            
-            // تفعيل أزرار إضافة الأصدقاء
-            friendActions.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const friendItem = this.closest('.friend-item');
-                    const friendName = friendItem.querySelector('.friend-name').textContent;
-                    
-                    // تأثير النقر
-                    this.classList.add('shake');
-                    setTimeout(() => this.classList.remove('shake'), 500);
-                    
-                    // تغيير الزر
-                    const icon = this.querySelector('i');
-                    if (icon.classList.contains('fa-user-plus')) {
-                        icon.classList.remove('fa-user-plus');
-                        icon.classList.add('fa-check');
-                        this.style.background = 'var(--secondary)';
-                        
-                        showNotification(`تم إرسال طلب صداقة إلى ${friendName}`, 'success');
-                        
-                        // بعد 2 ثانية، تغيير الزر إلى "صديق"
-                        setTimeout(() => {
-                            icon.classList.remove('fa-check');
-                            icon.classList.add('fa-user-friends');
-                            this.style.background = 'var(--gray)';
-                            this.title = 'صديق';
-                        }, 2000);
-                    } else if (icon.classList.contains('fa-user-friends')) {
-                        showNotification(`${friendName} موجود بالفعل في دائرة أصدقائك`, 'info');
-                    }
-                });
-            });
-            
-            // دالة تحديث عداد الإعجابات
-            function updateLikeCount(postCard, change) {
-                const likesElement = postCard.querySelector('.post-likes');
-                const currentText = likesElement.textContent;
-                const currentCount = parseInt(currentText.replace(/\D/g, ''));
-                
-                if (!isNaN(currentCount)) {
-                    const newCount = Math.max(0, currentCount + change);
-                    likesElement.innerHTML = `<i class="fas fa-heart" style="color: #EF4444;"></i> ${newCount.toLocaleString('ar')}`;
-                }
+                    loginOverlay.style.display = 'none';
+                    chatContainer.style.display = 'flex';
+                }, 300);
             }
             
-            // دالة عرض الإشعارات
-            function showNotification(message, type = 'info') {
-                // إنشاء إشعار جديد
-                const newNotification = document.createElement('div');
-                newNotification.className = 'notification';
+            // الاتصال بخادم WebSocket
+            function connectToServer() {
+                // الاتصال بالسيرفر (تغيير الرابط حسب السيرفر الفعلي)
+                socket = io('http://localhost:3000');
                 
-                // تحديد لون الحدود حسب النوع
-                let borderColor = 'var(--primary)';
-                if (type === 'success') borderColor = 'var(--secondary)';
-                if (type === 'warning') borderColor = 'var(--accent)';
-                if (type === 'error') borderColor = 'var(--danger)';
+                // حدث الاتصال الناجح
+                socket.on('connect', () => {
+                    console.log('✅ متصل بالسيرفر:', socket.id);
+                    currentUser.id = socket.id;
+                    
+                    // الانضمام إلى الدردشة
+                    socket.emit('join', currentUser);
+                });
                 
-                newNotification.style.borderLeftColor = borderColor;
-                newNotification.innerHTML = `
-                    <button class="notification-close">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="notification-title">Circl</div>
-                    <div class="notification-message">${message}</div>
+                // استقبال ترحيب
+                socket.on('welcome', (data) => {
+                    console.log('رسالة ترحيب:', data.message);
+                    
+                    // تحديث قائمة الغرف
+                    updateRoomList(data.rooms);
+                    
+                    // تحديث قائمة المستخدمين
+                    updateUserList(data.users);
+                    
+                    // عرض رسالة ترحيب
+                    addSystemMessage(`مرحباً بك في Circl Chat، ${currentUser.username}!`);
+                });
+                
+                // استقبال رسالة جديدة
+                socket.on('newMessage', (message) => {
+                    // إذا كانت الرسالة للغرفة الحالية
+                    if (message.room === currentRoom) {
+                        addMessage(message);
+                    }
+                });
+                
+                // مستخدم جديد انضم
+                socket.on('userJoined', (user) => {
+                    addSystemMessage(`🟢 ${user.username} انضم إلى الدردشة`);
+                    updateOnlineCount();
+                });
+                
+                // مستخدم غادر
+                socket.on('userLeft', (user) => {
+                    addSystemMessage(`🔴 ${user.username} غادر الدردشة`);
+                    updateOnlineCount();
+                });
+                
+                // تغيير الغرفة
+                socket.on('roomChanged', (data) => {
+                    currentRoom = data.room;
+                    currentRoomTitle.textContent = data.room;
+                    currentRoomDesc.textContent = `أنت في غرفة ${data.room}`;
+                    
+                    // تحديث واجهة الغرف
+                    updateRoomUI();
+                    
+                    // مسح الرسائل القديمة
+                    clearMessages();
+                    
+                    // عرض رسالة النظام
+                    addSystemMessage(data.message);
+                });
+                
+                // مؤشر الكتابة
+                socket.on('userTyping', (data) => {
+                    if (data.userId !== currentUser.id) {
+                        if (data.isTyping) {
+                            typingUsers.add(data.username);
+                        } else {
+                            typingUsers.delete(data.username);
+                        }
+                        
+                        updateTypingIndicator();
+                    }
+                });
+                
+                // حدث انقطاع الاتصال
+                socket.on('disconnect', () => {
+                    addSystemMessage('❌ انقطع الاتصال بالسيرفر. جاري إعادة الاتصال...');
+                });
+            }
+            
+            // إرسال رسالة
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const text = messageInput.value.trim();
+                if (!text || !socket) return;
+                
+                socket.emit('sendMessage', { text });
+                
+                // مسح حقل الإدخال
+                messageInput.value = '';
+                
+                // إيقاف مؤشر الكتابة
+                socket.emit('typing', false);
+                clearTimeout(typingTimeout);
+            }
+            
+            // مؤشر الكتابة أثناء الكتابة
+            messageInput.addEventListener('input', () => {
+                if (!typingTimeout) {
+                    socket.emit('typing', true);
+                }
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    socket.emit('typing', false);
+                    typingTimeout = null;
+                }, 1000);
+            });
+            
+            // تحديث قائمة الغرف
+            function updateRoomList(rooms) {
+                roomList.innerHTML = '';
+                
+                rooms.forEach(room => {
+                    const li = document.createElement('li');
+                    li.className = `room-item ${room === currentRoom ? 'active' : ''}`;
+                    li.innerHTML = `
+                        <i class="fas fa-hashtag room-icon"></i>
+                        <span class="room-name">${room}</span>
+                        <span class="room-count">0</span>
+                    `;
+                    
+                    li.addEventListener('click', () => {
+                        if (room !== currentRoom) {
+                            socket.emit('changeRoom', room);
+                        }
+                    });
+                    
+                    roomList.appendChild(li);
+                });
+            }
+            
+            // تحديث قائمة المستخدمين
+            function updateUserList(users) {
+                userList.innerHTML = '';
+                onlineCount.textContent = users.length;
+                
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.className = 'user-list-item';
+                    li.innerHTML = `
+                        <div class="user-list-avatar">
+                            <img src="${user.avatar}" alt="${user.username}">
+                        </div>
+                        <div class="user-list-info">
+                            <div class="user-list-name">${user.username}</div>
+                            <div class="user-list-status">${user.room}</div>
+                        </div>
+                        <div class="user-list-dot"></div>
+                    `;
+                    
+                    userList.appendChild(li);
+                });
+            }
+            
+            // تحديث عدد المتصلين
+            function updateOnlineCount() {
+                // في تطبيق حقيقي، سيأتي هذا من السيرفر
+                const count = document.querySelectorAll('.user-list-item').length;
+                onlineCount.textContent = count;
+            }
+            
+            // تحديث واجهة الغرف
+            function updateRoomUI() {
+                const roomItems = document.querySelectorAll('.room-item');
+                roomItems.forEach(item => {
+                    const roomName = item.querySelector('.room-name').textContent;
+                    item.classList.toggle('active', roomName === currentRoom);
+                });
+            }
+            
+            // إضافة رسالة جديدة
+            function addMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.userId === currentUser.id ? 'my-message' : ''}`;
+                
+                const time = new Date(message.timestamp).toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">
+                        <img src="${message.avatar}" alt="${message.username}">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <div class="message-sender">${message.username}</div>
+                            <div class="message-time">${time}</div>
+                        </div>
+                        <div class="message-text">${escapeHtml(message.text)}</div>
+                    </div>
                 `;
                 
-                // إضافة إلى الصفحة
-                document.body.appendChild(newNotification);
+                // إخفاء رسالة الترحيب إذا كانت موجودة
+                const welcomeMsg = document.querySelector('.welcome-message');
+                if (welcomeMsg) welcomeMsg.style.display = 'none';
                 
-                // عرض الإشعار
-                setTimeout(() => {
-                    newNotification.classList.add('show');
-                }, 10);
+                // إضافة الرسالة
+                messagesContainer.appendChild(messageDiv);
                 
-                // إعداد إغلاق الإشعار
-                const closeBtn = newNotification.querySelector('.notification-close');
-                closeBtn.addEventListener('click', () => {
-                    newNotification.classList.remove('show');
-                    setTimeout(() => {
-                        if (newNotification.parentNode) {
-                            newNotification.parentNode.removeChild(newNotification);
-                        }
-                    }, 300);
-                });
+                // التمرير للأسفل
+                scrollToBottom();
+            }
+            
+            // إضافة رسالة نظام
+            function addSystemMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-date';
+                messageDiv.innerHTML = `<div class="date-line">${text}</div>`;
                 
-                // إزالة الإشعار تلقائيًا بعد 4 ثوانٍ
-                setTimeout(() => {
-                    if (newNotification.parentNode && newNotification.classList.contains('show')) {
-                        newNotification.classList.remove('show');
-                        setTimeout(() => {
-                            if (newNotification.parentNode) {
-                                newNotification.parentNode.removeChild(newNotification);
-                            }
-                        }, 300);
+                messagesContainer.appendChild(messageDiv);
+                scrollToBottom();
+            }
+            
+            // مسح الرسائل
+            function clearMessages() {
+                const messages = messagesContainer.querySelectorAll('.message, .message-date');
+                messages.forEach(msg => {
+                    if (!msg.classList.contains('welcome-message')) {
+                        msg.remove();
                     }
-                }, 4000);
+                });
             }
             
-            // تبديل وضع السمة (فاتح/غامق)
-            function toggleTheme() {
-                const currentTheme = document.body.getAttribute('data-theme');
-                const themeIcon = themeToggle.querySelector('i');
-                
-                if (currentTheme === 'dark') {
-                    // الانتقال إلى الوضع الفاتح
-                    document.body.removeAttribute('data-theme');
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
+            // تحديث مؤشر الكتابة
+            function updateTypingIndicator() {
+                if (typingUsers.size > 0) {
+                    const usersArray = Array.from(typingUsers);
+                    const text = usersArray.length === 1 
+                        ? `${usersArray[0]} يكتب الآن...`
+                        : `${usersArray.slice(0, 2).join(' و ')} يكتبون الآن...`;
                     
-                    showNotification('تم التبديل إلى الوضع الفاتح', 'info');
+                    typingText.textContent = text;
+                    typingIndicator.style.display = 'flex';
                 } else {
-                    // الانتقال إلى الوضع الغامق
-                    document.body.setAttribute('data-theme', 'dark');
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    
-                    showNotification('تم التبديل إلى الوضع الغامق', 'info');
+                    typingIndicator.style.display = 'none';
                 }
             }
             
-            // إضافة تأثير عند الكتابة في حقل البحث
-            const searchInput = document.querySelector('.search-input');
-            searchInput.addEventListener('input', function() {
-                if (this.value.length > 0) {
-                    this.parentElement.classList.add('pulse');
-                } else {
-                    this.parentElement.classList.remove('pulse');
-                }
+            // التمرير لآخر رسالة
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // الهروب من HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            // القائمة الجانبية للجوال
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
             });
             
-            // إغلاق الشريط الجانبي عند النقر خارجها على الشاشات الصغيرة
-            document.addEventListener('click', (event) => {
-                const isSidebar = sidebar.contains(event.target);
-                const isHamburger = hamburgerBtn.contains(event.target);
-                
-                if (window.innerWidth <= 1200 && 
-                    !isSidebar && 
-                    !isHamburger && 
-                    sidebar.classList.contains('active')) {
+            // إغلاق القائمة عند النقر خارجها (للجوال)
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuBtn.contains(e.target)) {
                     sidebar.classList.remove('active');
                 }
             });
             
-            // تحميل محتوى إضافي عند التمرير (محاكاة)
-            window.addEventListener('scroll', () => {
-                const scrollPosition = window.scrollY + window.innerHeight;
-                const pageHeight = document.documentElement.scrollHeight;
-                
-                // عند الوصول إلى 80% من الصفحة، تحميل المزيد من المحتوى
-                if (scrollPosition >= pageHeight * 0.8) {
-                    // في تطبيق حقيقي، سيتم جلب المزيد من المنشورات من الخادم
-                    console.log('تحميل المزيد من المحتوى...');
-                }
-            });
+            // إضافة بعض الرسائل الوهمية للعرض
+            function addSampleMessages() {
+                setTimeout(() => {
+                    addSystemMessage('اليوم');
+                    addMessage({
+                        userId: 'sample1',
+                        username: 'أحمد',
+                        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed',
+                        text: 'مرحباً بالجميع! كيف الحال؟',
+                        timestamp: new Date()
+                    });
+                    
+                    addMessage({
+                        userId: 'sample2',
+                        username: 'سارة',
+                        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sara',
+                        text: 'أهلاً أحمد! كل شيء بخير، شكراً. وأنت كيف حالك؟',
+                        timestamp: new Date()
+                    });
+                }, 1000);
+            }
+            
+            // عند تحميل الصفحة، عرض بعض الرسائل الوهمية
+            setTimeout(addSampleMessages, 2000);
         });
     </script>
 </body>
