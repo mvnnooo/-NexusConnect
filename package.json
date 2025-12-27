@@ -1,29 +1,28 @@
 {
   "name": "circl-chat-pro",
   "version": "1.0.0",
-  "description": "تطبيق دردشة احترافي مع مكالمات فيديو ورسائل خاصة",
+  "description": "تطبيق دردشة احترافي يعمل مباشرة",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "setup": "npm install && mkdir uploads && mkdir uploads/images && mkdir uploads/files && mkdir uploads/audio",
-    "test": "echo \"التطبيق جاهز للتشغيل!\" && exit 0"
+    "setup": "npm install && mkdir -p uploads uploads/images uploads/files uploads/audio",
+    "quick": "node server.js",
+    "test": "echo \"✅ التطبيق جاهز للتشغيل!\" && exit 0"
   },
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.7.2",
     "mongoose": "^7.5.0",
-    "multer": "^1.4.5-lts.1",
-    "dotenv": "^16.3.1",
     "cors": "^2.8.5"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["chat", "realtime", "video-call", "messenger", "social"],
+  "keywords": ["chat", "realtime", "arabic", "messenger", "social"],
   "author": "Circl Team",
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=14.0.0"
   }
 }
