@@ -1,0 +1,13 @@
+circl-chat-pro/
+├── server.js              # خادم Node.js الأساسي
+├── package.json          # ملف الإعدادات
+├── .env                 # متغيرات البيئة
+├── public/              # واجهة المستخدم
+│   ├── index.html       # الصفحة الرئيسية
+│   ├── style.css        # أنماط CSS
+│   └── app.js           # منطق التطبيق
+├── src/                 # كود الخادم
+│   ├── models/          # نماذج MongoDB
+│   ├── routes/          # مسارات API
+│   └── utils/           # أدوات مساعدة
+└── uploads/             # الملفات المرفوعة
