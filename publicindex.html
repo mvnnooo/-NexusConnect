@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circl Chat Pro - دردشة احترافية</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css">
+</head>
+<body class="dark-theme">
+    <!-- نافذة تسجيل الدخول -->
+    <div id="loginModal" class="modal active">
+        <div class="modal-content login-modal">
+            <div class="logo-container">
+                <div class="logo-icon pulse">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h1 class="logo-text">Circl Chat Pro</h1>
+                <p class="tagline">اتصال بلا حدود، تواصل بلا قيود</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        اسم المستخدم
+                    </label>
+                    <input type="text" id="username" placeholder="أدخل اسمك" autocomplete="off" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label for="avatarSelect">
+                        <i class="fas fa-image"></i>
+                        اختر صورتك الشخصية
+                    </label>
+                    <div class="avatar-grid" id="avatarGrid">
+                        <!-- سيتم ملؤها بالجافاسكريبت -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="themeSelect">
+                        <i class="fas fa-moon"></i>
+                        المظهر المفضل
+                    </label>
+                    <select id="themeSelect">
+                        <option value="dark">داكن</option>
+                        <option value="light">فاتح</option>
+                        <option value="auto">تلقائي</option>
+                    </select>
+                </div>
+                
+                <button id="loginBtn" class="btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i>
+                    دخول إلى الدردشة
+                </button>
+                
+                <div class="login-footer">
+                    <p>بتسجيل الدخول، فإنك توافق على <a href="#">شروط الخدمة</a> و <a href="#">سياسة الخصوصية</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تطبيق الدردشة الرئيسي -->
+    <div id="chatApp" class="hidden">
+        <!-- شريط التنقل العلوي -->
+        <nav class="top-navbar">
+            <div class="nav-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="logo-mini">
+                    <i class="fas fa-comments"></i>
+                    <span>Circl</span>
+                </div>
+                
+                <div class="current-room-info">
+                    <div class="room-avatar">
+                        <i class="fas fa-hashtag"></i>
+                    </div>
+                    <div class="room-details">
+                        <h3 id="currentRoomName">عام</h3>
+                        <p id="currentRoomDesc">الدردشة العامة</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-center">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="بحث في المحادثات...">
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-menu">
+                    <div class="user-avatar online" id="userAvatarBtn">
+                        <img id="userAvatarImg" src="" alt="">
+                    </div>
+                    <div class="user-info">
+                        <span id="userNameDisplay"></span>
+                        <span class="user-status online" id="userStatusDisplay">متصل</span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item" id="profileBtn">
+                                <i class="fas fa-user"></i> الملف الشخصي
+                            </a>
+                            <a href="#" class="dropdown-item" id="settingsBtn">
+                                <i class="fas fa-cog"></i> الإعدادات
+                            </a>
+                            <a href="#" class="dropdown-item" id="themeToggleBtn">
+                                <i class="fas fa-moon"></i> تبديل المظهر
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item logout" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="nav-btn" id="notificationsBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="notificationCount">0</span>
+                </button>
+                
+                <button class="nav-btn" id="callsBtn">
+                    <i class="fas fa-phone"></i>
+                </button>
+                
+                <button class="nav-btn" id="newChatBtn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- المحتوى الرئيسي -->
+        <div class="main-container">
+            <!-- الشريط الجانبي -->
+            <aside class="sidebar" id="mainSidebar">
+                <!-- قائمة الغرف -->
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h4>الغرف</h4>
+                        <button class="icon-btn" id="createRoomBtn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="room-list" id="roomList">
+                        <!-- سيتم ملؤها بالجافاسكريبت -->
+                    </div>
+                </div>
+                
+                <!-- قائمة الدردشات المباشرة -->
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h4>الدردشات المباشرة</h4>
+                    </div>
+                    <div class="direct-chats" id="directChatsList">
+                        <!-- سيتم ملؤها بالجافاسكريبت -->
+                    </div>
+                </div>
+                
+                <!-- المستخدمون المتصلون -->
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h4>المستخدمون المتصلون</h4>
+                        <span class="online-count" id="onlineUsersCount">0</span>
+                    </div>
+                    <div class="online-users" id="onlineUsersList">
+                        <!-- سيتم ملؤها بالجافاسكريبت -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- منطقة الدردشة الرئيسية -->
+            <main class="chat-area">
+                <!-- شريط الدردشة العلوي -->
+                <div class="chat-header">
+                    <div class="chat-header-left">
+                        <div class="chat-title">
+                            <h2 id="chatRoomTitle">عام</h2>
+                            <div class="chat-meta">
+                                <span class="online-dot"></span>
+                                <span id="roomMembersCount">0</span> عضو
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-header-right">
+                        <div class="chat-actions">
+                            <button class="chat-action-btn" id="voiceCallBtn" title="مكالمة صوتية">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="chat-action-btn" id="videoCallBtn" title="مكالمة فيديو">
+                                <i class="fas fa-video"></i>
+                            </button>
+                            <button class="chat-action-btn" id="roomInfoBtn" title="معلومات الغرفة">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button class="chat-action-btn" id="roomSettingsBtn" title="إعدادات الغرفة">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- منطقة الرسائل -->
+                <div class="messages-container" id="messagesContainer">
+                    <!-- الرسائل ستظهر هنا -->
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>مرحباً بك في Circl Chat Pro!</h3>
+                        <p>ابدأ المحادثة مع أصدقائك أو انضم إلى إحدى الغرف.</p>
+                    </div>
+                </div>
+
+                <!-- مؤشر الكتابة -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span id="typingUsersText"></span>
+                </div>
+
+                <!-- منطقة إدخال الرسالة -->
+                <div class="message-input-area">
+                    <!-- أزرار الإضافة -->
+                    <div class="input-actions">
+                        <button class="input-action-btn" id="attachFileBtn" title="إرفاق ملف">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button class="input-action-btn" id="attachImageBtn" title="إرسال صورة">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="input-action-btn" id="recordAudioBtn" title="تسجيل صوتي">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="input-action-btn" id="emojiBtn" title="إضافة تعبير">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <button class="input-action-btn" id="formattingBtn" title="تنسيق النص">
+                            <i class="fas fa-font"></i>
+                        </button>
+                    </div>
+
+                    <!-- حقل الإدخال -->
+                    <div class="message-input-wrapper">
+                        <div class="reply-preview" id="replyPreview">
+                            <!-- معاينة الرد ستظهر هنا -->
+                        </div>
+                        
+                        <div class="input-wrapper">
+                            <textarea 
+                                id="messageInput" 
+                                placeholder="اكتب رسالتك هنا... (استخدم @لذكر شخص)"
+                                rows="1"
+                                autocomplete="off"
+                            ></textarea>
+                            
+                            <div class="input-suggestions" id="mentionSuggestions">
+                                <!-- اقتراحات المذكرات ستظهر هنا -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- زر الإرسال -->
+                    <button class="send-btn" id="sendMessageBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </main>
+
+            <!-- الشريط الجانبي الأيمن -->
+            <aside class="right-sidebar" id="rightSidebar">
+                <!-- معلومات الغرفة -->
+                <div class="sidebar-section active" id="roomInfoPanel">
+                    <div class="section-header">
+                        <h4>معلومات الغرفة</h4>
+                        <button class="icon-btn close-sidebar">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="room-info">
+                        <div class="room-avatar-large">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <h3 id="roomInfoName">عام</h3>
+                        <p id="roomInfoDesc">الدردشة العامة</p>
+                        
+                        <div class="room-stats">
+                            <div class="stat">
+                                <i class="fas fa-users"></i>
+                                <span id="roomMembersCountInfo">0</span> عضو
+                            </div>
+                            <div class="stat">
+                                <i class="fas fa-comments"></i>
+                                <span id="roomMessagesCount">0</span> رسالة
+                            </div>
+                            <div class="stat">
+                                <i class="fas fa-calendar"></i>
+                                <span id="roomCreatedAt">اليوم</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-content">
+                        <h5>أعضاء الغرفة</h5>
+                        <div class="room-members" id="roomMembersList">
+                            <!-- الأعضاء سيظهرون هنا -->
+                        </div>
+                    </div>
+                    
+                    <div class="section-content">
+                        <h5>ملفات الغرفة</h5>
+                        <div class="room-files" id="roomFilesList">
+                            <!-- الملفات ستظهر هنا -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- معلومات المكالمة -->
+                <div class="sidebar-section hidden" id="callPanel">
+                    <!-- لوحة المكالمة ستظهر هنا -->
+                </div>
+            </aside>
+        </div>
+
+        <!-- نافذة المكالمة -->
+        <div class="call-window hidden" id="callWindow">
+            <div class="call-container">
+                <div class="call-header">
+                    <div class="call-info">
+                        <h3 id="callTitle">مكالمة فيديو</h3>
+                        <p id="callDuration">00:00</p>
+                    </div>
+                    <div class="call-actions">
+                        <button class="call-action-btn" id="toggleVideoBtn">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="call-action-btn" id="toggleAudioBtn">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="call-action-btn danger" id="endCallBtn">
+                            <i class="fas fa-phone-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="call-participants" id="callParticipants">
+                    <!-- مشاركو المكالمة سيظهرون هنا -->
+                </div>
+                
+                <div class="call-footer">
+                    <div class="call-controls">
+                        <button class="control-btn" id="screenShareBtn">
+                            <i class="fas fa-desktop"></i>
+                        </button>
+                        <button class="control-btn" id="recordCallBtn">
+                            <i class="fas fa-circle"></i>
+                        </button>
+                        <button class="control-btn" id="inviteToCallBtn">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                        <button class="control-btn" id="callSettingsBtn">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الإشعارات -->
+        <div class="notifications-container" id="notificationsContainer">
+            <!-- الإشعارات ستظهر هنا -->
+        </div>
+
+        <!-- محرر تنسيق النص -->
+        <div class="formatting-toolbar hidden" id="formattingToolbar">
+            <!-- أدوات التنسيق ستظهر هنا -->
+        </div>
+
+        <!-- منبثق رفع الملفات -->
+        <input type="file" id="fileUploadInput" multiple hidden>
+        <input type="file" id="imageUploadInput" accept="image/*" hidden>
+        
+        <!-- مسجل الصوت -->
+        <div class="audio-recorder hidden" id="audioRecorder">
+            <!-- مسجل الصوت سيتظهر هنا -->
+        </div>
+    </div>
+
+    <!-- النوافذ المنبثقة -->
+    <div id="createRoomModal" class="modal">
+        <div class="modal-content">
+            <!-- نموذج إنشاء غرفة -->
+        </div>
+    </div>
+
+    <div id="userProfileModal" class="modal">
+        <div class="modal-content">
+            <!-- الملف الشخصي -->
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <!-- الإعدادات -->
+        </div>
+    </div>
+
+    <!-- نافذة الإشارات للمكالمات -->
+    <div id="incomingCallModal" class="modal">
+        <div class="modal-content call-modal">
+            <!-- طلب مكالمة واردة -->
+        </div>
+    </div>
+
+    <!-- نافذة الأموجي -->
+    <div id="emojiPicker" class="emoji-picker hidden">
+        <!-- منتقي الأموجي -->
+    </div>
+
+    <!-- تحميل -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader">
+            <div class="spinner"></div>
+            <p>جاري التحميل...</p>
+        </div>
+    </div>
+
+    <!-- الصوتيات -->
+    <audio id="messageSound" src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3"></audio>
+    <audio id="callSound" src="https://assets.mixkit.co/sfx/preview/mixkit-phone-call-ambient-1134.mp3"></audio>
+    <audio id="notificationSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+
+    <!-- مكتبات -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
