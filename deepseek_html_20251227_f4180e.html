@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusConnect - شبكة التواصل الاجتماعي الجديدة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --success-color: #4bb543;
+            --warning-color: #f9a826;
+            --danger-color: #e63946;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            line-height: 1.6;
+            direction: rtl;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 260px;
+            background-color: white;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .logo {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            margin: 0.3rem 0;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+            border-right: 4px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(67, 97, 238, 0.05);
+            color: var(--primary-color);
+            border-right-color: var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-left: 0.8rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-profile {
+            padding: 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 0.8rem;
+            border: 3px solid var(--accent-color);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: 260px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background-color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #f5f7fb;
+            border-radius: 50px;
+            padding: 0.6rem 1.2rem;
+            width: 40%;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 0.3rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+        }
+
+        .search-bar i {
+            color: var(--gray-color);
+            margin-left: 0.5rem;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-btn, .message-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--dark-color);
+            margin: 0 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .notification-btn:hover, .message-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -8px;
+            left: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .create-post-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.7rem 1.5rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .create-post-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .create-post-btn i {
+            margin-left: 0.5rem;
+        }
+
+        /* قسم المنشورات */
+        .content-wrapper {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .feed-section {
+            flex: 2;
+        }
+
+        .create-post {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .create-post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .create-post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 1rem;
+        }
+
+        .create-post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-input {
+            flex: 1;
+        }
+
+        .post-input textarea {
+            width: 100%;
+            border: none;
+            background-color: #f5f7fb;
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            height: 80px;
+        }
+
+        .post-input textarea:focus {
+            outline: none;
+            border: 1px solid var(--primary-color);
+        }
+
+        .create-post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .post-options {
+            display: flex;
+        }
+
+        .post-option {
+            display: flex;
+            align-items: center;
+            margin-left: 1.5rem;
+            color: var(--gray-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .post-option:hover {
+            color: var(--primary-color);
+        }
+
+        .post-option i {
+            margin-left: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .post-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.7rem 1.8rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .post-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* المنشورات */
+        .post {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .post-user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 1rem;
+        }
+
+        .post-user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-user-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .post-user-info p {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        .post-options-btn {
+            margin-right: auto;
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .post-content {
+            margin-bottom: 1rem;
+        }
+
+        .post-content p {
+            margin-bottom: 1rem;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 1rem;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            color: var(--gray-color);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+        }
+
+        .post-action:hover {
+            background-color: #f5f7fb;
+            color: var(--primary-color);
+        }
+
+        .post-action i {
+            margin-left: 0.5rem;
+        }
+
+        /* الشريط الجانبي الأيمن */
+        .sidebar-right {
+            flex: 1;
+        }
+
+        .widget {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .widget-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .widget-title h3 {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+        }
+
+        .friend-request, .event-item, .trending-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #f5f7fb;
+        }
+
+        .friend-request:last-child, .event-item:last-child, .trending-item:last-child {
+            border-bottom: none;
+        }
+
+        .friend-avatar, .event-avatar, .trending-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 0.8rem;
+        }
+
+        .friend-avatar img, .event-avatar img, .trending-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .friend-info, .event-info, .trending-info {
+            flex: 1;
+        }
+
+        .friend-info h4, .event-info h4, .trending-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .friend-info p, .event-info p, .trending-info p {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .friend-actions {
+            display: flex;
+        }
+
+        .accept-btn, .decline-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .accept-btn {
+            background-color: rgba(75, 181, 67, 0.1);
+            color: var(--success-color);
+        }
+
+        .decline-btn {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: var(--danger-color);
+        }
+
+        .accept-btn:hover {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .decline-btn:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .event-date {
+            display: flex;
+            align-items: center;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .event-date i {
+            margin-left: 0.3rem;
+        }
+
+        .trending-tag {
+            display: inline-block;
+            background-color: #f5f7fb;
+            color: var(--gray-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        /* القائمة المختصرة للهواتف */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            cursor: pointer;
+        }
+
+        /* التجاوب مع مختلف الشاشات */
+        @media (max-width: 1200px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .sidebar-right {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .search-bar {
+                width: 60%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-bar {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .create-post-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .post-options {
+                margin-bottom: 1rem;
+            }
+            
+            .post-actions {
+                flex-wrap: wrap;
+            }
+            
+            .post-action {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* تأثيرات إضافية */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(67, 97, 238, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .online-indicator {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            border: 2px solid white;
+            bottom: 2px;
+            left: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>Nexus<span>Connect</span></h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>الصفحة الرئيسية</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user-friends"></i>
+                    <span>شبكتي</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>الإشعارات</span>
+                    <span class="notification-count">3</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>الرسائل</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>الأحداث</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-images"></i>
+                    <span>المعرض</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="صورة المستخدم">
+                    <div class="online-indicator"></div>
+                </div>
+                <div class="user-info">
+                    <h4>أحمد محمد</h4>
+                    <p>@ahmedmohamed</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- شريط الأعلى -->
+            <div class="top-bar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="ابحث عن أصدقاء، منشورات، أو مجموعات...">
+                </div>
+                
+                <div class="top-actions">
+                    <button class="create-post-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>إنشاء منشور</span>
+                    </button>
+                    
+                    <button class="message-btn">
+                        <i class="fas fa-comment-dots"></i>
+                    </button>
+                    
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">5</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- المحتوى الرئيسي -->
+            <div class="content-wrapper">
+                <!-- قسم المنشورات -->
+                <section class="feed-section">
+                    <!-- إنشاء منشور جديد -->
+                    <div class="create-post">
+                        <div class="create-post-header">
+                            <div class="create-post-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="صورة المستخدم">
+                            </div>
+                            <div class="post-input">
+                                <textarea id="postContent" placeholder="ماذا يخطر ببالك اليوم؟"></textarea>
+                            </div>
+                        </div>
+                        <div class="create-post-actions">
+                            <div class="post-options">
+                                <div class="post-option" id="photoOption">
+                                    <i class="fas fa-image"></i>
+                                    <span>صورة</span>
+                                </div>
+                                <div class="post-option" id="videoOption">
+                                    <i class="fas fa-video"></i>
+                                    <span>فيديو</span>
+                                </div>
+                                <div class="post-option" id="eventOption">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>حدث</span>
+                                </div>
+                                <div class="post-option" id="pollOption">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>استطلاع</span>
+                                </div>
+                            </div>
+                            <button class="post-btn" id="publishBtn">نشر</button>
+                        </div>
+                    </div>
+
+                    <!-- المنشورات -->
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-user-avatar">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="صورة المستخدم">
+                            </div>
+                            <div class="post-user-info">
+                                <h4>سارة علي</h4>
+                                <p>قبل 3 ساعات • <i class="fas fa-globe-americas"></i></p>
+                            </div>
+                            <button class="post-options-btn">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                        <div class="post-content">
+                            <p>أتمنى لكم جميعًا نهاية أسبوع سعيدة! قضيت اليوم في قراءة كتاب رائع عن التطوير الشخصي. أنصح به بشدة لمن يبحث عن تحسين مهاراتهم القيادية.</p>
+                            <div class="post-image">
+                                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" alt="صورة الكتاب">
+                            </div>
+                        </div>
+                        <div class="post-stats">
+                            <div class="post-likes">
+                                <i class="fas fa-thumbs-up"></i> ٤٨
+                            </div>
+                            <div class="post-comments">
+                                ١٣ تعليقًا • ٥ مشاركات
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <div class="post-action">
+                                <i class="far fa-thumbs-up"></i>
+                                <span>أعجبني</span>
+                            </div>
+                            <div class="post-action">
+                                <i class="far fa-comment"></i>
+                                <span>تعليق</span>
+                            </div>
+                            <div class="post-action">
+                                <i class="fas fa-share"></i>
+                                <span>مشاركة</span>
+                            </div>
+                            <div class="post-action">
+                                <i class="far fa-bookmark"></i>
+                                <span>حفظ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-user-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="صورة المستخدم">
+                            </div>
+                            <div class="post-user-info">
+                                <h4>محمد خالد</h4>
+                                <p>قبل ٦ ساعات • <i class="fas fa-user-friends"></i></p>
+                            </div>
+                            <button class="post-options-btn">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                        <div class="post-content">
+                            <p>شاركت اليوم في مؤتمر التكنولوجيا والابتكار. كانت تجربة رائعة واستفدت كثيرًا من المحاضرات وورش العمل. إليكم بعض الصور من الفعالية:</p>
+                            <div class="post-image">
+                                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" alt="صورة المؤتمر">
+                            </div>
+                        </div>
+                        <div class="post-stats">
+                            <div class="post-likes">
+                                <i class="fas fa-thumbs-up"></i> ١٠٢
+                            </div>
+                            <div class="post-comments">
+                                ٣٦ تعليقًا • ١٨ مشاركات
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <div class="post-action">
+                                <i class="far fa-thumbs-up"></i>
+                                <span>أعجبني</span>
+                            </div>
+                            <div class="post-action">
+                                <i class="far fa-comment"></i>
+                                <span>تعليق</span>
+                            </div>
+                            <div class="post-action">
+                                <i class="fas fa-share"></i>
+                                <span>مشاركة</span>
+                            </div>
+                            <div class="post-action">
+                                <i class="far fa-bookmark"></i>
+                                <span>حفظ</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- الشريط الجانبي الأيمن -->
+                <aside class="sidebar-right">
+                    <!-- طلبات الصداقة -->
+                    <div class="widget">
+                        <div class="widget-title">
+                            <h3>طلبات الصداقة</h3>
+                            <a href="#" style="color: var(--primary-color); font-size: 0.9rem;">عرض الكل</a>
+                        </div>
+                        <div class="friend-request">
+                            <div class="friend-avatar">
+                                <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="صورة المستخدم">
+                            </div>
+                            <div class="friend-info">
+                                <h4>فاطمة أحمد</h4>
+                                <p>٥ أصدقاء مشتركين</p>
+                            </div>
+                            <div class="friend-actions">
+                                <button class="accept-btn">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="decline-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="friend-request">
+                            <div class="friend-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="صورة المستخدم">
+                            </div>
+                            <div class="friend-info">
+                                <h4>يوسف مصطفى</h4>
+                                <p>صديقان مشتركان</p>
+                            </div>
+                            <div class="friend-actions">
+                                <button class="accept-btn">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="decline-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الأحداث القادمة -->
+                    <div class="widget">
+                        <div class="widget-title">
+                            <h3>الأحداث القادمة</h3>
+                            <a href="#" style="color: var(--primary-color); font-size: 0.9rem;">عرض الكل</a>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-avatar">
+                                <i class="fas fa-calendar-alt" style="font-size: 1.5rem; color: var(--primary-color); padding: 10px;"></i>
+                            </div>
+                            <div class="event-info">
+                                <h4>لقاء خريجي الجامعة</h4>
+                                <p>الجمعة، ١٥ سبتمبر</p>
+                                <div class="event-date">
+                                    <i class="far fa-clock"></i>
+                                    <span>٦:٠٠ مساءً</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-avatar">
+                                <i class="fas fa-users" style="font-size: 1.5rem; color: var(--accent-color); padding: 10px;"></i>
+                            </div>
+                            <div class="event-info">
+                                <h4>ورشة عمل التطوير</h4>
+                                <p>السبت، ٢٣ سبتمبر</p>
+                                <div class="event-date">
+                                    <i class="far fa-clock"></i>
+                                    <span>١٠:٠٠ صباحًا</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الترندات -->
+                    <div class="widget">
+                        <div class="widget-title">
+                            <h3>الترندات الآن</h3>
+                            <a href="#" style="color: var(--primary-color); font-size: 0.9rem;">عرض الكل</a>
+                        </div>
+                        <div class="trending-item">
+                            <div class="trending-avatar">
+                                <i class="fas fa-hashtag" style="font-size: 1.5rem; color: var(--warning-color); padding: 10px;"></i>
+                            </div>
+                            <div class="trending-info">
+                                <h4>#تطوير_الذات</h4>
+                                <p>٢٫٣ ألف منشور</p>
+                                <span class="trending-tag">شائع</span>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <div class="trending-avatar">
+                                <i class="fas fa-hashtag" style="font-size: 1.5rem; color: var(--danger-color); padding: 10px;"></i>
+                            </div>
+                            <div class="trending-info">
+                                <h4>#تقنية_المستقبل</h4>
+                                <p>١٫٨ ألف منشور</p>
+                                <span class="trending-tag">جديد</span>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <div class="trending-avatar">
+                                <i class="fas fa-hashtag" style="font-size: 1.5rem; color: var(--success-color); padding: 10px;"></i>
+                            </div>
+                            <div class="trending-info">
+                                <h4>#ريادة_الأعمال</h4>
+                                <p>٣٫١ ألف منشور</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <!-- إشعار -->
+    <div class="toast" id="toast">
+        تم نشر منشورك بنجاح!
+    </div>
+
+    <script>
+        // تفعيل القائمة المختصرة للهواتف
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // محاكاة نشر منشور جديد
+        document.getElementById('publishBtn').addEventListener('click', function() {
+            const postContent = document.getElementById('postContent').value;
+            
+            if (postContent.trim() === '') {
+                alert('يرجى كتابة محتوى للمنشور قبل النشر');
+                return;
+            }
+            
+            // عرض تأثير التحميل
+            const originalText = this.textContent;
+            this.innerHTML = '<div class="loading"></div>';
+            
+            // محاكاة تأخير الشبكة
+            setTimeout(() => {
+                // استعادة النص الأصلي
+                this.textContent = originalText;
+                
+                // عرض إشعار النجاح
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                
+                // إخفاء الإشعار بعد 3 ثوانٍ
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+                
+                // مسح محتوى النص
+                document.getElementById('postContent').value = '';
+                
+                // إضافة منشور جديد (في تطبيق حقيقي، سيتم إرسال طلب إلى الخادم)
+                console.log('تم نشر المنشور:', postContent);
+                
+            }, 1500);
+        });
+
+        // إضافة تأثيرات تفاعلية لأزرار خيارات النشر
+        const postOptions = document.querySelectorAll('.post-option');
+        postOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const optionType = this.id;
+                let message = '';
+                
+                switch(optionType) {
+                    case 'photoOption':
+                        message = 'تم فتح معرض الصور';
+                        break;
+                    case 'videoOption':
+                        message = 'تم فتح معرض الفيديو';
+                        break;
+                    case 'eventOption':
+                        message = 'تم فتح نموذج إنشاء حدث';
+                        break;
+                    case 'pollOption':
+                        message = 'تم فتح نموذج إنشاء استطلاع';
+                        break;
+                }
+                
+                // عرض رسالة توضيحية
+                alert(message);
+            });
+        });
+
+        // تفعيل أزرار الإعجاب
+        const likeButtons = document.querySelectorAll('.post-action');
+        likeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const text = this.querySelector('span');
+                
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    
+                    // تغيير اللون للأزرق عند الإعجاب
+                    this.style.color = 'var(--primary-color)';
+                    
+                    // زيادة عدد الإعجابات (في تطبيق حقيقي، سيتم تحديث البيانات في الخادم)
+                    const postStats = this.closest('.post').querySelector('.post-likes');
+                    const currentLikes = parseInt(postStats.textContent);
+                    postStats.innerHTML = `<i class="fas fa-thumbs-up"></i> ${currentLikes + 1}`;
+                    
+                    // تغيير النص إلى "أعجبك"
+                    if (text.textContent === 'أعجبني') {
+                        text.textContent = 'أعجبك';
+                    }
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.style.color = '';
+                    
+                    // تقليل عدد الإعجابات
+                    const postStats = this.closest('.post').querySelector('.post-likes');
+                    const currentLikes = parseInt(postStats.textContent);
+                    postStats.innerHTML = `<i class="fas fa-thumbs-up"></i> ${currentLikes - 1}`;
+                    
+                    // تغيير النص إلى "أعجبني"
+                    if (text.textContent === 'أعجبك') {
+                        text.textContent = 'أعجبني';
+                    }
+                }
+            });
+        });
+
+        // تفعيل أزرار قبول ورفض طلبات الصداقة
+        const acceptButtons = document.querySelectorAll('.accept-btn');
+        const declineButtons = document.querySelectorAll('.decline-btn');
+        
+        acceptButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const friendRequest = this.closest('.friend-request');
+                friendRequest.style.opacity = '0.5';
+                setTimeout(() => {
+                    friendRequest.remove();
+                }, 500);
+                
+                // في تطبيق حقيقي، سيتم إرسال طلب إلى الخادم
+                console.log('تم قبول طلب الصداقة');
+            });
+        });
+        
+        declineButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const friendRequest = this.closest('.friend-request');
+                friendRequest.style.opacity = '0.5';
+                setTimeout(() => {
+                    friendRequest.remove();
+                }, 500);
+                
+                // في تطبيق حقيقي، سيتم إرسال طلب إلى الخادم
+                console.log('تم رفض طلب الصداقة');
+            });
+        });
+
+        // البحث في الوقت الفعلي (محاكاة)
+        const searchInput = document.querySelector('.search-bar input');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value;
+            if (searchTerm.length > 2) {
+                console.log('بحث عن:', searchTerm);
+                // في تطبيق حقيقي، سيتم إرسال طلب إلى الخادم للحصول على نتائج البحث
+            }
+        });
+
+        // إغلاق الشريط الجانبي عند النقر خارجها (للأجهزة المحمولة)
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !mobileMenuBtn.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
