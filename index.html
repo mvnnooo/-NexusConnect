@@ -1,4 +1,3 @@
-<!-- ------------ FRONTEND (public/index.html) ------------ -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,9 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circl Chat - دردشة مباشرة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #ffd700;
+            --diamond: #b9f2ff;
+            --king: #ff00ff;
+            --queen: #ff1493;
+            --owner: #ff0000;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -22,6 +33,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            color: #333;
         }
 
         .chat-container {
@@ -37,27 +49,30 @@
 
         /* الشريط الجانبي */
         .sidebar {
-            width: 350px;
+            width: 380px;
             background: #1a1f36;
             color: white;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
+        /* معلومات المستخدم مع المستوى */
         .user-profile {
             padding: 25px;
             text-align: center;
             border-bottom: 1px solid #2d3748;
             background: rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         .user-avatar {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             overflow: hidden;
             margin: 0 auto 15px;
-            border: 3px solid #667eea;
+            border: 4px solid;
             position: relative;
         }
 
@@ -71,22 +86,95 @@
             position: absolute;
             bottom: 5px;
             right: 5px;
-            width: 15px;
-            height: 15px;
+            width: 18px;
+            height: 18px;
             background: #10b981;
             border-radius: 50%;
-            border: 2px solid #1a1f36;
+            border: 3px solid #1a1f36;
         }
 
         .username {
             font-size: 1.4rem;
             font-weight: 700;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .verified-badge {
+            color: #1DA1F2;
+            font-size: 1rem;
         }
 
         .user-status {
             color: #a0aec0;
             font-size: 0.9rem;
+        }
+
+        /* شريط التقدم */
+        .level-container {
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .level-text {
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+
+        .level-rank {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .rank-badge {
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .beginner { background: #4a5568; color: white; }
+        .bronze { background: var(--bronze); color: white; }
+        .silver { background: var(--silver); color: #333; }
+        .gold { background: var(--gold); color: #333; }
+        .diamond { background: var(--diamond); color: #333; }
+        .king { background: var(--king); color: white; }
+        .queen { background: var(--queen); color: white; }
+
+        .progress-bar {
+            height: 8px;
+            background: #2d3748;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #a0aec0;
         }
 
         /* قائمة الغرف */
@@ -102,6 +190,16 @@
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-count-badge {
+            background: var(--primary);
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-size: 0.8rem;
         }
 
         .room-list {
@@ -116,6 +214,7 @@
             margin-bottom: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .room-item:hover {
@@ -123,7 +222,8 @@
         }
 
         .room-item.active {
-            background: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            border-right: 4px solid var(--primary);
         }
 
         .room-icon {
@@ -133,19 +233,46 @@
         }
 
         .room-item.active .room-icon {
-            color: white;
+            color: var(--primary);
+        }
+
+        .room-info {
+            flex: 1;
         }
 
         .room-name {
-            flex: 1;
             font-weight: 500;
+            margin-bottom: 3px;
         }
 
-        .room-count {
+        .room-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
+        .room-user-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .room-limit {
             background: rgba(255, 255, 255, 0.1);
-            padding: 3px 10px;
+            padding: 3px 8px;
             border-radius: 50px;
             font-size: 0.8rem;
+        }
+
+        .room-full .room-limit {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .featured-room {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 20, 147, 0.1));
         }
 
         /* قائمة المستخدمين */
@@ -164,6 +291,7 @@
             padding: 10px;
             border-radius: 10px;
             margin-bottom: 8px;
+            position: relative;
         }
 
         .user-list-item:hover {
@@ -171,11 +299,13 @@
         }
 
         .user-list-avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             overflow: hidden;
             margin-left: 10px;
+            border: 2px solid;
+            position: relative;
         }
 
         .user-list-avatar img {
@@ -184,6 +314,28 @@
             object-fit: cover;
         }
 
+        .user-rank-indicator {
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1a1f36;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            border: 2px solid white;
+        }
+
+        .user-rank-indicator.king { color: var(--king); }
+        .user-rank-indicator.queen { color: var(--queen); }
+        .user-rank-indicator.diamond { color: var(--diamond); }
+        .user-rank-indicator.gold { color: var(--gold); }
+        .user-rank-indicator.silver { color: var(--silver); }
+        .user-rank-indicator.bronze { color: var(--bronze); }
+
         .user-list-info {
             flex: 1;
         }
@@ -191,11 +343,17 @@
         .user-list-name {
             font-weight: 500;
             font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .user-list-status {
             font-size: 0.8rem;
             color: #a0aec0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .user-list-dot {
@@ -203,6 +361,15 @@
             height: 8px;
             border-radius: 50%;
             background: #10b981;
+        }
+
+        .owner-badge {
+            background: var(--owner);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            margin-right: 5px;
         }
 
         /* منطقة الدردشة الرئيسية */
@@ -315,18 +482,35 @@
         }
 
         .message-avatar {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             overflow: hidden;
             margin-left: 15px;
             flex-shrink: 0;
+            border: 3px solid;
+            position: relative;
         }
 
         .message-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .message-rank {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border: 2px solid #1a1f36;
         }
 
         .message-content {
@@ -349,7 +533,7 @@
         }
 
         .message.my-message .message-content {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-top-right-radius: 15px;
             border-top-left-radius: 5px;
@@ -365,6 +549,9 @@
         .message-sender {
             font-weight: 700;
             font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .message-time {
@@ -379,6 +566,31 @@
         .message-text {
             line-height: 1.5;
             font-size: 1rem;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-action-btn {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .message-action-btn:hover {
+            color: var(--primary);
         }
 
         .typing-indicator {
@@ -468,7 +680,7 @@
         }
 
         .send-btn {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             width: 50px;
             height: 50px;
@@ -498,7 +710,7 @@
             padding: 40px;
             border-radius: 20px;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
             text-align: center;
             animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
@@ -520,21 +732,24 @@
             justify-content: center;
             gap: 15px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
         .avatar-option {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             overflow: hidden;
             cursor: pointer;
             border: 3px solid transparent;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .avatar-option.selected {
             border-color: #667eea;
             transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
         }
 
         .avatar-option img {
@@ -561,6 +776,41 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .social-login {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .social-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn.facebook {
+            background: #1877F2;
+            color: white;
+        }
+
+        .social-btn.instagram {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+            color: white;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
         .join-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -573,11 +823,22 @@
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
+            margin-top: 10px;
         }
 
         .join-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .verified-note {
+            color: #1DA1F2;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         /* تجاوب مع الشاشات */
@@ -588,7 +849,7 @@
             }
             
             .sidebar {
-                width: 300px;
+                width: 350px;
             }
         }
 
@@ -600,6 +861,7 @@
                 bottom: 0;
                 z-index: 100;
                 transition: left 0.3s ease;
+                width: 85%;
             }
             
             .sidebar.active {
@@ -610,13 +872,111 @@
                 display: block;
             }
         }
+
+        /* تيجان ودروع */
+        .crown-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .shield-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 1.2rem;
+            color: var(--silver);
+        }
+
+        .star-badge {
+            position: absolute;
+            bottom: -5px;
+            left: -5px;
+            font-size: 1rem;
+            color: var(--bronze);
+        }
+
+        /* نافذة المتجر */
+        .store-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .store-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .store-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .store-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .donate-balance {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        .donate-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .donate-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .donate-price {
+            background: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <!-- نافذة تسجيل الدخول -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
-            <div class="login-title">دخول إلى Circl Chat</div>
+            <div class="login-title">🚀 دخول إلى Circl Chat</div>
             
             <div class="avatar-selection">
                 <div class="avatar-option selected" data-avatar="1">
@@ -628,9 +988,26 @@
                 <div class="avatar-option" data-avatar="3">
                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mohamed" alt="صورة شخصية">
                 </div>
+                <div class="avatar-option" data-avatar="4">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Noah" alt="صورة شخصية">
+                </div>
             </div>
             
-            <input type="text" class="username-input" id="usernameInput" placeholder="أدخل اسمك..." maxlength="20" autocomplete="off">
+            <input type="text" class="username-input" id="usernameInput" placeholder="أدخل اسمك (لن تستطيع تغييره لاحقاً)" maxlength="20" autocomplete="off">
+            
+            <div class="social-login">
+                <button class="social-btn facebook" id="facebookBtn">
+                    <i class="fab fa-facebook-f"></i> ربط فيسبوك
+                </button>
+                <button class="social-btn instagram" id="instagramBtn">
+                    <i class="fab fa-instagram"></i> ربط إنستجرام
+                </button>
+            </div>
+            
+            <div class="verified-note">
+                <i class="fas fa-check-circle"></i>
+                الربط يحقق الحساب ويضيف علامة التحقق الزرقاء
+            </div>
             
             <button class="join-btn" id="joinBtn">
                 <i class="fas fa-sign-in-alt"></i> دخول إلى الدردشة
@@ -638,23 +1015,64 @@
         </div>
     </div>
 
+    <!-- نافذة المتجر -->
+    <div class="store-overlay" id="storeOverlay">
+        <div class="store-box">
+            <div class="store-header">
+                <div class="store-title">🛍️ متجر الدونات</div>
+                <div class="donate-balance">
+                    <i class="fas fa-coins"></i>
+                    <span>رصيدك: <span id="donateBalance">0</span> دونات</span>
+                </div>
+            </div>
+            
+            <div id="donateItems">
+                <!-- سيتم ملؤها بالجافاسكريبت -->
+            </div>
+        </div>
+    </div>
+
     <!-- تطبيق الدردشة -->
     <div class="chat-container" id="chatContainer" style="display: none;">
         <!-- الشريط الجانبي -->
         <div class="sidebar">
-            <!-- معلومات المستخدم -->
+            <!-- معلومات المستخدم مع المستوى -->
             <div class="user-profile">
-                <div class="user-avatar">
+                <div class="user-avatar" id="userAvatar">
                     <img id="userAvatarImg" src="" alt="صورة المستخدم">
                     <div class="online-status"></div>
                 </div>
-                <div class="username" id="userDisplayName"></div>
+                <div class="username">
+                    <span id="userDisplayName"></span>
+                    <i class="fas fa-check-circle verified-badge" id="verifiedBadge" style="display: none;"></i>
+                </div>
                 <div class="user-status" id="userStatus">متصل الآن</div>
+            </div>
+            
+            <!-- شريط التقدم -->
+            <div class="level-container">
+                <div class="level-info">
+                    <div class="level-text">المستوى <span id="userLevel">1</span></div>
+                    <div class="level-rank">
+                        <span class="rank-badge" id="rankBadge">مبتدئ</span>
+                        <i class="fas fa-crown" id="rankIcon" style="display: none;"></i>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="levelProgress" style="width: 10%;"></div>
+                </div>
+                <div class="xp-info">
+                    <span id="currentXP">0 XP</span>
+                    <span id="nextLevelXP">100 XP للوصول للمستوى 2</span>
+                </div>
             </div>
             
             <!-- قائمة الغرف -->
             <div class="rooms-section">
-                <div class="section-title">غرف الدردشة</div>
+                <div class="section-title">
+                    <span>غرف الدردشة</span>
+                    <span class="room-count-badge" id="totalRoomsCount">4</span>
+                </div>
                 <ul class="room-list" id="roomList">
                     <!-- سيتم ملؤها بالجافاسكريبت -->
                 </ul>
@@ -662,7 +1080,10 @@
             
             <!-- قائمة المستخدمين -->
             <div class="users-section">
-                <div class="section-title">المستخدمون المتصلون (<span id="onlineCount">0</span>)</div>
+                <div class="section-title">
+                    <span>المستخدمون المتصلون</span>
+                    <span id="onlineCount">0</span>
+                </div>
                 <ul class="user-list" id="userList">
                     <!-- سيتم ملؤها بالجافاسكريبت -->
                 </ul>
@@ -679,7 +1100,7 @@
                     </div>
                     <div>
                         <div class="room-title" id="currentRoomTitle">عام</div>
-                        <div class="room-desc" id="currentRoomDesc">الغرفة العامة للجميع</div>
+                        <div class="room-desc" id="currentRoomDesc">الغرفة العامة للجميع | الحد الأقصى: 500 مستخدم</div>
                     </div>
                 </div>
                 
@@ -687,11 +1108,14 @@
                     <button class="chat-action-btn" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
                     </button>
+                    <button class="chat-action-btn" id="storeBtn" title="متجر الدونات">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
+                    <button class="chat-action-btn" id="rankingBtn" title="ترتيب المستخدمين">
+                        <i class="fas fa-trophy"></i>
+                    </button>
                     <button class="chat-action-btn" title="إعدادات">
                         <i class="fas fa-cog"></i>
-                    </button>
-                    <button class="chat-action-btn" title="بحث">
-                        <i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
@@ -741,14 +1165,81 @@
     </div>
 
     <script>
+        // نظام المستويات والرتب
+        const LEVEL_SYSTEM = {
+            ranks: [
+                { name: 'مبتدئ', minLevel: 1, color: 'beginner', xpRequired: 0 },
+                { name: 'برونزي', minLevel: 5, color: 'bronze', xpRequired: 500 },
+                { name: 'فضي', minLevel: 10, color: 'silver', xpRequired: 2000 },
+                { name: 'ذهبي', minLevel: 20, color: 'gold', xpRequired: 5000 },
+                { name: 'ماسي', minLevel: 30, color: 'diamond', xpRequired: 10000 },
+                { name: 'كينج', minLevel: 40, color: 'king', xpRequired: 20000, forGender: 'male' },
+                { name: 'كوين', minLevel: 40, color: 'queen', xpRequired: 20000, forGender: 'female' }
+            ],
+            
+            getRankInfo(xp, gender = 'male') {
+                const level = Math.floor(xp / 100) + 1;
+                let rank = this.ranks[0];
+                
+                for (let i = this.ranks.length - 1; i >= 0; i--) {
+                    if (level >= this.ranks[i].minLevel && xp >= this.ranks[i].xpRequired) {
+                        if (this.ranks[i].forGender && this.ranks[i].forGender !== gender) {
+                            continue;
+                        }
+                        rank = this.ranks[i];
+                        break;
+                    }
+                }
+                
+                return {
+                    level,
+                    rank: rank.name,
+                    rankColor: rank.color,
+                    nextLevelXP: (level * 100),
+                    currentLevelXP: xp % 100,
+                    progress: ((xp % 100) / 100) * 100
+                };
+            },
+            
+            getRankIcon(rank) {
+                const icons = {
+                    'مبتدئ': 'fa-seedling',
+                    'برونزي': 'fa-award',
+                    'فضي': 'fa-shield-alt',
+                    'ذهبي': 'fa-crown',
+                    'ماسي': 'fa-gem',
+                    'كينج': 'fa-crown',
+                    'كوين': 'fa-crown'
+                };
+                return icons[rank] || 'fa-user';
+            }
+        };
+
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
             // متغيرات عامة
             let socket;
-            let currentUser = {};
+            let currentUser = {
+                xp: 0,
+                donates: 0,
+                verified: false,
+                socialAccounts: [],
+                joinTime: null,
+                gender: 'male',
+                rankInfo: null
+            };
+            
             let currentRoom = 'عام';
             let typingTimeout;
             const typingUsers = new Set();
+            const chatRooms = [
+                { name: 'عام', desc: 'الغرفة العامة للجميع', limit: 500, users: 0, featured: true },
+                { name: 'مصر 🇪🇬', desc: 'غرفة مصر المميزة', limit: 500, users: 0, featured: true },
+                { name: 'الألعاب', desc: 'مناقشة الألعاب', limit: 200, users: 0 },
+                { name: 'التكنولوجيا', desc: 'أحدث التقنيات', limit: 150, users: 0 },
+                { name: 'الموسيقى', desc: 'شارك أغانيك المفضلة', limit: 100, users: 0 },
+                { name: 'VIP', desc: 'غرفة خاصة للأعضاء المميزين', limit: 50, users: 0, vip: true }
+            ];
             
             // عناصر DOM
             const loginOverlay = document.getElementById('loginOverlay');
@@ -757,6 +1248,7 @@
             const joinBtn = document.getElementById('joinBtn');
             const avatarOptions = document.querySelectorAll('.avatar-option');
             const userDisplayName = document.getElementById('userDisplayName');
+            const userAvatar = document.getElementById('userAvatar');
             const userAvatarImg = document.getElementById('userAvatarImg');
             const messagesContainer = document.getElementById('messagesContainer');
             const messageInput = document.getElementById('messageInput');
@@ -770,6 +1262,19 @@
             const typingText = document.getElementById('typingText');
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const sidebar = document.querySelector('.sidebar');
+            const storeBtn = document.getElementById('storeBtn');
+            const storeOverlay = document.getElementById('storeOverlay');
+            const facebookBtn = document.getElementById('facebookBtn');
+            const instagramBtn = document.getElementById('instagramBtn');
+            const verifiedBadge = document.getElementById('verifiedBadge');
+            
+            // عناصر المستوى
+            const userLevel = document.getElementById('userLevel');
+            const rankBadge = document.getElementById('rankBadge');
+            const rankIcon = document.getElementById('rankIcon');
+            const levelProgress = document.getElementById('levelProgress');
+            const currentXP = document.getElementById('currentXP');
+            const nextLevelXP = document.getElementById('nextLevelXP');
             
             // اختيار الصورة الشخصية
             let selectedAvatar = 1;
@@ -779,6 +1284,25 @@
                     option.classList.add('selected');
                     selectedAvatar = option.getAttribute('data-avatar');
                 });
+            });
+            
+            // ربط حسابات التواصل الاجتماعي
+            facebookBtn.addEventListener('click', () => {
+                currentUser.verified = true;
+                currentUser.socialAccounts.push('facebook');
+                facebookBtn.innerHTML = '<i class="fas fa-check"></i> تم الربط';
+                facebookBtn.disabled = true;
+                facebookBtn.style.background = '#10b981';
+                showNotification('✅ تم ربط حساب فيسبوك بنجاح!');
+            });
+            
+            instagramBtn.addEventListener('click', () => {
+                currentUser.verified = true;
+                currentUser.socialAccounts.push('instagram');
+                instagramBtn.innerHTML = '<i class="fas fa-check"></i> تم الربط';
+                instagramBtn.disabled = true;
+                instagramBtn.style.background = '#10b981';
+                showNotification('✅ تم ربط حساب إنستجرام بنجاح!');
             });
             
             // الدخول إلى الدردشة
@@ -797,14 +1321,26 @@
                 
                 // تخزين بيانات المستخدم
                 currentUser = {
+                    ...currentUser,
                     username: username,
                     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}${selectedAvatar}`,
-                    id: null
+                    id: null,
+                    joinTime: new Date(),
+                    xp: Math.floor(Math.random() * 5000), // XP عشوائي للعرض
+                    donates: Math.floor(Math.random() * 1000)
                 };
+                
+                // تحديث معلومات المستوى
+                updateLevelInfo();
                 
                 // تحديث الواجهة
                 userDisplayName.textContent = username;
                 userAvatarImg.src = currentUser.avatar;
+                
+                if (currentUser.verified) {
+                    verifiedBadge.style.display = 'inline-block';
+                    userAvatar.style.borderColor = '#1DA1F2';
+                }
                 
                 // الاتصال بالسيرفر
                 connectToServer();
@@ -817,87 +1353,83 @@
                 }, 300);
             }
             
+            // تحديث معلومات المستوى
+            function updateLevelInfo() {
+                currentUser.rankInfo = LEVEL_SYSTEM.getRankInfo(currentUser.xp, currentUser.gender);
+                
+                userLevel.textContent = currentUser.rankInfo.level;
+                rankBadge.textContent = currentUser.rankInfo.rank;
+                rankBadge.className = `rank-badge ${currentUser.rankInfo.rankColor}`;
+                
+                const iconClass = LEVEL_SYSTEM.getRankIcon(currentUser.rankInfo.rank);
+                rankIcon.className = `fas ${iconClass}`;
+                rankIcon.style.color = getRankColor(currentUser.rankInfo.rankColor);
+                rankIcon.style.display = currentUser.rankInfo.rank !== 'مبتدئ' ? 'block' : 'none';
+                
+                levelProgress.style.width = `${currentUser.rankInfo.progress}%`;
+                currentXP.textContent = `${currentUser.xp} XP`;
+                nextLevelXP.textContent = `${currentUser.rankInfo.nextLevelXP} XP للوصول للمستوى ${currentUser.rankInfo.level + 1}`;
+                
+                // إضافة التاج للرتب العالية
+                updateAvatarBadges();
+            }
+            
+            function updateAvatarBadges() {
+                // إزالة الرموز القديمة
+                document.querySelectorAll('.crown-badge, .shield-badge, .star-badge').forEach(el => el.remove());
+                
+                // إضافة رموز حسب الرتبة
+                const avatar = document.getElementById('userAvatar');
+                if (currentUser.rankInfo.rank === 'كينج' || currentUser.rankInfo.rank === 'كوين') {
+                    const crown = document.createElement('div');
+                    crown.className = 'crown-badge';
+                    crown.innerHTML = '<i class="fas fa-crown"></i>';
+                    avatar.appendChild(crown);
+                } else if (currentUser.rankInfo.rank === 'ماسي') {
+                    const shield = document.createElement('div');
+                    shield.className = 'shield-badge';
+                    shield.innerHTML = '<i class="fas fa-gem"></i>';
+                    avatar.appendChild(shield);
+                } else if (currentUser.rankInfo.rank === 'ذهبي') {
+                    const star = document.createElement('div');
+                    star.className = 'star-badge';
+                    star.innerHTML = '<i class="fas fa-star"></i>';
+                    avatar.appendChild(star);
+                }
+            }
+            
+            function getRankColor(rankColor) {
+                const colors = {
+                    'beginner': '#4a5568',
+                    'bronze': 'var(--bronze)',
+                    'silver': 'var(--silver)',
+                    'gold': 'var(--gold)',
+                    'diamond': 'var(--diamond)',
+                    'king': 'var(--king)',
+                    'queen': 'var(--queen)'
+                };
+                return colors[rankColor] || '#4a5568';
+            }
+            
             // الاتصال بخادم WebSocket
             function connectToServer() {
-                // الاتصال بالسيرفر (تغيير الرابط حسب السيرفر الفعلي)
-                socket = io('http://localhost:3000');
+                // محاكاة الاتصال بالسيرفر
+                console.log('🔗 جاري الاتصال بالسيرفر...');
                 
-                // حدث الاتصال الناجح
-                socket.on('connect', () => {
-                    console.log('✅ متصل بالسيرفر:', socket.id);
-                    currentUser.id = socket.id;
-                    
-                    // الانضمام إلى الدردشة
-                    socket.emit('join', currentUser);
-                });
-                
-                // استقبال ترحيب
-                socket.on('welcome', (data) => {
-                    console.log('رسالة ترحيب:', data.message);
-                    
+                // محاكاة البيانات الواردة
+                setTimeout(() => {
                     // تحديث قائمة الغرف
-                    updateRoomList(data.rooms);
+                    updateRoomList();
                     
                     // تحديث قائمة المستخدمين
-                    updateUserList(data.users);
+                    updateUserList();
                     
-                    // عرض رسالة ترحيب
+                    // إضافة رسالة ترحيب
                     addSystemMessage(`مرحباً بك في Circl Chat، ${currentUser.username}!`);
-                });
-                
-                // استقبال رسالة جديدة
-                socket.on('newMessage', (message) => {
-                    // إذا كانت الرسالة للغرفة الحالية
-                    if (message.room === currentRoom) {
-                        addMessage(message);
-                    }
-                });
-                
-                // مستخدم جديد انضم
-                socket.on('userJoined', (user) => {
-                    addSystemMessage(`🟢 ${user.username} انضم إلى الدردشة`);
-                    updateOnlineCount();
-                });
-                
-                // مستخدم غادر
-                socket.on('userLeft', (user) => {
-                    addSystemMessage(`🔴 ${user.username} غادر الدردشة`);
-                    updateOnlineCount();
-                });
-                
-                // تغيير الغرفة
-                socket.on('roomChanged', (data) => {
-                    currentRoom = data.room;
-                    currentRoomTitle.textContent = data.room;
-                    currentRoomDesc.textContent = `أنت في غرفة ${data.room}`;
                     
-                    // تحديث واجهة الغرف
-                    updateRoomUI();
-                    
-                    // مسح الرسائل القديمة
-                    clearMessages();
-                    
-                    // عرض رسالة النظام
-                    addSystemMessage(data.message);
-                });
-                
-                // مؤشر الكتابة
-                socket.on('userTyping', (data) => {
-                    if (data.userId !== currentUser.id) {
-                        if (data.isTyping) {
-                            typingUsers.add(data.username);
-                        } else {
-                            typingUsers.delete(data.username);
-                        }
-                        
-                        updateTypingIndicator();
-                    }
-                });
-                
-                // حدث انقطاع الاتصال
-                socket.on('disconnect', () => {
-                    addSystemMessage('❌ انقطع الاتصال بالسيرفر. جاري إعادة الاتصال...');
-                });
+                    // إضافة XP للمستخدم
+                    addXP(50);
+                }, 1000);
             }
             
             // إرسال رسالة
@@ -911,82 +1443,191 @@
             
             function sendMessage() {
                 const text = messageInput.value.trim();
-                if (!text || !socket) return;
+                if (!text) return;
                 
-                socket.emit('sendMessage', { text });
+                // محاكاة إرسال الرسالة
+                const message = {
+                    userId: currentUser.id || 'current',
+                    username: currentUser.username,
+                    avatar: currentUser.avatar,
+                    text: text,
+                    timestamp: new Date(),
+                    rank: currentUser.rankInfo.rank,
+                    rankColor: currentUser.rankInfo.rankColor,
+                    verified: currentUser.verified
+                };
+                
+                addMessage(message);
                 
                 // مسح حقل الإدخال
                 messageInput.value = '';
                 
-                // إيقاف مؤشر الكتابة
-                socket.emit('typing', false);
-                clearTimeout(typingTimeout);
+                // إضافة XP
+                addXP(5);
+                
+                // محاكاة استجابة الآخرين
+                if (Math.random() > 0.7) {
+                    setTimeout(() => {
+                        const responses = [
+                            'أهلاً! كيف حالك؟',
+                            'رسالة جميلة!',
+                            'شكراً للمشاركة',
+                            'أوافقك الرأي'
+                        ];
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                        
+                        const botMessage = {
+                            userId: 'bot',
+                            username: ['أحمد', 'سارة', 'محمد', 'فاطمة'][Math.floor(Math.random() * 4)],
+                            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`,
+                            text: randomResponse,
+                            timestamp: new Date(),
+                            rank: ['مبتدئ', 'برونزي', 'فضي'][Math.floor(Math.random() * 3)],
+                            rankColor: ['beginner', 'bronze', 'silver'][Math.floor(Math.random() * 3)],
+                            verified: Math.random() > 0.5
+                        };
+                        
+                        addMessage(botMessage);
+                    }, 1000 + Math.random() * 2000);
+                }
             }
             
-            // مؤشر الكتابة أثناء الكتابة
-            messageInput.addEventListener('input', () => {
-                if (!typingTimeout) {
-                    socket.emit('typing', true);
-                }
-                
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    socket.emit('typing', false);
-                    typingTimeout = null;
-                }, 1000);
-            });
-            
             // تحديث قائمة الغرف
-            function updateRoomList(rooms) {
+            function updateRoomList() {
                 roomList.innerHTML = '';
                 
-                rooms.forEach(room => {
+                chatRooms.forEach(room => {
+                    // تحديث عدد المستخدمين عشوائياً
+                    room.users = Math.floor(Math.random() * (room.limit * 0.8));
+                    
                     const li = document.createElement('li');
-                    li.className = `room-item ${room === currentRoom ? 'active' : ''}`;
+                    li.className = `room-item ${room.name === currentRoom ? 'active' : ''} ${room.users >= room.limit ? 'room-full' : ''} ${room.featured ? 'featured-room' : ''}`;
+                    
                     li.innerHTML = `
-                        <i class="fas fa-hashtag room-icon"></i>
-                        <span class="room-name">${room}</span>
-                        <span class="room-count">0</span>
+                        <i class="fas ${room.vip ? 'fa-crown' : 'fa-hashtag'} room-icon"></i>
+                        <div class="room-info">
+                            <div class="room-name">${room.name}</div>
+                            <div class="room-stats">
+                                <span class="room-user-count">
+                                    <i class="fas fa-users"></i> ${room.users}/${room.limit}
+                                </span>
+                                ${room.vip ? '<span style="color: var(--gold);"><i class="fas fa-star"></i> VIP</span>' : ''}
+                            </div>
+                        </div>
+                        ${room.users >= room.limit ? '<span class="room-limit"><i class="fas fa-lock"></i> ممتلئة</span>' : 
+                          `<span class="room-limit">${room.limit} حد</span>`}
                     `;
                     
                     li.addEventListener('click', () => {
-                        if (room !== currentRoom) {
-                            socket.emit('changeRoom', room);
+                        if (room.name !== currentRoom) {
+                            if (room.vip && currentUser.rankInfo.level < 10) {
+                                showNotification('🚫 هذه الغرفة للأعضاء VIP فقط! ارتقِ إلى المستوى 10 للدخول');
+                                return;
+                            }
+                            
+                            if (room.users >= room.limit) {
+                                showNotification('🚫 الغرفة ممتلئة! حاول لاحقاً');
+                                return;
+                            }
+                            
+                            changeRoom(room.name);
                         }
                     });
                     
                     roomList.appendChild(li);
                 });
+                
+                // تحديث العدد الإجمالي
+                document.getElementById('totalRoomsCount').textContent = chatRooms.length;
+            }
+            
+            // تغيير الغرفة
+            function changeRoom(roomName) {
+                const oldRoom = currentRoom;
+                currentRoom = roomName;
+                
+                // تحديث واجهة الغرف
+                updateRoomUI();
+                
+                // تحديث عنوان الغرفة
+                const room = chatRooms.find(r => r.name === roomName);
+                currentRoomTitle.textContent = roomName;
+                currentRoomDesc.textContent = `${room.desc} | الحد الأقصى: ${room.limit} مستخدم`;
+                
+                // مسح الرسائل القديمة
+                clearMessages();
+                
+                // عرض رسالة النظام
+                addSystemMessage(`📢 انتقلت من غرفة ${oldRoom} إلى غرفة ${roomName}`);
+                
+                // إضافة XP
+                addXP(10);
             }
             
             // تحديث قائمة المستخدمين
-            function updateUserList(users) {
+            function updateUserList() {
                 userList.innerHTML = '';
-                onlineCount.textContent = users.length;
                 
-                users.forEach(user => {
+                // مستخدمين وهميين
+                const fakeUsers = [
+                    { username: 'أحمد', rank: 'ذهبي', verified: true, online: true },
+                    { username: 'سارة', rank: 'ماسي', verified: true, online: true },
+                    { username: 'محمد', rank: 'فضي', verified: false, online: true },
+                    { username: 'فاطمة', rank: 'برونزي', verified: false, online: true },
+                    { username: 'علي', rank: 'كينج', verified: true, online: true },
+                    { username: 'نور', rank: 'كوين', verified: true, online: true },
+                    { username: 'محمود', rank: 'مبتدئ', verified: false, online: true },
+                    { username: 'هدى', rank: 'ذهبي', verified: true, online: true }
+                ];
+                
+                // إضافة المستخدم الحالي
+                const currentUserItem = {
+                    username: currentUser.username,
+                    rank: currentUser.rankInfo.rank,
+                    verified: currentUser.verified,
+                    online: true,
+                    isOwner: true
+                };
+                
+                const allUsers = [currentUserItem, ...fakeUsers];
+                
+                allUsers.forEach(user => {
                     const li = document.createElement('li');
                     li.className = 'user-list-item';
+                    
+                    const rankColor = user.rank === 'كينج' ? 'king' : 
+                                    user.rank === 'كوين' ? 'queen' :
+                                    user.rank === 'ماسي' ? 'diamond' :
+                                    user.rank === 'ذهبي' ? 'gold' :
+                                    user.rank === 'فضي' ? 'silver' :
+                                    user.rank === 'برونزي' ? 'bronze' : 'beginner';
+                    
                     li.innerHTML = `
-                        <div class="user-list-avatar">
-                            <img src="${user.avatar}" alt="${user.username}">
+                        <div class="user-list-avatar" style="border-color: ${getRankColor(rankColor)}">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}" alt="${user.username}">
+                            <div class="user-rank-indicator ${rankColor}">
+                                <i class="fas ${LEVEL_SYSTEM.getRankIcon(user.rank)}"></i>
+                            </div>
                         </div>
                         <div class="user-list-info">
-                            <div class="user-list-name">${user.username}</div>
-                            <div class="user-list-status">${user.room}</div>
+                            <div class="user-list-name">
+                                ${user.isOwner ? '<span class="owner-badge">OWNER</span>' : ''}
+                                ${user.username}
+                                ${user.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                            </div>
+                            <div class="user-list-status">
+                                <span>${user.rank}</span>
+                                <div class="user-list-dot"></div>
+                                <span>${user.online ? 'متصل' : 'غير متصل'}</span>
+                            </div>
                         </div>
-                        <div class="user-list-dot"></div>
                     `;
                     
                     userList.appendChild(li);
                 });
-            }
-            
-            // تحديث عدد المتصلين
-            function updateOnlineCount() {
-                // في تطبيق حقيقي، سيأتي هذا من السيرفر
-                const count = document.querySelectorAll('.user-list-item').length;
-                onlineCount.textContent = count;
+                
+                // تحديث عدد المتصلين
+                onlineCount.textContent = allUsers.length;
             }
             
             // تحديث واجهة الغرف
@@ -1008,16 +1649,35 @@
                     minute: '2-digit'
                 });
                 
+                const rankColor = message.rank === 'كينج' ? 'king' : 
+                                message.rank === 'كوين' ? 'queen' :
+                                message.rank === 'ماسي' ? 'diamond' :
+                                message.rank === 'ذهبي' ? 'gold' :
+                                message.rank === 'فضي' ? 'silver' :
+                                message.rank === 'برونزي' ? 'bronze' : 'beginner';
+                
                 messageDiv.innerHTML = `
-                    <div class="message-avatar">
+                    <div class="message-avatar" style="border-color: ${getRankColor(rankColor)}">
                         <img src="${message.avatar}" alt="${message.username}">
+                        <div class="message-rank" style="color: ${getRankColor(rankColor)}">
+                            <i class="fas ${LEVEL_SYSTEM.getRankIcon(message.rank)}"></i>
+                        </div>
                     </div>
                     <div class="message-content">
                         <div class="message-header">
-                            <div class="message-sender">${message.username}</div>
+                            <div class="message-sender">
+                                <span>${message.username}</span>
+                                ${message.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                                <span class="rank-badge ${rankColor}" style="font-size: 0.7rem; padding: 2px 6px;">${message.rank}</span>
+                            </div>
                             <div class="message-time">${time}</div>
                         </div>
                         <div class="message-text">${escapeHtml(message.text)}</div>
+                        <div class="message-actions">
+                            <button class="message-action-btn"><i class="far fa-thumbs-up"></i></button>
+                            <button class="message-action-btn"><i class="far fa-comment"></i></button>
+                            <button class="message-action-btn"><i class="fas fa-share"></i></button>
+                        </div>
                     </div>
                 `;
                 
@@ -1052,20 +1712,135 @@
                 });
             }
             
-            // تحديث مؤشر الكتابة
-            function updateTypingIndicator() {
-                if (typingUsers.size > 0) {
-                    const usersArray = Array.from(typingUsers);
-                    const text = usersArray.length === 1 
-                        ? `${usersArray[0]} يكتب الآن...`
-                        : `${usersArray.slice(0, 2).join(' و ')} يكتبون الآن...`;
-                    
-                    typingText.textContent = text;
-                    typingIndicator.style.display = 'flex';
-                } else {
-                    typingIndicator.style.display = 'none';
+            // إضافة XP
+            function addXP(amount) {
+                currentUser.xp += amount;
+                updateLevelInfo();
+                
+                // عرض إشعار
+                if (amount >= 10) {
+                    showNotification(`🎉 +${amount} XP! تقدم في المستوى`);
                 }
             }
+            
+            // عرض إشعار
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #1a1f36;
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    z-index: 10000;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    animation: slideDown 0.3s ease;
+                    font-family: 'Tajawal', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+                
+                notification.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideUp 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+                
+                // إضافة أنيميشن
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideDown {
+                        from { top: -100px; opacity: 0; }
+                        to { top: 20px; opacity: 1; }
+                    }
+                    @keyframes slideUp {
+                        from { top: 20px; opacity: 1; }
+                        to { top: -100px; opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // فتح متجر الدونات
+            storeBtn.addEventListener('click', () => {
+                storeOverlay.style.display = 'flex';
+                loadDonateItems();
+            });
+            
+            // إغلاق المتجر عند النقر خارج الصندوق
+            storeOverlay.addEventListener('click', (e) => {
+                if (e.target === storeOverlay) {
+                    storeOverlay.style.display = 'none';
+                }
+            });
+            
+            // تحميل عناصر المتجر
+            function loadDonateItems() {
+                const donateItems = document.getElementById('donateItems');
+                const items = [
+                    { name: '100 دونات', price: 10, description: 'للمزايا الأساسية' },
+                    { name: '500 دونات', price: 45, description: 'حزمة متميزة', popular: true },
+                    { name: '1000 دونات', price: 80, description: 'توفير كبير', best: true },
+                    { name: '2500 دونات', price: 180, description: 'حزمة VIP', vip: true },
+                    { name: '5000 دونات', price: 350, description: 'حزمة الماس', diamond: true },
+                    { name: 'شهر VIP', price: 100, description: 'عضوية VIP لمدة شهر' },
+                    { name: 'تغيير الاسم', price: 50, description: 'تغيير اسم المستخدم' },
+                    { name: 'إطارات مميزة', price: 30, description: 'إطارات للصور الشخصية' },
+                    { name: 'رموز خاصة', price: 20, description: 'رموز مميزة بجانب الاسم' }
+                ];
+                
+                donateItems.innerHTML = items.map(item => `
+                    <div class="donate-item">
+                        <div>
+                            <strong>${item.name}</strong>
+                            <div style="font-size: 0.9rem; color: #718096;">${item.description}</div>
+                            ${item.popular ? '<span style="color: var(--primary); font-size: 0.8rem;">⭐ الأكثر شيوعاً</span>' : ''}
+                            ${item.best ? '<span style="color: var(--gold); font-size: 0.8rem;">🏆 أفضل قيمة</span>' : ''}
+                        </div>
+                        <button class="donate-price" onclick="buyDonateItem('${item.name}', ${item.price})">
+                            ${item.price} دولار
+                        </button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('donateBalance').textContent = currentUser.donates;
+            }
+            
+            // شراء عنصر من المتجر
+            window.buyDonateItem = function(name, price) {
+                if (confirm(`هل تريد شراء ${name} بـ ${price} دولار؟`)) {
+                    currentUser.donates += parseInt(name);
+                    showNotification(`🎁 تم شراء ${name}! رصيدك الآن: ${currentUser.donates} دونات`);
+                    loadDonateItems();
+                    
+                    // إضافة XP للشراء
+                    addXP(price * 10);
+                }
+            };
+            
+            // القائمة الجانبية للجوال
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+            
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
             
             // التمرير لآخر رسالة
             function scrollToBottom() {
@@ -1079,44 +1854,60 @@
                 return div.innerHTML;
             }
             
-            // القائمة الجانبية للجوال
-            mobileMenuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
-            
-            // إغلاق القائمة عند النقر خارجها (للجوال)
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && 
-                    !sidebar.contains(e.target) && 
-                    !mobileMenuBtn.contains(e.target)) {
-                    sidebar.classList.remove('active');
+            // محاكاة مرور الوقت واكتساب XP
+            setInterval(() => {
+                if (currentUser.joinTime) {
+                    // إضافة 1 XP كل دقيقة للمستخدمين النشطين
+                    const minutesOnline = Math.floor((new Date() - currentUser.joinTime) / 60000);
+                    if (minutesOnline > 0 && messageInput === document.activeElement) {
+                        addXP(1);
+                    }
                 }
-            });
+            }, 60000); // كل دقيقة
             
-            // إضافة بعض الرسائل الوهمية للعرض
-            function addSampleMessages() {
-                setTimeout(() => {
-                    addSystemMessage('اليوم');
-                    addMessage({
-                        userId: 'sample1',
-                        username: 'أحمد',
-                        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed',
-                        text: 'مرحباً بالجميع! كيف الحال؟',
-                        timestamp: new Date()
-                    });
+            // إضافة بعض الرسائل الوهمية عند البدء
+            setTimeout(() => {
+                if (currentUser.username) {
+                    addSystemMessage('اليوم - بداية المحادثة');
                     
-                    addMessage({
-                        userId: 'sample2',
-                        username: 'سارة',
-                        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sara',
-                        text: 'أهلاً أحمد! كل شيء بخير، شكراً. وأنت كيف حالك؟',
-                        timestamp: new Date()
+                    const sampleMessages = [
+                        {
+                            userId: 'sample1',
+                            username: 'أحمد',
+                            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed',
+                            text: 'مرحباً بالجميع! كيف الحال؟',
+                            timestamp: new Date(),
+                            rank: 'ذهبي',
+                            rankColor: 'gold',
+                            verified: true
+                        },
+                        {
+                            userId: 'sample2',
+                            username: 'سارة',
+                            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sara',
+                            text: 'أهلاً أحمد! كل شيء بخير، شكراً. أنا سعيدة بوجود غرفة مصر 🇪🇬 خاصة بنا!',
+                            timestamp: new Date(),
+                            rank: 'ماسي',
+                            rankColor: 'diamond',
+                            verified: true
+                        },
+                        {
+                            userId: 'sample3',
+                            username: 'علي',
+                            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ali',
+                            text: 'أنا أيضاً سعيد! النظام الجديد للمستويات رائع، أنا حالياً ملك 👑',
+                            timestamp: new Date(),
+                            rank: 'كينج',
+                            rankColor: 'king',
+                            verified: true
+                        }
+                    ];
+                    
+                    sampleMessages.forEach(msg => {
+                        setTimeout(() => addMessage(msg), 500 * (sampleMessages.indexOf(msg) + 1));
                     });
-                }, 1000);
-            }
-            
-            // عند تحميل الصفحة، عرض بعض الرسائل الوهمية
-            setTimeout(addSampleMessages, 2000);
+                }
+            }, 1500);
         });
     </script>
 </body>
