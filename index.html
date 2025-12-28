@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circl Chat - دردشة مباشرة متعددة المستخدمين</title>
+    <title>Circl Chat - دردشة حقيقية متعددة المستخدمين</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
@@ -662,6 +662,58 @@
             animation: popIn 0.3s ease;
         }
 
+        /* ========== نافذة الرسائل الخاصة ========== */
+        .pm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1800;
+            backdrop-filter: blur(5px);
+        }
+
+        .pm-overlay.active {
+            display: flex;
+        }
+
+        .pm-box {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            height: 80vh;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pm-header {
+            padding: 1.5rem;
+            background: #111827;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pm-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+
+        .pm-input-container {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
         /* ========== التجاوب مع الشاشات ========== */
         @media (max-width: 1200px) {
             .container {
@@ -706,6 +758,11 @@
             .auth-box {
                 padding: 1.5rem;
                 margin: 1rem;
+            }
+            
+            .pm-box {
+                width: 95%;
+                height: 90vh;
             }
         }
 
@@ -831,6 +888,23 @@
         .connection-status.disconnected {
             background: var(--danger);
         }
+
+        /* ========== زر الرسائل الخاصة ========== */
+        .pm-btn {
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s ease;
+        }
+
+        .pm-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -921,6 +995,39 @@
         </div>
     </div>
 
+    <!-- نافذة الرسائل الخاصة -->
+    <div class="pm-overlay" id="pmOverlay">
+        <div class="pm-box">
+            <div class="pm-header">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div id="pmUserAvatar" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+                        <img src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div>
+                        <div id="pmUserName" style="font-weight: 600;"></div>
+                        <div id="pmUserStatus" style="font-size: 0.875rem; color: #9ca3af;">متصل الآن</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="closePMModal()" style="background: #ef4444; color: white; padding: 0.5rem 1rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="pm-messages" id="pmMessages">
+                <!-- الرسائل الخاصة ستظهر هنا -->
+            </div>
+            
+            <div class="pm-input-container">
+                <div class="input-wrapper">
+                    <input type="text" class="message-input" id="pmInput" placeholder="اكتب رسالتك الخاصة..." autocomplete="off">
+                    <button class="send-btn" id="pmSendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- نافذة الإدارة -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-header">
@@ -992,8 +1099,7 @@
             
             <div class="users-section dark-scrollbar">
                 <div class="section-title">
-                    <span>المستخدمون النشطون</span>
-                    <span id="onlineCount">0</span>
+                    <span>المستخدمون النشطون (<span id="onlineCount">0</span>)</span>
                 </div>
                 <ul class="user-list" id="userList"></ul>
             </div>
@@ -1054,299 +1160,252 @@
     </div>
 
     <script>
-        // ========== نظام خادم WebSocket محاكاة ==========
-        // هذا سيكون خادم وهمي للاختبار المحلي
-        class MockWebSocketServer {
+        // ========== نظام خادم WebSocket حقيقي ==========
+        // سنستخدم localStorage كمخزن مؤقت للبيانات المشتركة بين المتصفحات
+        class RealTimeServer {
             constructor() {
-                this.clients = new Map(); // {socketId: {socket, user, room}}
-                this.messages = [];
-                this.onlineUsers = new Map(); // {userId: {user, lastSeen, room}}
-                this.rooms = new Map(); // {roomId: {users: Set(userId), messages: []}}
-                this.setupDefaultRooms();
-                this.messageHistory = new Map(); // {roomId: []}
+                this.storageKey = 'circl_chat_server';
+                this.initializeServer();
+                this.setupStorageListener();
             }
 
-            setupDefaultRooms() {
-                const defaultRooms = [
-                    { id: 'room-1', name: 'عام', description: 'الغرفة العامة للجميع', type: 'public', icon: 'fa-users', order: 1 },
-                    { id: 'room-2', name: 'VIP', description: 'غرفة الأعضاء المميزين', type: 'vip', icon: 'fa-crown', order: 2, password: '1218' },
-                    { id: 'room-3', name: 'ثرابيست', description: 'جلسات الدعم النفسي مع الذكاء الاصطناعي', type: 'therapist', icon: 'fa-user-md', order: 3, isBot: true },
-                    { id: 'room-4', name: 'مصر 🇪🇬', description: 'غرفة مصر المميزة', type: 'public', icon: 'fa-flag', order: 4 },
-                    { id: 'room-5', name: 'الألعاب', description: 'مناقشة الألعاب والتحديات', type: 'public', icon: 'fa-gamepad', order: 5 }
-                ];
+            initializeServer() {
+                let serverData = localStorage.getItem(this.storageKey);
+                if (!serverData) {
+                    serverData = {
+                        users: {},
+                        rooms: {
+                            'room-1': { id: 'room-1', name: 'عام', description: 'الغرفة العامة للجميع', type: 'public', icon: 'fa-users', order: 1, users: [], messages: [] },
+                            'room-2': { id: 'room-2', name: 'VIP', description: 'غرفة الأعضاء المميزين', type: 'vip', icon: 'fa-crown', order: 2, password: '1218', users: [], messages: [] },
+                            'room-3': { id: 'room-3', name: 'ثرابيست', description: 'جلسات الدعم النفسي مع الذكاء الاصطناعي', type: 'therapist', icon: 'fa-user-md', order: 3, isBot: true, users: [], messages: [] },
+                            'room-4': { id: 'room-4', name: 'مصر 🇪🇬', description: 'غرفة مصر المميزة', type: 'public', icon: 'fa-flag', order: 4, users: [], messages: [] },
+                            'room-5': { id: 'room-5', name: 'الألعاب', description: 'مناقشة الألعاب والتحديات', type: 'public', icon: 'fa-gamepad', order: 5, users: [], messages: [] }
+                        },
+                        privateMessages: {},
+                        lastUpdate: Date.now()
+                    };
+                    localStorage.setItem(this.storageKey, JSON.stringify(serverData));
+                }
+            }
 
-                defaultRooms.forEach(room => {
-                    this.rooms.set(room.id, {
-                        ...room,
-                        users: new Set(),
-                        messages: []
+            setupStorageListener() {
+                // الاستماع لتغييرات localStorage من المتصفحات الأخرى
+                window.addEventListener('storage', (event) => {
+                    if (event.key === this.storageKey) {
+                        this.onServerUpdate();
+                    }
+                });
+            }
+
+            getServerData() {
+                const data = localStorage.getItem(this.storageKey);
+                return data ? JSON.parse(data) : null;
+            }
+
+            updateServerData(updater) {
+                const data = this.getServerData();
+                if (data) {
+                    updater(data);
+                    data.lastUpdate = Date.now();
+                    localStorage.setItem(this.storageKey, JSON.stringify(data));
+                    
+                    // إشعار جميع النوافذ بالتحديث
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: this.storageKey,
+                        newValue: JSON.stringify(data)
+                    }));
+                }
+            }
+
+            // إدارة المستخدمين
+            addUser(user) {
+                this.updateServerData((data) => {
+                    data.users[user.id] = {
+                        ...user,
+                        lastSeen: Date.now(),
+                        status: 'online',
+                        currentRoom: null
+                    };
+                });
+            }
+
+            updateUserStatus(userId, status) {
+                this.updateServerData((data) => {
+                    if (data.users[userId]) {
+                        data.users[userId].status = status;
+                        data.users[userId].lastSeen = Date.now();
+                    }
+                });
+            }
+
+            updateUserRoom(userId, roomId) {
+                this.updateServerData((data) => {
+                    if (data.users[userId]) {
+                        data.users[userId].currentRoom = roomId;
+                    }
+                });
+            }
+
+            // إدارة الغرف
+            joinRoom(userId, roomId, password = null) {
+                const result = { success: false, error: null, room: null, messages: [] };
+                
+                this.updateServerData((data) => {
+                    const room = data.rooms[roomId];
+                    if (!room) {
+                        result.error = 'الغرفة غير موجودة';
+                        return;
+                    }
+
+                    if (room.type === 'vip' && room.password && room.password !== password) {
+                        result.error = 'كلمة المرور غير صحيحة';
+                        return;
+                    }
+
+                    // مغادرة الغرف الأخرى
+                    Object.values(data.rooms).forEach(r => {
+                        const index = r.users.indexOf(userId);
+                        if (index > -1) {
+                            r.users.splice(index, 1);
+                        }
                     });
+
+                    // الانضمام للغرفة الجديدة
+                    if (!room.users.includes(userId)) {
+                        room.users.push(userId);
+                    }
+
+                    // تحديث حالة المستخدم
+                    if (data.users[userId]) {
+                        data.users[userId].currentRoom = roomId;
+                    }
+
+                    result.success = true;
+                    result.room = { ...room };
+                    result.messages = room.messages.slice(-50);
                 });
+
+                return result;
             }
 
-            // محاكاة اتصال WebSocket
-            connectClient(user) {
-                const socketId = `socket-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            sendMessage(userId, roomId, messageData) {
+                const result = { success: false, error: null, message: null };
                 
-                const mockSocket = {
-                    id: socketId,
-                    emit: (event, data) => {
-                        console.log(`Server → Client [${socketId}]:`, event, data);
-                    },
-                    on: (event, callback) => {
-                        // محاكاة استقبال الأحداث من العميل
-                        console.log(`Client [${socketId}] listening for:`, event);
-                    }
-                };
-
-                this.clients.set(socketId, { socket: mockSocket, user, room: null });
-                this.onlineUsers.set(user.id, { 
-                    ...user, 
-                    lastSeen: new Date(), 
-                    socketId,
-                    room: null 
-                });
-
-                return { socket: mockSocket, socketId };
-            }
-
-            disconnectClient(socketId) {
-                const client = this.clients.get(socketId);
-                if (client) {
-                    if (client.room) {
-                        const room = this.rooms.get(client.room);
-                        if (room) {
-                            room.users.delete(client.user.id);
-                            this.broadcastToRoom(client.room, 'user_left', {
-                                userId: client.user.id,
-                                username: client.user.username,
-                                roomId: client.room
-                            });
-                        }
-                    }
+                this.updateServerData((data) => {
+                    const room = data.rooms[roomId];
+                    const user = data.users[userId];
                     
-                    this.onlineUsers.delete(client.user.id);
-                    this.clients.delete(socketId);
+                    if (!room || !user) {
+                        result.error = 'الغرفة أو المستخدم غير موجود';
+                        return;
+                    }
+
+                    if (!room.users.includes(userId)) {
+                        result.error = 'المستخدم ليس في هذه الغرفة';
+                        return;
+                    }
+
+                    const message = {
+                        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        ...messageData,
+                        userId,
+                        roomId,
+                        timestamp: Date.now()
+                    };
+
+                    room.messages.push(message);
                     
-                    this.broadcastToAll('online_users', this.getOnlineUsers());
-                }
-            }
-
-            joinRoom(socketId, roomId, password = null) {
-                const client = this.clients.get(socketId);
-                if (!client) return { success: false, error: 'Client not found' };
-
-                const room = this.rooms.get(roomId);
-                if (!room) return { success: false, error: 'Room not found' };
-
-                // التحقق من كلمة المرور للغرف VIP
-                if (room.type === 'vip' && room.password && room.password !== password) {
-                    return { success: false, error: 'Invalid password' };
-                }
-
-                // مغادرة الغرفة السابقة
-                if (client.room) {
-                    const oldRoom = this.rooms.get(client.room);
-                    if (oldRoom) {
-                        oldRoom.users.delete(client.user.id);
-                        this.broadcastToRoom(client.room, 'user_left', {
-                            userId: client.user.id,
-                            username: client.user.username,
-                            roomId: client.room
-                        });
+                    // حفظ فقط آخر 100 رسالة
+                    if (room.messages.length > 100) {
+                        room.messages = room.messages.slice(-100);
                     }
-                }
 
-                // الانضمام للغرفة الجديدة
-                client.room = roomId;
-                room.users.add(client.user.id);
-                
-                // تحديث حالة المستخدم
-                const userInfo = this.onlineUsers.get(client.user.id);
-                if (userInfo) {
-                    userInfo.room = roomId;
-                    userInfo.lastSeen = new Date();
-                }
-
-                // إرسال رسالة دخول للجميع في الغرفة
-                this.broadcastToRoom(roomId, 'user_joined', {
-                    userId: client.user.id,
-                    username: client.user.username,
-                    avatar: client.user.avatar,
-                    role: client.user.role,
-                    roomId
+                    result.success = true;
+                    result.message = message;
                 });
 
-                // إرسال تحديث للمستخدمين المتصلين
-                this.broadcastToAll('online_users', this.getOnlineUsers());
-
-                // إرسال تاريخ الرسائل للمستخدم الجديد
-                const messages = this.getMessageHistory(roomId);
-
-                return { 
-                    success: true, 
-                    room: {
-                        id: room.id,
-                        name: room.name,
-                        description: room.description,
-                        type: room.type,
-                        icon: room.icon,
-                        users: Array.from(room.users)
-                    },
-                    messages
-                };
+                return result;
             }
 
-            sendMessage(socketId, messageData) {
-                const client = this.clients.get(socketId);
-                if (!client || !client.room) return { success: false, error: 'Client not in room' };
-
-                const room = this.rooms.get(client.room);
-                if (!room) return { success: false, error: 'Room not found' };
-
-                const message = {
-                    id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    ...messageData,
-                    timestamp: new Date().toISOString()
-                };
-
-                // حفظ الرسالة في السجل
-                this.saveMessageToHistory(client.room, message);
-
-                // إذا كانت غرفة ثيرابيست، توليد رد من الذكاء الاصطناعي
-                if (room.type === 'therapist') {
-                    setTimeout(() => {
-                        this.generateTherapistResponse(client.room, message);
-                    }, 1000);
-                }
-
-                // بث الرسالة للجميع في الغرفة
-                this.broadcastToRoom(client.room, 'new_message', message);
-
-                // إضافة نقاط للمستخدم
-                this.addUserPoints(client.user.id, 5);
-
-                return { success: true, message };
-            }
-
-            generateTherapistResponse(roomId, userMessage) {
-                const responses = [
-                    "مرحباً! أنا مساعدك الذكي للدعم النفسي. كيف يمكنني مساعدتك اليوم؟",
-                    "أفهم مشاعرك. دعنا نتحدث عن هذا أكثر.",
-                    "شكراً لمشاركتك هذا معي. تذكر أنك لست وحدك.",
-                    "هذا شعور طبيعي. دعنا نستكشف طرقاً للتعامل معه.",
-                    "الرعاية الذاتية مهمة جداً. خصص وقتاً لنفسك كل يوم.",
-                    "أقدر شجاعتك في الحديث عن هذا. هذا خطوة مهمة نحو الشفاء."
-                ];
-
-                const botMessage = {
-                    id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    roomId,
-                    userId: 'therapist-bot',
-                    username: '🧠 ثيرابيست AI',
-                    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=therapist&backgroundColor=8b5cf6',
-                    text: responses[Math.floor(Math.random() * responses.length)],
-                    timestamp: new Date().toISOString(),
-                    type: 'system'
-                };
-
-                this.saveMessageToHistory(roomId, botMessage);
-                this.broadcastToRoom(roomId, 'new_message', botMessage);
-            }
-
-            saveMessageToHistory(roomId, message) {
-                if (!this.messageHistory.has(roomId)) {
-                    this.messageHistory.set(roomId, []);
-                }
+            sendPrivateMessage(senderId, receiverId, messageData) {
+                const result = { success: false, error: null, message: null };
                 
-                const history = this.messageHistory.get(roomId);
-                history.push(message);
-                
-                // حفظ آخر 100 رسالة فقط
-                if (history.length > 100) {
-                    history.shift();
-                }
-            }
-
-            getMessageHistory(roomId) {
-                return this.messageHistory.get(roomId) || [];
-            }
-
-            broadcastToRoom(roomId, event, data) {
-                const room = this.rooms.get(roomId);
-                if (!room) return;
-
-                room.users.forEach(userId => {
-                    const userInfo = this.onlineUsers.get(userId);
-                    if (userInfo && userInfo.socketId) {
-                        const client = this.clients.get(userInfo.socketId);
-                        if (client) {
-                            client.socket.emit(event, data);
-                        }
+                this.updateServerData((data) => {
+                    const sender = data.users[senderId];
+                    const receiver = data.users[receiverId];
+                    
+                    if (!sender || !receiver) {
+                        result.error = 'المستخدم غير موجود';
+                        return;
                     }
+
+                    const conversationKey = [senderId, receiverId].sort().join('_');
+                    if (!data.privateMessages[conversationKey]) {
+                        data.privateMessages[conversationKey] = [];
+                    }
+
+                    const message = {
+                        id: `pm-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        ...messageData,
+                        senderId,
+                        receiverId,
+                        timestamp: Date.now(),
+                        read: false
+                    };
+
+                    data.privateMessages[conversationKey].push(message);
+                    
+                    // حفظ فقط آخر 50 رسالة
+                    if (data.privateMessages[conversationKey].length > 50) {
+                        data.privateMessages[conversationKey] = data.privateMessages[conversationKey].slice(-50);
+                    }
+
+                    result.success = true;
+                    result.message = message;
                 });
+
+                return result;
             }
 
-            broadcastToAll(event, data) {
-                this.clients.forEach(client => {
-                    client.socket.emit(event, data);
-                });
+            getPrivateMessages(userId1, userId2) {
+                const data = this.getServerData();
+                if (!data) return [];
+                
+                const conversationKey = [userId1, userId2].sort().join('_');
+                return data.privateMessages[conversationKey] || [];
             }
 
             getOnlineUsers() {
-                return Array.from(this.onlineUsers.values()).map(user => ({
-                    id: user.id,
-                    username: user.username,
-                    avatar: user.avatar,
-                    role: user.role,
-                    room: user.room,
-                    lastSeen: user.lastSeen
-                }));
+                const data = this.getServerData();
+                if (!data) return [];
+                
+                const now = Date.now();
+                return Object.values(data.users).filter(user => 
+                    user.status === 'online' && (now - user.lastSeen) < 30000
+                );
             }
 
             getRoomUsers(roomId) {
-                const room = this.rooms.get(roomId);
-                if (!room) return [];
-
-                return Array.from(room.users).map(userId => {
-                    const user = this.onlineUsers.get(userId);
-                    return user ? {
-                        id: user.id,
-                        username: user.username,
-                        avatar: user.avatar,
-                        role: user.role
-                    } : null;
-                }).filter(Boolean);
+                const data = this.getServerData();
+                if (!data || !data.rooms[roomId]) return [];
+                
+                const room = data.rooms[roomId];
+                return room.users.map(userId => data.users[userId]).filter(Boolean);
             }
 
             getAllRooms() {
-                return Array.from(this.rooms.values()).map(room => ({
-                    id: room.id,
-                    name: room.name,
-                    description: room.description,
-                    type: room.type,
-                    icon: room.icon,
-                    order: room.order,
-                    userCount: room.users.size
+                const data = this.getServerData();
+                if (!data) return [];
+                
+                return Object.values(data.rooms).map(room => ({
+                    ...room,
+                    userCount: room.users.length
                 }));
             }
 
-            addUserPoints(userId, points) {
-                const userInfo = this.onlineUsers.get(userId);
-                if (userInfo) {
-                    if (!userInfo.points) userInfo.points = 0;
-                    userInfo.points += points;
-                    userInfo.level = Math.floor(userInfo.points / 100) + 1;
-                    
-                    // إرسال تحديث النقاط للمستخدم
-                    const client = this.clients.get(userInfo.socketId);
-                    if (client) {
-                        client.socket.emit('points_update', {
-                            points: userInfo.points,
-                            level: userInfo.level
-                        });
-                    }
-                }
+            onServerUpdate() {
+                // سيتم استدعاء هذه الدالة عند تحديث البيانات من متصفح آخر
+                window.dispatchEvent(new CustomEvent('server-update'));
             }
         }
 
@@ -1354,7 +1413,7 @@
         class LocalDatabase {
             constructor() {
                 this.dbName = 'circl_chat_local';
-                this.version = 2;
+                this.version = 3;
                 this.db = null;
                 this.init();
             }
@@ -1379,6 +1438,10 @@
                         
                         if (!db.objectStoreNames.contains('settings')) {
                             db.createObjectStore('settings', { keyPath: 'key' });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('notifications')) {
+                            db.createObjectStore('notifications', { keyPath: 'id' });
                         }
                     };
                 });
@@ -1407,6 +1470,17 @@
                 });
             }
 
+            async getUserById(userId) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['users'], 'readonly');
+                    const store = transaction.objectStore('users');
+                    const request = store.get(userId);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
             async saveSetting(key, value) {
                 return new Promise((resolve, reject) => {
                     const transaction = this.db.transaction(['settings'], 'readwrite');
@@ -1425,6 +1499,17 @@
                     const request = store.get(key);
                     
                     request.onsuccess = () => resolve(request.result?.value);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async addNotification(notification) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['notifications'], 'readwrite');
+                    const store = transaction.objectStore('notifications');
+                    const request = store.add(notification);
+                    
+                    request.onsuccess = () => resolve(request.result);
                     request.onerror = () => reject(request.error);
                 });
             }
@@ -1488,16 +1573,17 @@
         // ========== تطبيق الدردشة الرئيسي ==========
         class ChatApp {
             constructor() {
-                this.server = new MockWebSocketServer();
+                this.server = new RealTimeServer();
                 this.localDb = new LocalDatabase();
                 this.therapistAI = new TherapistAI();
                 this.currentUser = null;
                 this.currentRoom = null;
                 this.socket = null;
-                this.socketId = null;
                 this.typingTimeout = null;
                 this.onlineUsers = new Map();
                 this.rooms = [];
+                this.pmTargetUser = null;
+                this.updateInterval = null;
                 this.initialize();
             }
 
@@ -1506,6 +1592,7 @@
                     await this.localDb.init();
                     this.setupEventListeners();
                     this.checkAutoLogin();
+                    this.startUpdateInterval();
                 } catch (error) {
                     console.error('خطأ في تهيئة التطبيق:', error);
                     this.showNotification('خطأ في تهيئة التطبيق', 'error');
@@ -1570,6 +1657,15 @@
                     }
                 });
 
+                // إرسال الرسائل الخاصة
+                document.getElementById('pmSendBtn').addEventListener('click', () => this.sendPrivateMessage());
+                document.getElementById('pmInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendPrivateMessage();
+                    }
+                });
+
                 // الكتابة النشطة
                 document.getElementById('messageInput').addEventListener('input', () => {
                     this.signalTyping();
@@ -1611,28 +1707,49 @@
                     this.handleResponsiveDesign();
                 });
 
-                // إغلاق لوحة الإدارة عند النقر خارجها
-                document.addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('adminPanel')) {
-                        this.closeAdminPanel();
-                    }
+                // الاستماع لتحديثات الخادم
+                window.addEventListener('server-update', () => {
+                    this.onServerUpdate();
                 });
 
-                // إغلاق نافذة VIP عند النقر خارجها
-                document.addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('vipModal')) {
-                        this.closeVipModal();
-                    }
+                // تحديث حالة الاتصال
+                window.addEventListener('online', () => {
+                    this.updateConnectionStatus(true);
                 });
 
-                // إغلاق الشريط الجانبي عند النقر خارجها في الجوال
-                document.addEventListener('click', (e) => {
-                    if (window.innerWidth <= 768 && 
-                        !document.getElementById('sidebar').contains(e.target) && 
-                        !document.getElementById('mobileMenuBtn').contains(e.target)) {
-                        document.getElementById('sidebar').classList.remove('active');
+                window.addEventListener('offline', () => {
+                    this.updateConnectionStatus(false);
+                });
+
+                // تحديث حالة المستخدم عند إغلاق النافذة
+                window.addEventListener('beforeunload', () => {
+                    if (this.currentUser) {
+                        this.server.updateUserStatus(this.currentUser.id, 'offline');
                     }
                 });
+            }
+
+            startUpdateInterval() {
+                // تحديث البيانات كل 2 ثانية
+                this.updateInterval = setInterval(() => {
+                    if (this.currentUser) {
+                        this.server.updateUserStatus(this.currentUser.id, 'online');
+                        this.updateOnlineUsers();
+                        if (this.currentRoom) {
+                            this.updateRoomUsers();
+                        }
+                    }
+                }, 2000);
+            }
+
+            onServerUpdate() {
+                if (this.currentUser) {
+                    this.updateOnlineUsers();
+                    if (this.currentRoom) {
+                        this.updateRoomMessages();
+                        this.updateRoomUsers();
+                    }
+                }
             }
 
             checkAutoLogin() {
@@ -1780,6 +1897,10 @@
                 this.currentUser = user;
                 localStorage.setItem('circl_current_user', JSON.stringify(user));
                 
+                // إضافة المستخدم للخادم
+                this.server.addUser(user);
+                this.server.updateUserStatus(user.id, 'online');
+                
                 // إخفاء نافذة المصادقة
                 document.getElementById('authOverlay').style.display = 'none';
                 
@@ -1796,8 +1917,11 @@
                 // تحديث معلومات المستخدم
                 this.updateUserProfile();
                 
-                // الاتصال بالخادم
-                this.connectToServer();
+                // تحميل الغرف
+                await this.loadRooms();
+                
+                // الانضمام للغرفة العامة تلقائياً
+                await this.joinRoom('room-1');
                 
                 // إظهار زر الإدارة للمشرفين والمالك
                 if (['owner', 'admin'].includes(this.currentUser.role)) {
@@ -1806,6 +1930,9 @@
                 
                 // التحقق من التصميم المتجاوب
                 this.handleResponsiveDesign();
+                
+                // تحديث حالة الاتصال
+                this.updateConnectionStatus(navigator.onLine);
             }
 
             updateUserProfile() {
@@ -1856,63 +1983,6 @@
                 return 'مبتدئ';
             }
 
-            connectToServer() {
-                this.showNotification('جارٍ الاتصال بالخادم...', 'info');
-                
-                // محاكاة اتصال WebSocket
-                setTimeout(() => {
-                    const { socket, socketId } = this.server.connectClient(this.currentUser);
-                    this.socket = socket;
-                    this.socketId = socketId;
-                    
-                    // إعداد مستمعي الأحداث
-                    this.setupSocketListeners();
-                    
-                    // تحديث حالة الاتصال
-                    document.getElementById('connectionStatus').classList.remove('disconnected');
-                    document.getElementById('connectionStatus').innerHTML = `
-                        <i class="fas fa-wifi"></i>
-                        <span>متصل</span>
-                    `;
-                    
-                    this.showNotification('تم الاتصال بالخادم بنجاح', 'success');
-                    
-                    // تحميل الغرف
-                    this.loadRooms();
-                    
-                }, 1000);
-            }
-
-            setupSocketListeners() {
-                // محاكاة استقبال الأحداث من الخادم
-                this.socket.on = (event, callback) => {
-                    switch (event) {
-                        case 'new_message':
-                            // محاكاة استقبال رسائل جديدة
-                            setInterval(() => {
-                                // سيتم استقبال الرسائل من خلال broadcastToRoom في الخادم
-                            }, 100);
-                            break;
-                            
-                        case 'user_joined':
-                            // معالجة انضمام مستخدم جديد للغرفة
-                            break;
-                            
-                        case 'user_left':
-                            // معالجة مغادرة مستخدم للغرفة
-                            break;
-                            
-                        case 'online_users':
-                            // تحديث قائمة المستخدمين المتصلين
-                            break;
-                            
-                        case 'points_update':
-                            // تحديث النقاط
-                            break;
-                    }
-                };
-            }
-
             async loadRooms() {
                 try {
                     this.rooms = this.server.getAllRooms();
@@ -1947,11 +2017,6 @@
                     }
                     
                     document.getElementById('roomsCount').textContent = this.rooms.length;
-                    
-                    // الانضمام للغرفة العامة تلقائياً
-                    if (this.rooms.length > 0 && !this.currentRoom) {
-                        await this.joinRoom('room-1');
-                    }
                 } catch (error) {
                     console.error('خطأ في تحميل الغرف:', error);
                 }
@@ -1971,7 +2036,7 @@
                         return;
                     }
 
-                    const result = this.server.joinRoom(this.socketId, roomId);
+                    const result = this.server.joinRoom(this.currentUser.id, roomId);
                     
                     if (!result.success) {
                         this.showNotification(result.error, 'error');
@@ -1983,7 +2048,7 @@
                     
                     // تحديث واجهة المستخدم
                     document.getElementById('currentRoomTitle').textContent = room.name;
-                    document.getElementById('currentRoomDesc').textContent = room.description;
+                    document.getElementById('currentRoomDesc').textContent = `${room.description} (${result.room.userCount} مستخدم)`;
                     document.getElementById('roomIcon').className = `fas ${room.icon}`;
                     
                     // تحديث قائمة الغرف
@@ -1993,8 +2058,12 @@
                     await this.loadMessages(result.messages);
                     
                     // تحديث قائمة المستخدمين النشطين
-                    await this.updateActiveUsers(roomId);
+                    await this.updateRoomUsers();
                     
+                    // إذا كانت غرفة ثيرابيست، إظهار رسالة ترحيبية
+                    if (room.type === 'therapist') {
+                        this.handleTherapistRoom();
+                    }
                 } catch (error) {
                     console.error('خطأ في الانضمام للغرفة:', error);
                     this.showNotification('حدث خطأ في الانضمام للغرفة', 'error');
@@ -2057,6 +2126,14 @@
                 const container = document.getElementById('messagesContainer');
                 const isCurrentUser = message.userId === this.currentUser.id;
                 
+                // الحصول على معلومات المستخدم
+                let user;
+                try {
+                    user = await this.localDb.getUserById(message.userId);
+                } catch (error) {
+                    user = null;
+                }
+                
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${isCurrentUser ? 'my-message' : ''}`;
                 
@@ -2068,14 +2145,20 @@
                 messageDiv.innerHTML = `
                     ${!isCurrentUser ? `
                         <div class="message-avatar">
-                            <img src="${message.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" alt="${message.username || 'مستخدم'}">
+                            <img src="${message.avatar || user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" 
+                                 alt="${message.username || user?.username || 'مستخدم'}">
                         </div>
                     ` : ''}
                     
                     <div class="message-content">
                         <div class="message-header">
                             <div class="message-sender">
-                                ${message.username || 'مستخدم'}
+                                ${message.username || user?.username || 'مستخدم'}
+                                ${isCurrentUser ? '' : `
+                                    <button class="pm-btn" onclick="app.openPrivateChat('${message.userId}', '${message.username || user?.username || 'مستخدم'}', '${message.avatar || user?.avatar || ''}')">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </button>
+                                `}
                             </div>
                             <div class="message-time">${time}</div>
                         </div>
@@ -2101,15 +2184,12 @@
 
                 try {
                     const messageData = {
-                        roomId: this.currentRoom.id,
-                        userId: this.currentUser.id,
                         username: this.currentUser.username,
                         avatar: this.currentUser.avatar,
-                        text: text,
-                        type: 'text'
+                        text: text
                     };
 
-                    const result = this.server.sendMessage(this.socketId, messageData);
+                    const result = this.server.sendMessage(this.currentUser.id, this.currentRoom.id, messageData);
                     
                     if (!result.success) {
                         this.showNotification(result.error, 'error');
@@ -2125,19 +2205,49 @@
                     // إخفاء مؤشر الكتابة
                     this.clearTyping();
                     
+                    // إضافة نقاط
+                    await this.addUserPoints(5);
+                    
                 } catch (error) {
                     console.error('خطأ في إرسال الرسالة:', error);
                     this.showNotification('حدث خطأ في إرسال الرسالة', 'error');
                 }
             }
 
-            async updateActiveUsers(roomId) {
+            async updateRoomMessages() {
+                if (!this.currentRoom) return;
+                
                 try {
-                    const users = this.server.getRoomUsers(roomId);
+                    const serverData = this.server.getServerData();
+                    if (serverData && serverData.rooms[this.currentRoom.id]) {
+                        const messages = serverData.rooms[this.currentRoom.id].messages;
+                        const container = document.getElementById('messagesContainer');
+                        const currentMessageCount = container.querySelectorAll('.message').length;
+                        
+                        // إذا كان هناك رسائل جديدة
+                        if (messages.length > currentMessageCount) {
+                            const newMessages = messages.slice(currentMessageCount);
+                            for (const message of newMessages) {
+                                await this.displayMessage(message);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('خطأ في تحديث الرسائل:', error);
+                }
+            }
+
+            async updateRoomUsers() {
+                if (!this.currentRoom) return;
+                
+                try {
+                    const users = this.server.getRoomUsers(this.currentRoom.id);
                     const userList = document.getElementById('userList');
                     userList.innerHTML = '';
                     
                     for (const user of users) {
+                        if (user.id === this.currentUser.id) continue;
+                        
                         const li = document.createElement('li');
                         li.className = 'user-list-item';
                         li.innerHTML = `
@@ -2145,7 +2255,12 @@
                                 <img src="${user.avatar}" alt="${user.username}">
                             </div>
                             <div style="flex: 1;">
-                                <div style="font-weight: 500; font-size: 0.875rem;">${user.username}</div>
+                                <div style="font-weight: 500; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    ${user.username}
+                                    <button class="pm-btn" onclick="app.openPrivateChat('${user.id}', '${user.username}', '${user.avatar}')">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </button>
+                                </div>
                                 <div style="font-size: 0.75rem; color: #9ca3af;">${this.getRoleText(user.role)}</div>
                             </div>
                         `;
@@ -2155,6 +2270,182 @@
                     document.getElementById('onlineCount').textContent = users.length;
                 } catch (error) {
                     console.error('خطأ في تحديث المستخدمين:', error);
+                }
+            }
+
+            async updateOnlineUsers() {
+                try {
+                    const onlineUsers = this.server.getOnlineUsers();
+                    this.onlineUsers = new Map(onlineUsers.map(user => [user.id, user]));
+                    
+                    // تحديث عدد المستخدمين المتصلين
+                    document.getElementById('onlineCount').textContent = onlineUsers.length;
+                } catch (error) {
+                    console.error('خطأ في تحديث المستخدمين المتصلين:', error);
+                }
+            }
+
+            async openPrivateChat(userId, username, avatar) {
+                this.pmTargetUser = { id: userId, username, avatar };
+                
+                document.getElementById('pmUserName').textContent = username;
+                document.getElementById('pmUserAvatar').querySelector('img').src = avatar;
+                document.getElementById('pmOverlay').classList.add('active');
+                document.getElementById('pmInput').focus();
+                
+                // تحميل الرسائل الخاصة
+                await this.loadPrivateMessages(userId);
+            }
+
+            async loadPrivateMessages(targetUserId) {
+                const container = document.getElementById('pmMessages');
+                container.innerHTML = '';
+                
+                const messages = this.server.getPrivateMessages(this.currentUser.id, targetUserId);
+                
+                if (messages.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                            <i class="fas fa-comments" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                            <p>ابدأ محادثة خاصة مع ${this.pmTargetUser.username}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                for (const message of messages) {
+                    await this.displayPrivateMessage(message);
+                }
+                
+                // التمرير لآخر رسالة
+                container.scrollTop = container.scrollHeight;
+            }
+
+            async displayPrivateMessage(message) {
+                const container = document.getElementById('pmMessages');
+                const isCurrentUser = message.senderId === this.currentUser.id;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isCurrentUser ? 'my-message' : ''}`;
+                messageDiv.style.marginBottom = '0.75rem';
+                
+                const time = new Date(message.timestamp).toLocaleTimeString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                messageDiv.innerHTML = `
+                    ${!isCurrentUser ? `
+                        <div class="message-avatar" style="width: 36px; height: 36px;">
+                            <img src="${message.senderAvatar || this.pmTargetUser.avatar}" 
+                                 alt="${message.senderUsername || this.pmTargetUser.username}">
+                        </div>
+                    ` : ''}
+                    
+                    <div class="message-content" style="padding: 0.75rem; max-width: 80%;">
+                        <div class="message-header">
+                            <div class="message-sender" style="font-size: 0.8rem;">
+                                ${message.senderUsername || this.pmTargetUser.username}
+                            </div>
+                            <div class="message-time" style="font-size: 0.7rem;">${time}</div>
+                        </div>
+                        <div class="message-text" style="font-size: 0.9rem;">${this.escapeHtml(message.text)}</div>
+                    </div>
+                    
+                    ${isCurrentUser ? `
+                        <div class="message-avatar" style="width: 36px; height: 36px;">
+                            <img src="${this.currentUser.avatar}" alt="${this.currentUser.username}">
+                        </div>
+                    ` : ''}
+                `;
+                
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            async sendPrivateMessage() {
+                if (!this.pmTargetUser) return;
+                
+                const input = document.getElementById('pmInput');
+                const text = input.value.trim();
+                
+                if (!text) return;
+
+                try {
+                    const messageData = {
+                        senderUsername: this.currentUser.username,
+                        senderAvatar: this.currentUser.avatar,
+                        text: text
+                    };
+
+                    const result = this.server.sendPrivateMessage(
+                        this.currentUser.id,
+                        this.pmTargetUser.id,
+                        messageData
+                    );
+                    
+                    if (!result.success) {
+                        this.showNotification(result.error, 'error');
+                        return;
+                    }
+
+                    // عرض الرسالة فوراً
+                    await this.displayPrivateMessage(result.message);
+                    
+                    // مسح حقل الإدخال
+                    input.value = '';
+                    
+                    // إضافة نقاط
+                    await this.addUserPoints(3);
+                    
+                } catch (error) {
+                    console.error('خطأ في إرسال الرسالة الخاصة:', error);
+                    this.showNotification('حدث خطأ في إرسال الرسالة', 'error');
+                }
+            }
+
+            closePMModal() {
+                document.getElementById('pmOverlay').classList.remove('active');
+                document.getElementById('pmInput').value = '';
+                this.pmTargetUser = null;
+            }
+
+            async handleTherapistRoom() {
+                const container = document.getElementById('messagesContainer');
+                
+                // إضافة رسالة ترحيب من البوت
+                const welcomeMessage = {
+                    id: `msg-${Date.now()}`,
+                    userId: 'therapist-bot',
+                    username: '🧠 ثيرابيست AI',
+                    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=therapist&backgroundColor=8b5cf6',
+                    text: 'مرحباً! أنا مساعدك الذكي للدعم النفسي. كيف يمكنني مساعدتك اليوم؟',
+                    timestamp: Date.now(),
+                    type: 'system'
+                };
+
+                this.server.sendMessage('therapist-bot', this.currentRoom.id, {
+                    username: welcomeMessage.username,
+                    avatar: welcomeMessage.avatar,
+                    text: welcomeMessage.text
+                });
+            }
+
+            async addUserPoints(points) {
+                if (!this.currentUser) return;
+                
+                try {
+                    this.currentUser.points = (this.currentUser.points || 0) + points;
+                    this.currentUser.level = Math.floor(this.currentUser.points / 100) + 1;
+                    
+                    await this.localDb.saveUser(this.currentUser);
+                    this.updateLevelInfo();
+                    
+                    if (points >= 10) {
+                        this.showNotification(`🎉 +${points} نقطة!`, 'success');
+                    }
+                } catch (error) {
+                    console.error('خطأ في إضافة النقاط:', error);
                 }
             }
 
@@ -2175,6 +2466,23 @@
             clearTyping() {
                 document.getElementById('typingIndicator').style.display = 'none';
                 clearTimeout(this.typingTimeout);
+            }
+
+            updateConnectionStatus(connected) {
+                const statusEl = document.getElementById('connectionStatus');
+                if (connected) {
+                    statusEl.classList.remove('disconnected');
+                    statusEl.innerHTML = `
+                        <i class="fas fa-wifi"></i>
+                        <span>متصل</span>
+                    `;
+                } else {
+                    statusEl.classList.add('disconnected');
+                    statusEl.innerHTML = `
+                        <i class="fas fa-wifi-slash"></i>
+                        <span>غير متصل</span>
+                    `;
+                }
             }
 
             async openAdminPanel() {
@@ -2211,7 +2519,7 @@
                                 <div>
                                     <div style="font-weight: 600;">${user.username}</div>
                                     <div style="font-size: 0.875rem; color: #6b7280;">
-                                        ${this.getRoleText(user.role)} • ${user.room || 'غير متصل'}
+                                        ${this.getRoleText(user.role)} • ${user.currentRoom || 'غير متصل'}
                                     </div>
                                 </div>
                             </div>
@@ -2279,17 +2587,23 @@
 
                 try {
                     const roles = ['user', 'vip', 'moderator', 'admin'];
-                    const currentRole = this.server.onlineUsers.get(userId)?.role || 'user';
-                    const currentIndex = roles.indexOf(currentRole);
+                    const user = this.onlineUsers.get(userId);
+                    if (!user) return;
+                    
+                    const currentIndex = roles.indexOf(user.role);
                     const nextRole = roles[Math.min(currentIndex + 1, roles.length - 1)];
                     
-                    const user = this.server.onlineUsers.get(userId);
-                    if (user) {
-                        user.role = nextRole;
-                        
-                        this.showNotification(`تم ترقية ${user.username} إلى ${this.getRoleText(nextRole)}`, 'success');
-                        await this.loadAdminUsers();
+                    user.role = nextRole;
+                    
+                    // تحديث في قاعدة البيانات المحلية
+                    const localUser = await this.localDb.getUserById(userId);
+                    if (localUser) {
+                        localUser.role = nextRole;
+                        await this.localDb.saveUser(localUser);
                     }
+                    
+                    this.showNotification(`تم ترقية ${user.username} إلى ${this.getRoleText(nextRole)}`, 'success');
+                    await this.loadAdminUsers();
                 } catch (error) {
                     console.error('خطأ في ترقية المستخدم:', error);
                     this.showNotification('حدث خطأ في ترقية المستخدم', 'error');
@@ -2352,14 +2666,16 @@
             }
 
             logout() {
-                if (this.socketId) {
-                    this.server.disconnectClient(this.socketId);
+                if (this.currentUser) {
+                    this.server.updateUserStatus(this.currentUser.id, 'offline');
+                }
+                
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
                 }
                 
                 this.currentUser = null;
                 this.currentRoom = null;
-                this.socket = null;
-                this.socketId = null;
                 localStorage.removeItem('circl_current_user');
                 
                 document.getElementById('chatContainer').style.display = 'none';
@@ -2380,6 +2696,7 @@
             window.enterVipRoom = () => app.enterVipRoom();
             window.closeVipModal = () => app.closeVipModal();
             window.closeAdminPanel = () => app.closeAdminPanel();
+            window.closePMModal = () => app.closePMModal();
         });
 
         // إضافة زر تسجيل الخروج
@@ -2389,7 +2706,7 @@
             logoutBtn.title = 'تسجيل الخروج';
             logoutBtn.style.cssText = `
                 position: fixed;
-                bottom: 20px;
+                bottom: 80px;
                 left: 20px;
                 width: 50px;
                 height: 50px;
@@ -2429,10 +2746,10 @@
             });
         });
 
-        // تحديث حالة الاتصال كل 5 ثوان
+        // تحديث حالة الاتصال
         setInterval(() => {
             const statusEl = document.getElementById('connectionStatus');
-            if (app && app.socket) {
+            if (navigator.onLine) {
                 statusEl.classList.remove('disconnected');
                 statusEl.innerHTML = `
                     <i class="fas fa-wifi"></i>
