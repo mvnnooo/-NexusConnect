@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6C63FF">
     <title>سيرك - تطبيق الشات الجماعي | Circl - Group Chat App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,23 +14,37 @@
         :root {
             --primary: #6C63FF;
             --primary-dark: #5A52D3;
+            --primary-light: #8B85FF;
             --secondary: #FF6584;
+            --secondary-dark: #E05572;
             --dark: #2A2D43;
+            --dark-light: #3A3E5E;
             --light: #F8F9FA;
             --gray: #E0E0E0;
             --gray-dark: #9E9E9E;
+            --gray-light: #F5F5F5;
             --success: #4CAF50;
             --warning: #FF9800;
             --danger: #F44336;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.12);
             --radius: 16px;
+            --radius-sm: 8px;
             --transition: all 0.3s ease;
+            --header-height: 60px;
+            --nav-height: 70px;
+            --status-bar-height: 30px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -42,25 +57,28 @@
             margin: 0 auto;
             position: relative;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         /* شريط الحالة العلوي */
         .status-bar {
             background-color: var(--dark);
             color: white;
-            padding: 8px 16px;
+            padding: 6px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+            height: var(--status-bar-height);
         }
 
         .status-icons {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .time-display {
@@ -71,44 +89,58 @@
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 18px 16px;
+            padding: 0 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
-            top: 44px;
-            z-index: 99;
+            top: var(--status-bar-height);
+            z-index: 999;
+            height: var(--header-height);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .app-header .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .app-header .logo h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
         }
 
         .app-header .logo-icon {
-            font-size: 28px;
+            font-size: 26px;
             color: var(--secondary);
+            animation: pulse 2s infinite;
         }
 
         .header-actions {
             display: flex;
-            gap: 16px;
+            gap: 18px;
         }
 
         .header-actions i {
             font-size: 20px;
             cursor: pointer;
             transition: var(--transition);
+            padding: 5px;
+            border-radius: 50%;
         }
 
         .header-actions i:hover {
             transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: var(--gray-light);
+            padding-bottom: var(--nav-height);
         }
 
         /* التنقل السفلي */
@@ -120,13 +152,14 @@
             background-color: white;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
+            padding: 12px 0 10px;
             box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
             border-top-left-radius: var(--radius);
             border-top-right-radius: var(--radius);
-            z-index: 100;
+            z-index: 1000;
             max-width: 500px;
             margin: 0 auto;
+            height: var(--nav-height);
         }
 
         .nav-item {
@@ -138,18 +171,30 @@
             transition: var(--transition);
             flex: 1;
             color: var(--gray-dark);
+            position: relative;
         }
 
         .nav-item.active {
             color: var(--primary);
         }
 
-        .nav-item:hover {
-            transform: translateY(-2px);
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
         }
 
         .nav-item i {
             font-size: 20px;
+            transition: var(--transition);
+        }
+
+        .nav-item.active i {
+            transform: translateY(-3px);
         }
 
         .nav-item span {
@@ -157,13 +202,26 @@
             font-weight: 500;
         }
 
-        /* المحتوى الرئيسي */
-        .main-content {
-            padding: 16px;
-            padding-bottom: 80px;
-            min-height: calc(100vh - 130px);
-            overflow-y: auto;
-            background-color: #f5f7fb;
+        /* أقسام المحتوى */
+        .content-section {
+            padding: 20px 16px;
+            min-height: 100%;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         /* شاشة الدردشات */
@@ -184,11 +242,13 @@
             cursor: pointer;
             transition: var(--transition);
             position: relative;
+            border: 1px solid transparent;
         }
 
         .chat-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-heavy);
+            border-color: var(--primary-light);
         }
 
         .chat-card.unread::after {
@@ -215,10 +275,12 @@
             font-size: 22px;
             font-weight: 600;
             flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(108, 99, 255, 0.2);
         }
 
         .chat-info {
             flex: 1;
+            min-width: 0;
         }
 
         .chat-header {
@@ -232,11 +294,15 @@
             font-size: 16px;
             font-weight: 600;
             color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .chat-time {
             font-size: 12px;
             color: var(--gray-dark);
+            flex-shrink: 0;
         }
 
         .chat-preview {
@@ -245,44 +311,78 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
+        }
+
+        .chat-preview-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
         }
 
         .unread-count {
             background-color: var(--primary);
             color: white;
             font-size: 12px;
-            width: 20px;
+            min-width: 20px;
             height: 20px;
-            border-radius: 50%;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
+            padding: 0 6px;
+            flex-shrink: 0;
         }
 
         /* شاشة الدردشة */
         .chat-screen {
             display: none;
             flex-direction: column;
-            height: calc(100vh - 130px);
+            height: calc(100vh - var(--status-bar-height) - var(--header-height));
+            position: fixed;
+            top: calc(var(--status-bar-height) + var(--header-height));
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: var(--gray-light);
+            z-index: 1001;
+        }
+
+        .chat-screen.active {
+            display: flex;
         }
 
         .chat-header-bar {
             background-color: white;
-            padding: 16px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             position: sticky;
-            top: 44px;
+            top: 0;
             z-index: 10;
+            border-bottom: 1px solid var(--gray);
         }
 
         .back-button {
             font-size: 20px;
             cursor: pointer;
             color: var(--primary);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            background-color: rgba(108, 99, 255, 0.1);
         }
 
         .chat-header-info {
@@ -290,12 +390,17 @@
             align-items: center;
             gap: 12px;
             flex: 1;
+            min-width: 0;
         }
 
         .chat-header-info .chat-avatar {
             width: 44px;
             height: 44px;
             font-size: 18px;
+        }
+
+        .chat-header-text {
+            min-width: 0;
         }
 
         .chat-status {
@@ -312,6 +417,23 @@
             height: 8px;
             background-color: var(--success);
             border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .chat-actions i {
+            font-size: 20px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-actions i:hover {
+            transform: scale(1.1);
         }
 
         .chat-messages {
@@ -325,13 +447,12 @@
 
         .message {
             display: flex;
-            max-width: 80%;
-            animation: fadeIn 0.3s ease;
+            max-width: 85%;
+            animation: fadeInUp 0.3s ease;
         }
 
         .message.sent {
             align-self: flex-end;
-            flex-direction: row-reverse;
         }
 
         .message.received {
@@ -343,6 +464,7 @@
             border-radius: 20px;
             position: relative;
             word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .message.sent .message-content {
@@ -355,19 +477,26 @@
             background-color: white;
             color: var(--dark);
             border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--dark-light);
         }
 
         .message-time {
             font-size: 11px;
-            color: var(--gray-dark);
-            margin-top: 4px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 6px;
             display: block;
-            text-align: right;
+            text-align: left;
         }
 
         .message.received .message-time {
-            text-align: left;
+            color: var(--gray-dark);
+            text-align: right;
         }
 
         .message-input-container {
@@ -377,40 +506,74 @@
             gap: 12px;
             align-items: center;
             border-top: 1px solid var(--gray);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .message-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: var(--gray-light);
+            border-radius: 24px;
+            padding: 4px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .message-input-wrapper:focus-within {
+            border-color: var(--primary);
+            background-color: white;
+        }
+
+        .attachment-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .attachment-btn:hover {
+            background-color: rgba(108, 99, 255, 0.1);
         }
 
         .message-input {
             flex: 1;
-            border: 1px solid var(--gray);
-            border-radius: 24px;
-            padding: 12px 18px;
+            border: none;
+            padding: 10px 14px;
             font-family: inherit;
             font-size: 14px;
             outline: none;
-            transition: var(--transition);
-        }
-
-        .message-input:focus {
-            border-color: var(--primary);
+            background: transparent;
         }
 
         .send-button {
             background-color: var(--primary);
             color: white;
             border: none;
-            width: 46px;
-            height: 46px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: var(--transition);
+            flex-shrink: 0;
         }
 
-        .send-button:hover {
+        .send-button:hover:not(:disabled) {
             background-color: var(--primary-dark);
             transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
         }
 
         /* شاشة المجموعات */
@@ -427,16 +590,16 @@
             box-shadow: var(--shadow);
             cursor: pointer;
             transition: var(--transition);
+            height: 100%;
         }
 
         .group-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-heavy);
         }
 
         .group-banner {
             height: 100px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
             position: relative;
             display: flex;
             align-items: center;
@@ -448,6 +611,8 @@
         .group-avatar {
             position: absolute;
             bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -464,6 +629,7 @@
 
         .group-info {
             padding: 30px 16px 16px;
+            text-align: center;
         }
 
         .group-name {
@@ -471,6 +637,9 @@
             font-weight: 600;
             margin-bottom: 6px;
             color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .group-members {
@@ -478,7 +647,124 @@
             color: var(--gray-dark);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
+        }
+
+        /* شاشة الملف الشخصي */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: 10px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border: 5px solid white;
+            box-shadow: var(--shadow-heavy);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-avatar::after {
+            content: '\f030';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: var(--transition);
+        }
+
+        .profile-avatar:hover::after {
+            transform: translateY(0);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .profile-status {
+            font-size: 14px;
+            color: var(--gray-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-status::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 10px;
+            border-radius: var(--radius-sm);
+        }
+
+        .stat-item:hover {
+            background-color: var(--gray-light);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-dark);
         }
 
         /* شاشة الإعدادات */
@@ -495,12 +781,19 @@
             box-shadow: var(--shadow);
         }
 
-        .section-title {
+        .settings-section-title {
             padding: 16px;
             font-size: 18px;
             font-weight: 600;
             color: var(--dark);
             border-bottom: 1px solid var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-section-title i {
+            color: var(--primary);
         }
 
         .settings-item {
@@ -510,10 +803,15 @@
             padding: 16px;
             cursor: pointer;
             transition: var(--transition);
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
         }
 
         .settings-item:hover {
-            background-color: rgba(0, 0, 0, 0.02);
+            background-color: var(--gray-light);
         }
 
         .settings-item-left {
@@ -534,6 +832,10 @@
             font-size: 18px;
         }
 
+        .settings-text {
+            flex: 1;
+        }
+
         .settings-text h3 {
             font-size: 16px;
             font-weight: 600;
@@ -550,6 +852,7 @@
             position: relative;
             width: 50px;
             height: 26px;
+            flex-shrink: 0;
         }
 
         .toggle-switch input {
@@ -590,82 +893,9 @@
             transform: translateX(24px);
         }
 
-        /* شاشة الملف الشخصي */
-        .profile-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 16px;
-            background-color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-top: 20px;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            border: 5px solid white;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 6px;
-        }
-
-        .profile-status {
-            font-size: 14px;
+        .settings-value {
             color: var(--gray-dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .profile-status::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background-color: var(--success);
-            border-radius: 50%;
-        }
-
-        .profile-stats {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--gray);
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .stat-label {
             font-size: 14px;
-            color: var(--gray-dark);
         }
 
         /* لغة التطبيق */
@@ -685,6 +915,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            flex: 1;
+            max-width: 140px;
         }
 
         .lang-btn.active {
@@ -693,21 +925,119 @@
             border-color: var(--primary);
         }
 
+        .lang-btn:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
         /* الرسوم المتحركة */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* تأثيرات الدخول والخروج */
+        .page-enter {
+            animation: slideInRight 0.3s forwards;
+        }
+
+        .page-exit {
+            animation: slideOutLeft 0.3s forwards;
         }
 
         /* الطبقات المخفية */
         .hidden {
             display: none !important;
+        }
+
+        /* شاشة التحميل */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background-color: white;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* رسائل النظام */
+        .system-message {
+            align-self: center;
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--gray-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+        /* الوقت في الرسائل */
+        .message-time-small {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-left: 8px;
         }
 
         /* التأكد من أن المحتوى مرئي على الأجهزة المحمولة */
@@ -719,9 +1049,29 @@
             .bottom-nav {
                 border-radius: 0;
             }
+            
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* التأكد من دعم اللغة العربية */
+        @media (max-width: 350px) {
+            .app-header .logo h1 {
+                font-size: 18px;
+            }
+            
+            .header-actions {
+                gap: 12px;
+            }
+            
+            .chat-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+        }
+
+        /* دعم اللغة العربية */
         [dir="rtl"] .message.sent .message-content {
             border-bottom-left-radius: 4px;
             border-bottom-right-radius: 20px;
@@ -731,9 +1081,68 @@
             border-bottom-right-radius: 4px;
             border-bottom-left-radius: 20px;
         }
+
+        [dir="rtl"] .slider:before {
+            left: auto;
+            right: 3px;
+        }
+
+        [dir="rtl"] input:checked + .slider:before {
+            transform: translateX(-24px);
+        }
+
+        [dir="ltr"] .back-button i {
+            transform: rotate(180deg);
+        }
+
+        /* شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(108, 99, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(108, 99, 255, 0.5);
+        }
+
+        /* رسالة جديدة */
+        .new-message-indicator {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            z-index: 100;
+            display: none;
+            animation: fadeInUp 0.3s ease;
+        }
     </style>
 </head>
 <body>
+    <!-- شاشة التحميل -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-logo">○</div>
+        <div class="loading-text">سيرك</div>
+        <div class="loading-subtext">تطبيق الشات الجماعي</div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loading-progress"></div>
+        </div>
+    </div>
+
     <!-- شريط الحالة العلوي -->
     <div class="status-bar">
         <div class="time-display" id="current-time">09:45</div>
@@ -748,12 +1157,12 @@
     <header class="app-header">
         <div class="logo">
             <div class="logo-icon">○</div>
-            <h1>سيرك | Circl</h1>
+            <h1 id="app-title">سيرك | Circl</h1>
         </div>
         <div class="header-actions">
-            <i class="fas fa-search" id="search-btn"></i>
-            <i class="fas fa-user-plus" id="add-contact-btn"></i>
-            <i class="fas fa-cog" id="settings-btn"></i>
+            <i class="fas fa-search" id="search-btn" title="بحث"></i>
+            <i class="fas fa-user-plus" id="add-contact-btn" title="إضافة صديق"></i>
+            <i class="fas fa-cog" id="settings-btn" title="الإعدادات"></i>
         </div>
     </header>
 
@@ -761,39 +1170,45 @@
     <main class="main-content" id="main-content">
         <!-- شاشة الدردشات (الرئيسية) -->
         <div class="content-section active" id="chats-section">
-            <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 22px;">الدردشات</h2>
+            <h2 class="section-title">
+                <span id="chats-title">الدردشات</span>
+                <i class="fas fa-edit" id="new-chat-btn" style="color: var(--primary); cursor: pointer;" title="دردشة جديدة"></i>
+            </h2>
             <div class="chats-container" id="chats-container">
                 <!-- سيتم ملء الدردشات بواسطة JavaScript -->
             </div>
         </div>
 
         <!-- شاشة المجموعات -->
-        <div class="content-section hidden" id="groups-section">
-            <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 22px;">المجموعات</h2>
+        <div class="content-section" id="groups-section">
+            <h2 class="section-title">
+                <span id="groups-title">المجموعات</span>
+                <i class="fas fa-plus-circle" id="new-group-btn" style="color: var(--primary); cursor: pointer;" title="مجموعة جديدة"></i>
+            </h2>
             <div class="groups-container" id="groups-container">
                 <!-- سيتم ملء المجموعات بواسطة JavaScript -->
             </div>
         </div>
 
         <!-- شاشة الملف الشخصي -->
-        <div class="content-section hidden" id="profile-section">
+        <div class="content-section" id="profile-section">
             <div class="profile-container">
-                <div class="profile-avatar" id="user-avatar">م</div>
+                <div class="profile-avatar" id="user-avatar" title="تغيير الصورة">م</div>
                 <h2 class="profile-name" id="user-name">محمد أحمد</h2>
                 <div class="profile-status" id="user-status">متصل الآن</div>
                 
                 <div class="profile-stats">
-                    <div class="stat-item">
+                    <div class="stat-item" id="friends-stat">
                         <span class="stat-value" id="friends-count">147</span>
-                        <span class="stat-label">الأصدقاء</span>
+                        <span class="stat-label" id="friends-label">الأصدقاء</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" id="groups-stat">
                         <span class="stat-value" id="groups-count">12</span>
-                        <span class="stat-label">المجموعات</span>
+                        <span class="stat-label" id="groups-label">المجموعات</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" id="messages-stat">
                         <span class="stat-value" id="messages-count">2.3k</span>
-                        <span class="stat-label">الرسائل</span>
+                        <span class="stat-label" id="messages-label">الرسائل</span>
                     </div>
                 </div>
                 
@@ -802,22 +1217,58 @@
                     <button class="lang-btn" id="lang-en">English</button>
                 </div>
             </div>
-        </div>
-
-        <!-- شاشة الإعدادات -->
-        <div class="content-section hidden" id="settings-section">
-            <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 22px;">الإعدادات</h2>
-            <div class="settings-container">
+            
+            <div class="settings-container" style="margin-top: 20px;">
                 <div class="settings-section">
-                    <div class="section-title">الحساب</div>
+                    <div class="settings-section-title">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="profile-actions-title">إجراءات الملف الشخصي</span>
+                    </div>
                     <div class="settings-item" id="edit-profile-btn">
                         <div class="settings-item-left">
                             <div class="settings-icon">
                                 <i class="fas fa-user-edit"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>تعديل الملف الشخصي</h3>
-                                <p>تغيير الصورة والمعلومات الشخصية</p>
+                                <h3 id="edit-profile-text">تعديل الملف الشخصي</h3>
+                                <p id="edit-profile-desc">تغيير الصورة والمعلومات الشخصية</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="settings-item" id="change-status-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3 id="change-status-text">تغيير الحالة</h3>
+                                <p id="change-status-desc">تحديث حالة الاتصال الخاصة بك</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- شاشة الإعدادات -->
+        <div class="content-section" id="settings-section">
+            <h2 class="section-title" id="settings-title">الإعدادات</h2>
+            <div class="settings-container">
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        <i class="fas fa-user-cog"></i>
+                        <span id="account-settings-title">إعدادات الحساب</span>
+                    </div>
+                    <div class="settings-item" id="edit-profile-settings-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3 id="edit-profile-settings-text">تعديل الملف الشخصي</h3>
+                                <p id="edit-profile-settings-desc">تغيير الصورة والمعلومات الشخصية</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-left"></i>
@@ -828,8 +1279,8 @@
                                 <i class="fas fa-lock"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>الخصوصية</h3>
-                                <p>إدارة إعدادات الخصوصية والأمان</p>
+                                <h3 id="privacy-text">الخصوصية</h3>
+                                <p id="privacy-desc">إدارة إعدادات الخصوصية والأمان</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-left"></i>
@@ -837,15 +1288,18 @@
                 </div>
 
                 <div class="settings-section">
-                    <div class="section-title">التطبيق</div>
+                    <div class="settings-section-title">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span id="app-settings-title">إعدادات التطبيق</span>
+                    </div>
                     <div class="settings-item">
                         <div class="settings-item-left">
                             <div class="settings-icon">
                                 <i class="fas fa-bell"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>الإشعارات</h3>
-                                <p>إدارة إشعارات التطبيق</p>
+                                <h3 id="notifications-text">الإشعارات</h3>
+                                <p id="notifications-desc">إدارة إشعارات التطبيق</p>
                             </div>
                         </div>
                         <div class="toggle-switch">
@@ -853,17 +1307,17 @@
                             <label for="notifications-toggle" class="slider"></label>
                         </div>
                     </div>
-                    <div class="settings-item">
+                    <div class="settings-item" id="appearance-btn">
                         <div class="settings-item-left">
                             <div class="settings-icon">
                                 <i class="fas fa-palette"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>المظهر</h3>
-                                <p>تغيير سمة التطبيق</p>
+                                <h3 id="appearance-text">المظهر</h3>
+                                <p id="appearance-desc">تغيير سمة التطبيق</p>
                             </div>
                         </div>
-                        <i class="fas fa-chevron-left"></i>
+                        <div class="settings-value" id="current-theme">فاتح</div>
                     </div>
                     <div class="settings-item">
                         <div class="settings-item-left">
@@ -871,27 +1325,27 @@
                                 <i class="fas fa-language"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>اللغة</h3>
-                                <p>تغيير لغة التطبيق</p>
+                                <h3 id="language-text">اللغة</h3>
+                                <p id="language-desc">تغيير لغة التطبيق</p>
                             </div>
                         </div>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="language-toggle">
-                            <label for="language-toggle" class="slider"></label>
-                        </div>
+                        <div class="settings-value" id="current-language">العربية</div>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="section-title">عام</div>
+                    <div class="settings-section-title">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="general-settings-title">عام</span>
+                    </div>
                     <div class="settings-item" id="help-btn">
                         <div class="settings-item-left">
                             <div class="settings-icon">
                                 <i class="fas fa-question-circle"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>المساعدة والدعم</h3>
-                                <p>الدليل ومركز المساعدة</p>
+                                <h3 id="help-text">المساعدة والدعم</h3>
+                                <p id="help-desc">الدليل ومركز المساعدة</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-left"></i>
@@ -902,8 +1356,20 @@
                                 <i class="fas fa-info-circle"></i>
                             </div>
                             <div class="settings-text">
-                                <h3>حول التطبيق</h3>
-                                <p>إصدار التطبيق والمعلومات</p>
+                                <h3 id="about-text">حول التطبيق</h3>
+                                <p id="about-desc">إصدار التطبيق والمعلومات</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="settings-item" id="logout-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon" style="background-color: rgba(244, 67, 54, 0.1); color: var(--danger);">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3 id="logout-text" style="color: var(--danger);">تسجيل الخروج</h3>
+                                <p id="logout-desc">الخروج من حسابك</p>
                             </div>
                         </div>
                         <i class="fas fa-chevron-left"></i>
@@ -913,22 +1379,22 @@
         </div>
 
         <!-- شاشة الدردشة الفردية -->
-        <div class="chat-screen hidden" id="chat-screen">
+        <div class="chat-screen" id="chat-screen">
             <div class="chat-header-bar">
-                <div class="back-button" id="back-to-chats">
+                <div class="back-button" id="back-to-chats" title="رجوع">
                     <i class="fas fa-arrow-right"></i>
                 </div>
                 <div class="chat-header-info">
                     <div class="chat-avatar" id="chat-with-avatar">م</div>
-                    <div>
+                    <div class="chat-header-text">
                         <div class="chat-name" id="chat-with-name">محمد أحمد</div>
                         <div class="chat-status" id="chat-with-status">متصل الآن</div>
                     </div>
                 </div>
-                <div class="header-actions">
-                    <i class="fas fa-phone"></i>
-                    <i class="fas fa-video"></i>
-                    <i class="fas fa-ellipsis-v"></i>
+                <div class="chat-actions">
+                    <i class="fas fa-phone" id="call-btn" title="اتصال صوتي"></i>
+                    <i class="fas fa-video" id="video-call-btn" title="اتصال فيديو"></i>
+                    <i class="fas fa-ellipsis-v" id="chat-menu-btn" title="المزيد"></i>
                 </div>
             </div>
 
@@ -937,73 +1403,105 @@
             </div>
 
             <div class="message-input-container">
-                <i class="fas fa-plus-circle" style="font-size: 24px; color: var(--primary); cursor: pointer;"></i>
-                <input type="text" class="message-input" id="message-input" placeholder="اكتب رسالة...">
-                <button class="send-button" id="send-message-btn">
+                <div class="message-input-wrapper">
+                    <button class="attachment-btn" id="attachment-btn" title="إرفاق ملف">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input type="text" class="message-input" id="message-input" placeholder="اكتب رسالة...">
+                    <button class="attachment-btn" id="emoji-btn" title="إضافة إيموجي">
+                        <i class="far fa-smile"></i>
+                    </button>
+                </div>
+                <button class="send-button" id="send-message-btn" disabled>
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+            
+            <div class="new-message-indicator" id="new-message-indicator">رسائل جديدة ↓</div>
         </div>
     </main>
 
     <!-- التنقل السفلي -->
     <nav class="bottom-nav">
-        <div class="nav-item active" data-section="chats-section">
+        <div class="nav-item active" data-section="chats-section" id="nav-chats">
             <i class="fas fa-comments"></i>
-            <span>الدردشات</span>
+            <span id="nav-chats-text">الدردشات</span>
         </div>
-        <div class="nav-item" data-section="groups-section">
+        <div class="nav-item" data-section="groups-section" id="nav-groups">
             <i class="fas fa-users"></i>
-            <span>المجموعات</span>
+            <span id="nav-groups-text">المجموعات</span>
         </div>
-        <div class="nav-item" data-section="profile-section">
+        <div class="nav-item" data-section="profile-section" id="nav-profile">
             <i class="fas fa-user"></i>
-            <span>الملف الشخصي</span>
+            <span id="nav-profile-text">الملف</span>
         </div>
-        <div class="nav-item" data-section="settings-section">
+        <div class="nav-item" data-section="settings-section" id="nav-settings">
             <i class="fas fa-cog"></i>
-            <span>الإعدادات</span>
+            <span id="nav-settings-text">الإعدادات</span>
         </div>
     </nav>
 
     <script>
-        // البيانات الأولية للتطبيق
-        const appData = {
-            currentLanguage: 'ar',
-            currentUser: {
+        // البيانات الرئيسية للتطبيق
+        const App = {
+            // إعدادات التطبيق
+            config: {
+                currentLanguage: 'ar',
+                currentTheme: 'light',
+                notificationsEnabled: true,
+                soundEnabled: true,
+                vibrationEnabled: true
+            },
+            
+            // بيانات المستخدم
+            user: {
+                id: 1,
                 name: 'محمد أحمد',
                 avatar: 'م',
-                status: 'متصل الآن'
+                status: 'متصل الآن',
+                phone: '+966500123456',
+                email: 'mohamed@example.com',
+                friends: 147,
+                groups: 12,
+                messages: 2300
             },
+            
+            // بيانات الدردشات
             chats: [
                 {
                     id: 1,
                     name: 'مجموعة العائلة',
                     avatar: 'ع',
-                    lastMessage: 'متى اجتماع العائلة؟',
+                    lastMessage: 'متى اجتماع العائلة القادم؟',
                     time: '09:30',
                     unread: 5,
                     isGroup: true,
-                    members: 12
+                    members: 12,
+                    lastActive: '2023-10-15T09:30:00',
+                    color: '#6C63FF'
                 },
                 {
                     id: 2,
                     name: 'أحمد خالد',
                     avatar: 'أ',
-                    lastMessage: 'شكرًا على المساعدة!',
+                    lastMessage: 'شكرًا على المساعدة في المشروع!',
                     time: 'أمس',
                     unread: 0,
-                    isGroup: false
+                    isGroup: false,
+                    lastActive: '2023-10-14T15:45:00',
+                    color: '#FF6584'
                 },
                 {
                     id: 3,
                     name: 'فريق العمل',
                     avatar: 'ف',
-                    lastMessage: 'الاجتماع في الساعة 2',
+                    lastMessage: 'الاجتماع الأسبوعي في الساعة 2 ظهرًا',
                     time: 'الجمعة',
                     unread: 12,
                     isGroup: true,
-                    members: 8
+                    members: 8,
+                    lastActive: '2023-10-13T14:00:00',
+                    color: '#4CAF50'
                 },
                 {
                     id: 4,
@@ -1012,136 +1510,353 @@
                     lastMessage: 'هل رأيت الفيلم الجديد؟',
                     time: 'الخميس',
                     unread: 0,
-                    isGroup: false
+                    isGroup: false,
+                    lastActive: '2023-10-12T20:15:00',
+                    color: '#FF9800'
                 },
                 {
                     id: 5,
                     name: 'أصدقاء الجامعة',
                     avatar: 'ص',
-                    lastMessage: 'نلتقي في المطعم الساعة 7',
+                    lastMessage: 'نلتقي في المطعم الساعة 7 مساءً',
                     time: 'الأربعاء',
                     unread: 3,
                     isGroup: true,
-                    members: 20
+                    members: 20,
+                    lastActive: '2023-10-11T19:00:00',
+                    color: '#9C27B0'
+                },
+                {
+                    id: 6,
+                    name: 'علي حسن',
+                    avatar: 'ع',
+                    lastMessage: 'أرسلت لك الملف المطلوب',
+                    time: 'الثلاثاء',
+                    unread: 1,
+                    isGroup: false,
+                    lastActive: '2023-10-10T11:20:00',
+                    color: '#2196F3'
                 }
             ],
+            
+            // بيانات المجموعات
             groups: [
                 {
                     id: 1,
                     name: 'مجموعة العائلة',
                     avatar: 'ع',
                     members: 12,
-                    color: '#6C63FF'
+                    color: '#6C63FF',
+                    description: 'مجموعة العائلة الكريمة'
                 },
                 {
                     id: 2,
                     name: 'فريق العمل',
                     avatar: 'ف',
                     members: 8,
-                    color: '#FF6584'
+                    color: '#FF6584',
+                    description: 'فريق تطوير المشروع'
                 },
                 {
                     id: 3,
                     name: 'أصدقاء الجامعة',
                     avatar: 'ص',
                     members: 20,
-                    color: '#4CAF50'
+                    color: '#4CAF50',
+                    description: 'خريجو جامعة الملك سعود'
                 },
                 {
                     id: 4,
                     name: 'نادي القراءة',
                     avatar: 'ن',
                     members: 15,
-                    color: '#FF9800'
+                    color: '#FF9800',
+                    description: 'لمحبي القراءة والكتب'
                 },
                 {
                     id: 5,
                     name: 'مشروع التخرج',
                     avatar: 'م',
                     members: 5,
-                    color: '#9C27B0'
+                    color: '#9C27B0',
+                    description: 'فريق مشروع التخرج 2023'
                 },
                 {
                     id: 6,
                     name: 'السفر والسياحة',
                     avatar: 'س',
                     members: 25,
-                    color: '#2196F3'
+                    color: '#2196F3',
+                    description: 'لمحبي السفر والمغامرات'
+                },
+                {
+                    id: 7,
+                    name: 'لجنة الحفلات',
+                    avatar: 'ل',
+                    members: 10,
+                    color: '#E91E63',
+                    description: 'لتنظيم الحفلات والمناسبات'
+                },
+                {
+                    id: 8,
+                    name: 'مجموعة الدراسة',
+                    avatar: 'م',
+                    members: 6,
+                    color: '#00BCD4',
+                    description: 'للمذاكرة والمساعدة الدراسية'
                 }
             ],
-            messages: [
-                {
-                    id: 1,
-                    chatId: 1,
-                    sender: 'الأم',
-                    content: 'مرحبًا جميعًا، متى اجتماع العائلة القادم؟',
-                    time: '09:15',
-                    sent: false
-                },
-                {
-                    id: 2,
-                    chatId: 1,
-                    sender: 'أنت',
-                    content: 'أقترح يوم السعة القادم',
-                    time: '09:20',
-                    sent: true
-                },
-                {
-                    id: 3,
-                    chatId: 1,
-                    sender: 'الأخ',
-                    content: 'أنا موافق، عندي إجازة نهاية الأسبوع',
-                    time: '09:25',
-                    sent: false
-                },
-                {
-                    id: 4,
-                    chatId: 1,
-                    sender: 'الأخت',
-                    content: 'أي مطعم تفضلون؟',
-                    time: '09:30',
-                    sent: false
-                }
-            ],
+            
+            // بيانات الرسائل
+            messages: {
+                1: [
+                    {
+                        id: 1,
+                        senderId: 2,
+                        senderName: 'الأم',
+                        content: 'مرحبًا جميعًا، متى اجتماع العائلة القادم؟',
+                        time: '09:15',
+                        timestamp: '2023-10-15T09:15:00',
+                        sent: false
+                    },
+                    {
+                        id: 2,
+                        senderId: 1,
+                        senderName: 'أنت',
+                        content: 'أقترح يوم السبت القادم',
+                        time: '09:20',
+                        timestamp: '2023-10-15T09:20:00',
+                        sent: true
+                    },
+                    {
+                        id: 3,
+                        senderId: 3,
+                        senderName: 'الأخ',
+                        content: 'أنا موافق، عندي إجازة نهاية الأسبوع',
+                        time: '09:25',
+                        timestamp: '2023-10-15T09:25:00',
+                        sent: false
+                    },
+                    {
+                        id: 4,
+                        senderId: 4,
+                        senderName: 'الأخت',
+                        content: 'أي مطعم تفضلون؟',
+                        time: '09:30',
+                        timestamp: '2023-10-15T09:30:00',
+                        sent: false
+                    }
+                ],
+                2: [
+                    {
+                        id: 1,
+                        senderId: 5,
+                        senderName: 'أحمد خالد',
+                        content: 'مرحبًا، كيف حالك؟',
+                        time: 'أمس 15:30',
+                        timestamp: '2023-10-14T15:30:00',
+                        sent: false
+                    },
+                    {
+                        id: 2,
+                        senderId: 1,
+                        senderName: 'أنت',
+                        content: 'أهلاً أحمد، أنا بخير الحمدلله. وأنت؟',
+                        time: 'أمس 15:35',
+                        timestamp: '2023-10-14T15:35:00',
+                        sent: true
+                    },
+                    {
+                        id: 3,
+                        senderId: 5,
+                        senderName: 'أحمد خالد',
+                        content: 'بخير أيضًا، شكرًا على المساعدة في المشروع!',
+                        time: 'أمس 15:45',
+                        timestamp: '2023-10-14T15:45:00',
+                        sent: false
+                    }
+                ],
+                3: [
+                    {
+                        id: 1,
+                        senderId: 6,
+                        senderName: 'مدير الفريق',
+                        content: 'تذكير: الاجتماع الأسبوعي غدًا في الساعة 2 ظهرًا',
+                        time: 'الجمعة 10:00',
+                        timestamp: '2023-10-13T10:00:00',
+                        sent: false
+                    },
+                    {
+                        id: 2,
+                        senderId: 1,
+                        senderName: 'أنت',
+                        content: 'حاضر، سأحضر الاجتماع',
+                        time: 'الجمعة 10:15',
+                        timestamp: '2023-10-13T10:15:00',
+                        sent: true
+                    },
+                    {
+                        id: 3,
+                        senderId: 7,
+                        senderName: 'زميل العمل',
+                        content: 'هل أحضر العرض التقديمي؟',
+                        time: 'الجمعة 14:00',
+                        timestamp: '2023-10-13T14:00:00',
+                        sent: false
+                    }
+                ]
+            },
+            
+            // الدردشة الحالية
             currentChatId: null,
-            englishData: {
-                appName: 'Circl',
-                chats: 'Chats',
-                groups: 'Groups',
-                profile: 'Profile',
-                settings: 'Settings',
-                online: 'Online',
-                typeMessage: 'Type a message...',
-                editProfile: 'Edit Profile',
-                privacy: 'Privacy',
-                notifications: 'Notifications',
-                appearance: 'Appearance',
-                language: 'Language',
-                help: 'Help & Support',
-                about: 'About',
-                friends: 'Friends',
-                messages: 'Messages'
+            
+            // الترجمات
+            translations: {
+                ar: {
+                    appName: 'سيرك | Circl',
+                    chats: 'الدردشات',
+                    groups: 'المجموعات',
+                    profile: 'الملف الشخصي',
+                    settings: 'الإعدادات',
+                    online: 'متصل الآن',
+                    offline: 'غير متصل',
+                    typing: 'يكتب الآن...',
+                    typeMessage: 'اكتب رسالة...',
+                    editProfile: 'تعديل الملف الشخصي',
+                    editProfileDesc: 'تغيير الصورة والمعلومات الشخصية',
+                    changeStatus: 'تغيير الحالة',
+                    changeStatusDesc: 'تحديث حالة الاتصال الخاصة بك',
+                    privacy: 'الخصوصية',
+                    privacyDesc: 'إدارة إعدادات الخصوصية والأمان',
+                    notifications: 'الإشعارات',
+                    notificationsDesc: 'إدارة إشعارات التطبيق',
+                    appearance: 'المظهر',
+                    appearanceDesc: 'تغيير سمة التطبيق',
+                    language: 'اللغة',
+                    languageDesc: 'تغيير لغة التطبيق',
+                    help: 'المساعدة والدعم',
+                    helpDesc: 'الدليل ومركز المساعدة',
+                    about: 'حول التطبيق',
+                    aboutDesc: 'إصدار التطبيق والمعلومات',
+                    logout: 'تسجيل الخروج',
+                    logoutDesc: 'الخروج من حسابك',
+                    friends: 'الأصدقاء',
+                    messages: 'الرسائل',
+                    accountSettings: 'إعدادات الحساب',
+                    appSettings: 'إعدادات التطبيق',
+                    generalSettings: 'عام',
+                    profileActions: 'إجراءات الملف الشخصي',
+                    search: 'بحث',
+                    addFriend: 'إضافة صديق',
+                    newChat: 'دردشة جديدة',
+                    newGroup: 'مجموعة جديدة',
+                    seen: 'تمت المشاهدة',
+                    sent: 'تم الإرسال',
+                    delivered: 'تم التوصيل',
+                    today: 'اليوم',
+                    yesterday: 'أمس',
+                    thisWeek: 'هذا الأسبوع',
+                    lastWeek: 'الأسبوع الماضي',
+                    photo: 'صورة',
+                    video: 'فيديو',
+                    audio: 'صوت',
+                    document: 'ملف',
+                    location: 'موقع',
+                    contact: 'جهة اتصال'
+                },
+                en: {
+                    appName: 'Circl | سيرك',
+                    chats: 'Chats',
+                    groups: 'Groups',
+                    profile: 'Profile',
+                    settings: 'Settings',
+                    online: 'Online now',
+                    offline: 'Offline',
+                    typing: 'Typing...',
+                    typeMessage: 'Type a message...',
+                    editProfile: 'Edit Profile',
+                    editProfileDesc: 'Change photo and personal info',
+                    changeStatus: 'Change Status',
+                    changeStatusDesc: 'Update your connection status',
+                    privacy: 'Privacy',
+                    privacyDesc: 'Manage privacy and security settings',
+                    notifications: 'Notifications',
+                    notificationsDesc: 'Manage app notifications',
+                    appearance: 'Appearance',
+                    appearanceDesc: 'Change app theme',
+                    language: 'Language',
+                    languageDesc: 'Change app language',
+                    help: 'Help & Support',
+                    helpDesc: 'Guide and help center',
+                    about: 'About',
+                    aboutDesc: 'App version and info',
+                    logout: 'Logout',
+                    logoutDesc: 'Sign out of your account',
+                    friends: 'Friends',
+                    messages: 'Messages',
+                    accountSettings: 'Account Settings',
+                    appSettings: 'App Settings',
+                    generalSettings: 'General',
+                    profileActions: 'Profile Actions',
+                    search: 'Search',
+                    addFriend: 'Add Friend',
+                    newChat: 'New Chat',
+                    newGroup: 'New Group',
+                    seen: 'Seen',
+                    sent: 'Sent',
+                    delivered: 'Delivered',
+                    today: 'Today',
+                    yesterday: 'Yesterday',
+                    thisWeek: 'This Week',
+                    lastWeek: 'Last Week',
+                    photo: 'Photo',
+                    video: 'Video',
+                    audio: 'Audio',
+                    document: 'Document',
+                    location: 'Location',
+                    contact: 'Contact'
+                }
             }
         };
 
         // تهيئة التطبيق عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
-            // تحديث الوقت
-            updateTime();
-            setInterval(updateTime, 60000);
-            
-            // تحميل الدردشات
-            loadChats();
-            
-            // تحميل المجموعات
-            loadGroups();
+            // محاكاة شاشة التحميل
+            simulateLoading();
             
             // إعداد معالجات الأحداث
             setupEventListeners();
             
-            // إعداد معالج اللغة
-            setupLanguageSwitcher();
+            // تحميل البيانات الأولية
+            loadInitialData();
+            
+            // إعداد تحديث الوقت
+            updateTime();
+            setInterval(updateTime, 60000);
         });
+
+        // محاكاة شاشة التحميل
+        function simulateLoading() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const progressBar = document.getElementById('loading-progress');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingScreen.classList.add('hidden');
+                        }, 500);
+                    }, 300);
+                }
+            }, 100);
+        }
 
         // تحديث الوقت الحالي
         function updateTime() {
@@ -1150,26 +1865,36 @@
             document.getElementById('current-time').textContent = timeString;
         }
 
+        // تحميل البيانات الأولية
+        function loadInitialData() {
+            loadChats();
+            loadGroups();
+            updateUserProfile();
+        }
+
         // تحميل قائمة الدردشات
         function loadChats() {
             const chatsContainer = document.getElementById('chats-container');
             chatsContainer.innerHTML = '';
             
-            appData.chats.forEach(chat => {
+            App.chats.forEach(chat => {
                 const chatElement = document.createElement('div');
                 chatElement.className = `chat-card ${chat.unread > 0 ? 'unread' : ''}`;
                 chatElement.dataset.chatId = chat.id;
                 
+                const timeText = formatTime(chat.lastActive);
+                const unreadBadge = chat.unread > 0 ? `<span class="unread-count">${chat.unread}</span>` : '';
+                
                 chatElement.innerHTML = `
-                    <div class="chat-avatar" style="background: ${getAvatarColor(chat.name)};">${chat.avatar}</div>
+                    <div class="chat-avatar" style="background: ${chat.color || getAvatarColor(chat.name)};">${chat.avatar}</div>
                     <div class="chat-info">
                         <div class="chat-header">
                             <div class="chat-name">${chat.name}</div>
-                            <div class="chat-time">${chat.time}</div>
+                            <div class="chat-time">${timeText}</div>
                         </div>
                         <div class="chat-preview">
-                            <span>${chat.lastMessage}</span>
-                            ${chat.unread > 0 ? `<span class="unread-count">${chat.unread}</span>` : ''}
+                            <div class="chat-preview-text">${chat.lastMessage}</div>
+                            ${unreadBadge}
                         </div>
                     </div>
                 `;
@@ -1184,20 +1909,20 @@
             const groupsContainer = document.getElementById('groups-container');
             groupsContainer.innerHTML = '';
             
-            appData.groups.forEach(group => {
+            App.groups.forEach(group => {
                 const groupElement = document.createElement('div');
                 groupElement.className = 'group-card';
                 groupElement.dataset.groupId = group.id;
                 
                 groupElement.innerHTML = `
                     <div class="group-banner" style="background: ${group.color};">
-                        <div class="group-avatar">${group.avatar}</div>
+                        <div class="group-avatar" style="background: ${group.color};">${group.avatar}</div>
                     </div>
                     <div class="group-info">
                         <div class="group-name">${group.name}</div>
                         <div class="group-members">
                             <i class="fas fa-users"></i>
-                            ${group.members} أعضاء
+                            ${group.members} ${App.translations[App.config.currentLanguage].friends}
                         </div>
                     </div>
                 `;
@@ -1207,25 +1932,83 @@
             });
         }
 
+        // تحديث ملف المستخدم الشخصي
+        function updateUserProfile() {
+            document.getElementById('user-avatar').textContent = App.user.avatar;
+            document.getElementById('user-name').textContent = App.user.name;
+            document.getElementById('user-status').textContent = App.user.status;
+            document.getElementById('friends-count').textContent = App.user.friends;
+            document.getElementById('groups-count').textContent = App.user.groups;
+            document.getElementById('messages-count').textContent = formatNumber(App.user.messages);
+        }
+
         // فتح دردشة معينة
         function openChat(chatId) {
-            const chat = appData.chats.find(c => c.id === chatId);
+            const chat = App.chats.find(c => c.id === chatId);
             if (!chat) return;
             
             // حفظ معرف الدردشة الحالية
-            appData.currentChatId = chatId;
+            App.currentChatId = chatId;
             
             // تحديث معلومات الدردشة في الشاشة
             document.getElementById('chat-with-avatar').textContent = chat.avatar;
-            document.getElementById('chat-with-avatar').style.background = getAvatarColor(chat.name);
+            document.getElementById('chat-with-avatar').style.background = chat.color || getAvatarColor(chat.name);
             document.getElementById('chat-with-name').textContent = chat.name;
+            document.getElementById('chat-with-status').textContent = chat.isGroup ? 
+                `${chat.members} ${App.translations[App.config.currentLanguage].friends}` : 
+                App.translations[App.config.currentLanguage].online;
             
             // تحميل الرسائل
             loadMessages(chatId);
             
+            // إخفاء الدردشات غير المقروءة
+            if (chat.unread > 0) {
+                chat.unread = 0;
+                loadChats();
+            }
+            
             // تبديل الشاشة
-            document.getElementById('chats-section').classList.add('hidden');
-            document.getElementById('chat-screen').classList.remove('hidden');
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('chat-screen').classList.add('active');
+            
+            // التركيز على حقل الإدخال
+            setTimeout(() => {
+                document.getElementById('message-input').focus();
+            }, 300);
+        }
+
+        // فتح مجموعة معينة
+        function openGroup(groupId) {
+            const group = App.groups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            // البحث عن دردشة المجموعة المقابلة
+            const chat = App.chats.find(c => c.isGroup && c.name === group.name);
+            if (chat) {
+                openChat(chat.id);
+            } else {
+                // إنشاء دردشة جديدة للمجموعة
+                const newChat = {
+                    id: App.chats.length + 1,
+                    name: group.name,
+                    avatar: group.avatar,
+                    lastMessage: 'مرحبًا في المجموعة!',
+                    time: 'الآن',
+                    unread: 0,
+                    isGroup: true,
+                    members: group.members,
+                    lastActive: new Date().toISOString(),
+                    color: group.color
+                };
+                
+                App.chats.unshift(newChat);
+                App.messages[newChat.id] = [];
+                
+                openChat(newChat.id);
+                loadChats();
+            }
         }
 
         // تحميل رسائل دردشة معينة
@@ -1233,20 +2016,24 @@
             const messagesContainer = document.getElementById('chat-messages');
             messagesContainer.innerHTML = '';
             
-            // تصفية الرسائل الخاصة بهذه الدردشة
-            const chatMessages = appData.messages.filter(m => m.chatId === chatId);
+            // الحصول على رسائل الدردشة
+            const chatMessages = App.messages[chatId] || [];
             
             // إضافة رسائل الترحيب إذا لم تكن هناك رسائل
             if (chatMessages.length === 0) {
                 const welcomeMessage = {
                     id: 0,
-                    chatId: chatId,
-                    sender: 'النظام',
-                    content: 'هذه بداية المحادثة. أرسل رسالة لبدء الدردشة!',
+                    senderId: 0,
+                    senderName: 'النظام',
+                    content: App.config.currentLanguage === 'ar' 
+                        ? 'هذه بداية المحادثة. أرسل رسالة لبدء الدردشة!' 
+                        : 'This is the beginning of the conversation. Send a message to start chatting!',
                     time: 'الآن',
+                    timestamp: new Date().toISOString(),
                     sent: false
                 };
                 chatMessages.push(welcomeMessage);
+                App.messages[chatId] = [welcomeMessage];
             }
             
             // عرض الرسائل
@@ -1254,11 +2041,17 @@
                 const messageElement = document.createElement('div');
                 messageElement.className = `message ${message.sent ? 'sent' : 'received'}`;
                 
+                const senderName = message.senderName === 'أنت' ? 
+                    (App.config.currentLanguage === 'ar' ? 'أنت' : 'You') : 
+                    message.senderName;
+                
+                const showSender = !message.sent && message.senderId !== 0 && message.senderName !== 'أنت';
+                
                 messageElement.innerHTML = `
                     <div class="message-content">
-                        ${!message.sent && message.sender !== 'النظام' ? `<div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">${message.sender}</div>` : ''}
+                        ${showSender ? `<div class="message-sender">${senderName}</div>` : ''}
                         <div>${message.content}</div>
-                        <span class="message-time">${message.time}</span>
+                        <span class="message-time">${message.time}${message.sent ? '<span class="message-time-small"> ✓✓</span>' : ''}</span>
                     </div>
                 `;
                 
@@ -1266,17 +2059,101 @@
             });
             
             // التمرير إلى الأسفل لرؤية أحدث الرسائل
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 100);
         }
 
-        // فتح مجموعة معينة
-        function openGroup(groupId) {
-            const group = appData.groups.find(g => g.id === groupId);
-            if (!group) return;
+        // إرسال رسالة جديدة
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const messageText = input.value.trim();
             
-            // في تطبيق حقيقي، هنا ستنتقل إلى شاشة المجموعة
-            // للتبسيط، سنفتحها كدردشة
-            openChat(groupId);
+            if (!messageText || !App.currentChatId) return;
+            
+            // إنشاء رسالة جديدة
+            const newMessage = {
+                id: (App.messages[App.currentChatId]?.length || 0) + 1,
+                senderId: App.user.id,
+                senderName: 'أنت',
+                content: messageText,
+                time: 'الآن',
+                timestamp: new Date().toISOString(),
+                sent: true
+            };
+            
+            // إضافة الرسالة إلى البيانات
+            if (!App.messages[App.currentChatId]) {
+                App.messages[App.currentChatId] = [];
+            }
+            App.messages[App.currentChatId].push(newMessage);
+            
+            // تحديث آخر رسالة في قائمة الدردشات
+            const chatIndex = App.chats.findIndex(c => c.id === App.currentChatId);
+            if (chatIndex !== -1) {
+                App.chats[chatIndex].lastMessage = messageText.length > 30 ? messageText.substring(0, 30) + '...' : messageText;
+                App.chats[chatIndex].lastActive = new Date().toISOString();
+                App.chats[chatIndex].time = 'الآن';
+            }
+            
+            // تحديث الرسائل على الشاشة
+            loadMessages(App.currentChatId);
+            
+            // مسح حقل الإدخال وتعطيل زر الإرسال
+            input.value = '';
+            document.getElementById('send-message-btn').disabled = true;
+            
+            // محاكاة رد تلقائي بعد 1-3 ثواني
+            if (Math.random() > 0.3) {
+                setTimeout(() => {
+                    const replies = App.config.currentLanguage === 'ar' ? [
+                        'تم استلام رسالتك!',
+                        'شكرًا على رسالتك',
+                        'سأرد عليك قريبًا',
+                        'أهلاً وسهلاً',
+                        'كيف يمكنني مساعدتك؟'
+                    ] : [
+                        'Message received!',
+                        'Thanks for your message',
+                        'I\'ll reply soon',
+                        'Hello there',
+                        'How can I help you?'
+                    ];
+                    
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    
+                    const autoReply = {
+                        id: (App.messages[App.currentChatId]?.length || 0) + 1,
+                        senderId: App.currentChatId,
+                        senderName: App.chats.find(c => c.id === App.currentChatId)?.name || 'مستخدم',
+                        content: randomReply,
+                        time: 'الآن',
+                        timestamp: new Date().toISOString(),
+                        sent: false
+                    };
+                    
+                    App.messages[App.currentChatId].push(autoReply);
+                    
+                    // تحديث قائمة الدردشات
+                    if (chatIndex !== -1) {
+                        App.chats[chatIndex].lastMessage = randomReply;
+                        App.chats[chatIndex].lastActive = new Date().toISOString();
+                        App.chats[chatIndex].unread = 0;
+                    }
+                    
+                    // تحديث العرض إذا كانت الدردشة مفتوحة
+                    if (App.currentChatId) {
+                        loadMessages(App.currentChatId);
+                        loadChats();
+                        
+                        // إظهار إشعار برسالة جديدة
+                        showNewMessageIndicator();
+                    }
+                }, 1000 + Math.random() * 2000);
+            }
+            
+            // تحديث قائمة الدردشات
+            loadChats();
         }
 
         // إعداد معالجات الأحداث
@@ -1293,141 +2170,97 @@
                     
                     // إخفاء جميع الأقسام
                     document.querySelectorAll('.content-section').forEach(section => {
-                        section.classList.add('hidden');
+                        section.classList.remove('active');
                     });
                     
                     // إظهار القسم المطلوب
-                    document.getElementById(targetSection).classList.remove('hidden');
+                    document.getElementById(targetSection).classList.add('active');
                     
                     // إخفاء شاشة الدردشة إذا كانت مفتوحة
-                    document.getElementById('chat-screen').classList.add('hidden');
-                    
-                    // إظهار شاشة الدردشات إذا لزم الأمر
-                    if (targetSection === 'chats-section') {
-                        document.getElementById('chats-section').classList.remove('hidden');
-                    }
+                    document.getElementById('chat-screen').classList.remove('active');
                 });
             });
             
             // زر العودة من شاشة الدردشة
             document.getElementById('back-to-chats').addEventListener('click', function() {
-                document.getElementById('chat-screen').classList.add('hidden');
-                document.getElementById('chats-section').classList.remove('hidden');
+                document.getElementById('chat-screen').classList.remove('active');
+                document.getElementById('chats-section').classList.add('active');
+                document.querySelector('.nav-item[data-section="chats-section"]').classList.add('active');
+                document.querySelectorAll('.nav-item:not([data-section="chats-section"])').forEach(nav => nav.classList.remove('active'));
             });
             
             // إرسال رسالة
             document.getElementById('send-message-btn').addEventListener('click', sendMessage);
-            document.getElementById('message-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
+            
+            // حقل إدخال الرسالة
+            const messageInput = document.getElementById('message-input');
+            messageInput.addEventListener('input', function() {
+                document.getElementById('send-message-btn').disabled = this.value.trim() === '';
+            });
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (this.value.trim() !== '') {
+                        sendMessage();
+                    }
                 }
             });
             
             // أزرار الإعدادات
-            document.getElementById('edit-profile-btn').addEventListener('click', function() {
-                alert('ميزة تعديل الملف الشخصي قيد التطوير');
-            });
+            document.getElementById('edit-profile-btn').addEventListener('click', showEditProfile);
+            document.getElementById('edit-profile-settings-btn').addEventListener('click', showEditProfile);
+            document.getElementById('change-status-btn').addEventListener('click', changeStatus);
+            document.getElementById('privacy-btn').addEventListener('click', showPrivacySettings);
+            document.getElementById('appearance-btn').addEventListener('click', showAppearanceSettings);
+            document.getElementById('help-btn').addEventListener('click', showHelp);
+            document.getElementById('about-btn').addEventListener('click', showAbout);
+            document.getElementById('logout-btn').addEventListener('click', confirmLogout);
             
-            document.getElementById('privacy-btn').addEventListener('click', function() {
-                alert('ميزة الخصوصية قيد التطوير');
-            });
-            
-            document.getElementById('help-btn').addEventListener('click', function() {
-                alert('مركز المساعدة قيد التطوير');
-            });
-            
-            document.getElementById('about-btn').addEventListener('click', function() {
-                alert('سيرك v1.0\nتطبيق شات جماعي\nالإصدار: 1.0.0\n© 2023 جميع الحقوق محفوظة');
+            // تبديل الإشعارات
+            document.getElementById('notifications-toggle').addEventListener('change', function() {
+                App.config.notificationsEnabled = this.checked;
+                showNotification(this.checked ? 'تم تفعيل الإشعارات' : 'تم إيقاف الإشعارات');
             });
             
             // أزرار رأس التطبيق
-            document.getElementById('search-btn').addEventListener('click', function() {
-                alert('ميزة البحث قيد التطوير');
-            });
-            
-            document.getElementById('add-contact-btn').addEventListener('click', function() {
-                alert('ميزة إضافة جهة اتصال قيد التطوير');
-            });
-            
+            document.getElementById('search-btn').addEventListener('click', showSearch);
+            document.getElementById('add-contact-btn').addEventListener('click', addContact);
             document.getElementById('settings-btn').addEventListener('click', function() {
-                // التبديل إلى شاشة الإعدادات
-                navItems.forEach(nav => nav.classList.remove('active'));
-                document.querySelector('.nav-item[data-section="settings-section"]').classList.add('active');
-                
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.classList.add('hidden');
-                });
-                
-                document.getElementById('settings-section').classList.remove('hidden');
-                document.getElementById('chat-screen').classList.add('hidden');
+                document.querySelector('.nav-item[data-section="settings-section"]').click();
             });
-        }
-
-        // إرسال رسالة جديدة
-        function sendMessage() {
-            const input = document.getElementById('message-input');
-            const messageText = input.value.trim();
             
-            if (!messageText) return;
+            // أزرار دردشة جديدة ومجموعة جديدة
+            document.getElementById('new-chat-btn').addEventListener('click', newChat);
+            document.getElementById('new-group-btn').addEventListener('click', newGroup);
             
-            // إنشاء رسالة جديدة
-            const newMessage = {
-                id: appData.messages.length + 1,
-                chatId: appData.currentChatId,
-                sender: 'أنت',
-                content: messageText,
-                time: 'الآن',
-                sent: true
-            };
-            
-            // إضافة الرسالة إلى البيانات
-            appData.messages.push(newMessage);
-            
-            // إضافة رد تلقائي (محاكاة)
-            setTimeout(() => {
-                const autoReply = {
-                    id: appData.messages.length + 1,
-                    chatId: appData.currentChatId,
-                    sender: 'النظام',
-                    content: 'تم استلام رسالتك. سيرد عليك قريبًا!',
-                    time: 'الآن',
-                    sent: false
-                };
-                
-                appData.messages.push(autoReply);
-                
-                // تحديث الرسائل إذا كانت هذه الدردشة مفتوحة
-                if (appData.currentChatId) {
-                    loadMessages(appData.currentChatId);
-                }
-            }, 1000);
-            
-            // تحديث الرسائل على الشاشة
-            loadMessages(appData.currentChatId);
-            
-            // مسح حقل الإدخال
-            input.value = '';
-            input.focus();
-        }
-
-        // إعداد مبدل اللغة
-        function setupLanguageSwitcher() {
+            // تبديل اللغة
             document.getElementById('lang-ar').addEventListener('click', function() {
-                if (appData.currentLanguage !== 'ar') {
-                    switchLanguage('ar');
-                }
+                switchLanguage('ar');
             });
             
             document.getElementById('lang-en').addEventListener('click', function() {
-                if (appData.currentLanguage !== 'en') {
-                    switchLanguage('en');
-                }
+                switchLanguage('en');
             });
+            
+            // أزرار المرفقات والإيموجي
+            document.getElementById('attachment-btn').addEventListener('click', showAttachments);
+            document.getElementById('emoji-btn').addEventListener('click', showEmojiPicker);
+            
+            // أزرار الاتصال في شاشة الدردشة
+            document.getElementById('call-btn').addEventListener('click', makeCall);
+            document.getElementById('video-call-btn').addEventListener('click', makeVideoCall);
+            document.getElementById('chat-menu-btn').addEventListener('click', showChatMenu);
+            
+            // مؤشر الرسائل الجديدة
+            document.getElementById('new-message-indicator').addEventListener('click', scrollToBottom);
         }
 
-        // تبديل لغة التطبيق
+        // تغيير لغة التطبيق
         function switchLanguage(lang) {
-            appData.currentLanguage = lang;
+            if (App.config.currentLanguage === lang) return;
+            
+            App.config.currentLanguage = lang;
             
             // تحديث أزرار اللغة
             document.getElementById('lang-ar').classList.toggle('active', lang === 'ar');
@@ -1437,57 +2270,109 @@
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
             
-            // تحديث النصوص حسب اللغة
-            if (lang === 'en') {
-                // تحديث النصوص إلى الإنجليزية
-                document.querySelector('.logo h1').textContent = 'Circl';
-                document.querySelector('.nav-item[data-section="chats-section"] span').textContent = 'Chats';
-                document.querySelector('.nav-item[data-section="groups-section"] span').textContent = 'Groups';
-                document.querySelector('.nav-item[data-section="profile-section"] span').textContent = 'Profile';
-                document.querySelector('.nav-item[data-section="settings-section"] span').textContent = 'Settings';
-                document.getElementById('chats-section').querySelector('h2').textContent = 'Chats';
-                document.getElementById('groups-section').querySelector('h2').textContent = 'Groups';
-                document.getElementById('settings-section').querySelector('h2').textContent = 'Settings';
-                document.getElementById('message-input').placeholder = 'Type a message...';
-                document.getElementById('user-status').textContent = 'Online now';
-                document.getElementById('user-status').innerHTML = '<div style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background-color: var(--success); border-radius: 50%;"></div> Online now</div>';
-                document.querySelectorAll('.stat-label')[0].textContent = 'Friends';
-                document.querySelectorAll('.stat-label')[1].textContent = 'Groups';
-                document.querySelectorAll('.stat-label')[2].textContent = 'Messages';
-                document.querySelector('.section-title').textContent = 'Account';
-                document.querySelectorAll('.settings-text h3')[0].textContent = 'Edit Profile';
-                document.querySelectorAll('.settings-text p')[0].textContent = 'Change photo and personal info';
-                document.querySelectorAll('.settings-text h3')[1].textContent = 'Privacy';
-                document.querySelectorAll('.settings-text p')[1].textContent = 'Manage privacy and security settings';
-                document.querySelectorAll('.section-title')[1].textContent = 'App';
-                document.querySelectorAll('.settings-text h3')[2].textContent = 'Notifications';
-                document.querySelectorAll('.settings-text p')[2].textContent = 'Manage app notifications';
-                document.querySelectorAll('.settings-text h3')[3].textContent = 'Appearance';
-                document.querySelectorAll('.settings-text p')[3].textContent = 'Change app theme';
-                document.querySelectorAll('.settings-text h3')[4].textContent = 'Language';
-                document.querySelectorAll('.settings-text p')[4].textContent = 'Change app language';
-                document.querySelectorAll('.section-title')[2].textContent = 'General';
-                document.querySelectorAll('.settings-text h3')[5].textContent = 'Help & Support';
-                document.querySelectorAll('.settings-text p')[5].textContent = 'Guide and help center';
-                document.querySelectorAll('.settings-text h3')[6].textContent = 'About';
-                document.querySelectorAll('.settings-text p')[6].textContent = 'App version and info';
+            // تحديث النصوص
+            updateTexts();
+            
+            // تحديث القيم المعروضة
+            document.getElementById('current-language').textContent = lang === 'ar' ? 'العربية' : 'English';
+            
+            // تحديث البيانات المعروضة
+            loadChats();
+            loadGroups();
+            
+            // تحديث حقل الإدخال
+            document.getElementById('message-input').placeholder = App.translations[lang].typeMessage;
+            
+            // إظهار إشعار
+            showNotification(lang === 'ar' ? 'تم تغيير اللغة إلى العربية' : 'Language changed to English');
+        }
+
+        // تحديث جميع النصوص بناءً على اللغة الحالية
+        function updateTexts() {
+            const lang = App.config.currentLanguage;
+            const t = App.translations[lang];
+            
+            // تحديث النصوص الرئيسية
+            document.getElementById('app-title').textContent = t.appName;
+            document.getElementById('chats-title').textContent = t.chats;
+            document.getElementById('groups-title').textContent = t.groups;
+            document.getElementById('settings-title').textContent = t.settings;
+            document.getElementById('nav-chats-text').textContent = t.chats;
+            document.getElementById('nav-groups-text').textContent = t.groups;
+            document.getElementById('nav-profile-text').textContent = t.profile;
+            document.getElementById('nav-settings-text').textContent = t.settings;
+            
+            // تحديث نصوص الملف الشخصي
+            document.getElementById('friends-label').textContent = t.friends;
+            document.getElementById('groups-label').textContent = t.groups;
+            document.getElementById('messages-label').textContent = t.messages;
+            document.getElementById('profile-actions-title').textContent = t.profileActions;
+            document.getElementById('edit-profile-text').textContent = t.editProfile;
+            document.getElementById('edit-profile-desc').textContent = t.editProfileDesc;
+            document.getElementById('change-status-text').textContent = t.changeStatus;
+            document.getElementById('change-status-desc').textContent = t.changeStatusDesc;
+            
+            // تحديث نصوص الإعدادات
+            document.getElementById('account-settings-title').textContent = t.accountSettings;
+            document.getElementById('app-settings-title').textContent = t.appSettings;
+            document.getElementById('general-settings-title').textContent = t.generalSettings;
+            
+            document.getElementById('edit-profile-settings-text').textContent = t.editProfile;
+            document.getElementById('edit-profile-settings-desc').textContent = t.editProfileDesc;
+            document.getElementById('privacy-text').textContent = t.privacy;
+            document.getElementById('privacy-desc').textContent = t.privacyDesc;
+            document.getElementById('notifications-text').textContent = t.notifications;
+            document.getElementById('notifications-desc').textContent = t.notificationsDesc;
+            document.getElementById('appearance-text').textContent = t.appearance;
+            document.getElementById('appearance-desc').textContent = t.appearanceDesc;
+            document.getElementById('language-text').textContent = t.language;
+            document.getElementById('language-desc').textContent = t.languageDesc;
+            document.getElementById('help-text').textContent = t.help;
+            document.getElementById('help-desc').textContent = t.helpDesc;
+            document.getElementById('about-text').textContent = t.about;
+            document.getElementById('about-desc').textContent = t.aboutDesc;
+            document.getElementById('logout-text').textContent = t.logout;
+            document.getElementById('logout-desc').textContent = t.logoutDesc;
+            
+            // تحديث عناوين الأزرار
+            document.getElementById('search-btn').title = t.search;
+            document.getElementById('add-contact-btn').title = t.addFriend;
+            document.getElementById('settings-btn').title = t.settings;
+            document.getElementById('new-chat-btn').title = t.newChat;
+            document.getElementById('new-group-btn').title = t.newGroup;
+            document.getElementById('back-to-chats').title = lang === 'ar' ? 'رجوع' : 'Back';
+            document.getElementById('call-btn').title = lang === 'ar' ? 'اتصال صوتي' : 'Voice Call';
+            document.getElementById('video-call-btn').title = lang === 'ar' ? 'اتصال فيديو' : 'Video Call';
+            document.getElementById('chat-menu-btn').title = lang === 'ar' ? 'المزيد' : 'More';
+            document.getElementById('attachment-btn').title = lang === 'ar' ? 'إرفاق ملف' : 'Attach File';
+            document.getElementById('emoji-btn').title = lang === 'ar' ? 'إضافة إيموجي' : 'Add Emoji';
+            document.getElementById('user-avatar').title = lang === 'ar' ? 'تغيير الصورة' : 'Change Photo';
+        }
+
+        // تنسيق الوقت
+        function formatTime(timestamp) {
+            const now = new Date();
+            const date = new Date(timestamp);
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            } else if (diffDays === 1) {
+                return App.config.currentLanguage === 'ar' ? 'أمس' : 'Yesterday';
+            } else if (diffDays < 7) {
+                return date.toLocaleDateString('ar-EG', { weekday: 'long' });
             } else {
-                // تحديث النصوص إلى العربية
-                document.querySelector('.logo h1').textContent = 'سيرك | Circl';
-                document.querySelector('.nav-item[data-section="chats-section"] span').textContent = 'الدردشات';
-                document.querySelector('.nav-item[data-section="groups-section"] span').textContent = 'المجموعات';
-                document.querySelector('.nav-item[data-section="profile-section"] span').textContent = 'الملف الشخصي';
-                document.querySelector('.nav-item[data-section="settings-section"] span').textContent = 'الإعدادات';
-                document.getElementById('chats-section').querySelector('h2').textContent = 'الدردشات';
-                document.getElementById('groups-section').querySelector('h2').textContent = 'المجموعات';
-                document.getElementById('settings-section').querySelector('h2').textContent = 'الإعدادات';
-                document.getElementById('message-input').placeholder = 'اكتب رسالة...';
-                document.getElementById('user-status').textContent = 'متصل الآن';
-                document.getElementById('user-status').innerHTML = '<div style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background-color: var(--success); border-radius: 50%;"></div> متصل الآن</div>';
-                document.querySelectorAll('.stat-label')[0].textContent = 'الأصدقاء';
-                document.querySelectorAll('.stat-label')[1].textContent = 'المجموعات';
-                document.querySelectorAll('.stat-label')[2].textContent = 'الرسائل';
+                return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
             }
+        }
+
+        // تنسيق الأرقام
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
         }
 
         // الحصول على لون للصورة الرمزية بناءً على النص
@@ -1498,19 +2383,381 @@
                 'linear-gradient(135deg, #4CAF50, #3D8B40)',
                 'linear-gradient(135deg, #FF9800, #E68900)',
                 'linear-gradient(135deg, #2196F3, #0B7DDA)',
-                'linear-gradient(135deg, #9C27B0, #7B1FA2)'
+                'linear-gradient(135deg, #9C27B0, #7B1FA2)',
+                'linear-gradient(135deg, #E91E63, #C2185B)',
+                'linear-gradient(135deg, #00BCD4, #0097A7)'
             ];
             
-            // توليد رقم فريد من النص
             let hash = 0;
             for (let i = 0; i < name.length; i++) {
                 hash = name.charCodeAt(i) + ((hash << 5) - hash);
             }
             
-            // استخدام القيمة المطلقة والقياس
             const index = Math.abs(hash) % colors.length;
             return colors[index];
         }
+
+        // إظهار إشعار
+        function showNotification(message) {
+            // في تطبيق حقيقي، هنا سيتم استخدام API الإشعارات
+            console.log('Notification:', message);
+            
+            // عرض إشعار بسيط
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--primary);
+                color: white;
+                padding: 12px 24px;
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-heavy);
+                z-index: 2000;
+                animation: fadeInUp 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // وظائف الإعدادات
+        function showEditProfile() {
+            const newName = prompt(App.config.currentLanguage === 'ar' 
+                ? 'أدخل اسمك الجديد:' 
+                : 'Enter your new name:', App.user.name);
+            
+            if (newName && newName.trim() !== '') {
+                App.user.name = newName.trim();
+                updateUserProfile();
+                showNotification(App.config.currentLanguage === 'ar' 
+                    ? 'تم تحديث الملف الشخصي' 
+                    : 'Profile updated');
+            }
+        }
+
+        function changeStatus() {
+            const statuses = App.config.currentLanguage === 'ar' ? [
+                'متصل الآن',
+                'مشغول',
+                'غير متصل',
+                'سأعود قريبًا'
+            ] : [
+                'Online now',
+                'Busy',
+                'Offline',
+                'Be right back'
+            ];
+            
+            const currentStatus = App.user.status;
+            const statusIndex = statuses.findIndex(s => s === currentStatus);
+            const nextStatus = statuses[(statusIndex + 1) % statuses.length];
+            
+            App.user.status = nextStatus;
+            updateUserProfile();
+            
+            showNotification(App.config.currentLanguage === 'ar' 
+                ? `تم تغيير الحالة إلى: ${nextStatus}`
+                : `Status changed to: ${nextStatus}`);
+        }
+
+        function showPrivacySettings() {
+            alert(App.config.currentLanguage === 'ar' 
+                ? 'إعدادات الخصوصية قيد التطوير. ستكون متاحة قريبًا!' 
+                : 'Privacy settings are under development. Coming soon!');
+        }
+
+        function showAppearanceSettings() {
+            const themes = App.config.currentLanguage === 'ar' 
+                ? ['فاتح', 'داكن', 'تلقائي'] 
+                : ['Light', 'Dark', 'Auto'];
+            
+            const currentTheme = document.getElementById('current-theme').textContent;
+            const themeIndex = themes.findIndex(t => t === currentTheme);
+            const nextTheme = themes[(themeIndex + 1) % themes.length];
+            
+            document.getElementById('current-theme').textContent = nextTheme;
+            
+            // في تطبيق حقيقي، هنا سيتم تغيير السمة
+            showNotification(App.config.currentLanguage === 'ar' 
+                ? `تم تغيير السمة إلى: ${nextTheme}`
+                : `Theme changed to: ${nextTheme}`);
+        }
+
+        function showHelp() {
+            alert(App.config.currentLanguage === 'ar' 
+                ? 'مركز المساعدة قيد التطوير. للاستفسارات، راسلنا على support@circl.app' 
+                : 'Help center is under development. For inquiries, contact us at support@circl.app');
+        }
+
+        function showAbout() {
+            alert(App.config.currentLanguage === 'ar' 
+                ? `سيرك v2.0\nتطبيق شات جماعي\nالإصدار: 2.0.0\nتاريخ البناء: 15 أكتوبر 2023\n© 2023 جميع الحقوق محفوظة` 
+                : `Circl v2.0\nGroup Chat Application\nVersion: 2.0.0\nBuild Date: October 15, 2023\n© 2023 All rights reserved`);
+        }
+
+        function confirmLogout() {
+            const confirmMsg = App.config.currentLanguage === 'ar' 
+                ? 'هل أنت متأكد من تسجيل الخروج؟' 
+                : 'Are you sure you want to logout?';
+            
+            if (confirm(confirmMsg)) {
+                showNotification(App.config.currentLanguage === 'ar' 
+                    ? 'تم تسجيل الخروج بنجاح' 
+                    : 'Logged out successfully');
+                
+                // في تطبيق حقيقي، هنا سيتم إعادة التوجيه إلى شاشة تسجيل الدخول
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        function showSearch() {
+            alert(App.config.currentLanguage === 'ar' 
+                ? 'ميزة البحث قيد التطوير. ستكون متاحة قريبًا!' 
+                : 'Search feature is under development. Coming soon!');
+        }
+
+        function addContact() {
+            const contactName = prompt(App.config.currentLanguage === 'ar' 
+                ? 'أدخل اسم جهة الاتصال:' 
+                : 'Enter contact name:', '');
+            
+            if (contactName && contactName.trim() !== '') {
+                const newContact = {
+                    id: App.chats.length + 1,
+                    name: contactName.trim(),
+                    avatar: contactName.trim().charAt(0),
+                    lastMessage: App.config.currentLanguage === 'ar' ? 'مرحبًا!' : 'Hello!',
+                    time: 'الآن',
+                    unread: 0,
+                    isGroup: false,
+                    lastActive: new Date().toISOString(),
+                    color: getAvatarColor(contactName.trim())
+                };
+                
+                App.chats.unshift(newContact);
+                App.messages[newContact.id] = [];
+                loadChats();
+                
+                showNotification(App.config.currentLanguage === 'ar' 
+                    ? `تم إضافة ${contactName.trim()} إلى جهات الاتصال` 
+                    : `${contactName.trim()} added to contacts`);
+            }
+        }
+
+        function newChat() {
+            const contactName = prompt(App.config.currentLanguage === 'ar' 
+                ? 'أدخل اسم الشخص أو المجموعة:' 
+                : 'Enter person or group name:', '');
+            
+            if (contactName && contactName.trim() !== '') {
+                const isGroup = confirm(App.config.currentLanguage === 'ar' 
+                    ? 'هل هذه دردشة جماعية؟' 
+                    : 'Is this a group chat?');
+                
+                const newChatItem = {
+                    id: App.chats.length + 1,
+                    name: contactName.trim(),
+                    avatar: contactName.trim().charAt(0),
+                    lastMessage: App.config.currentLanguage === 'ar' ? 'ابدأ المحادثة!' : 'Start the conversation!',
+                    time: 'الآن',
+                    unread: 0,
+                    isGroup: isGroup,
+                    members: isGroup ? 1 : 0,
+                    lastActive: new Date().toISOString(),
+                    color: getAvatarColor(contactName.trim())
+                };
+                
+                App.chats.unshift(newChatItem);
+                App.messages[newChatItem.id] = [];
+                loadChats();
+                openChat(newChatItem.id);
+                
+                showNotification(App.config.currentLanguage === 'ar' 
+                    ? `تم إنشاء دردشة جديدة مع ${contactName.trim()}` 
+                    : `Created new chat with ${contactName.trim()}`);
+            }
+        }
+
+        function newGroup() {
+            const groupName = prompt(App.config.currentLanguage === 'ar' 
+                ? 'أدخل اسم المجموعة:' 
+                : 'Enter group name:', '');
+            
+            if (groupName && groupName.trim() !== '') {
+                const newGroupItem = {
+                    id: App.groups.length + 1,
+                    name: groupName.trim(),
+                    avatar: groupName.trim().charAt(0),
+                    members: 1,
+                    color: getAvatarColor(groupName.trim()),
+                    description: App.config.currentLanguage === 'ar' 
+                        ? 'مجموعة جديدة' 
+                        : 'New group'
+                };
+                
+                App.groups.unshift(newGroupItem);
+                loadGroups();
+                
+                showNotification(App.config.currentLanguage === 'ar' 
+                    ? `تم إنشاء مجموعة ${groupName.trim()}` 
+                    : `Created group ${groupName.trim()}`);
+            }
+        }
+
+        function showAttachments() {
+            const options = App.config.currentLanguage === 'ar' 
+                ? ['صورة', 'فيديو', 'صوت', 'ملف', 'موقع', 'جهة اتصال'] 
+                : ['Photo', 'Video', 'Audio', 'Document', 'Location', 'Contact'];
+            
+            let optionsHTML = options.map(option => `<div class="attachment-option">${option}</div>`).join('');
+            
+            const attachmentMenu = document.createElement('div');
+            attachmentMenu.innerHTML = `
+                <div style="position: fixed; bottom: 80px; left: 16px; right: 16px; background: white; border-radius: var(--radius); box-shadow: var(--shadow-heavy); z-index: 1000; padding: 16px;">
+                    <div style="font-weight: 600; margin-bottom: 12px; color: var(--dark);">${App.config.currentLanguage === 'ar' ? 'إرفاق ملف' : 'Attach File'}</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        ${optionsHTML}
+                    </div>
+                    <div style="text-align: center; margin-top: 16px; color: var(--danger); cursor: pointer; padding: 12px;" id="cancel-attachment">
+                        ${App.config.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
+                    </div>
+                </div>
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999;" id="attachment-overlay"></div>
+            `;
+            
+            document.body.appendChild(attachmentMenu);
+            
+            // إضافة أحداث
+            document.getElementById('attachment-overlay').addEventListener('click', () => {
+                document.body.removeChild(attachmentMenu);
+            });
+            
+            document.getElementById('cancel-attachment').addEventListener('click', () => {
+                document.body.removeChild(attachmentMenu);
+            });
+            
+            // إضافة أنماط للخيارات
+            setTimeout(() => {
+                const optionsElements = attachmentMenu.querySelectorAll('.attachment-option');
+                optionsElements.forEach(option => {
+                    option.style.cssText = `
+                        padding: 16px;
+                        text-align: center;
+                        background: var(--gray-light);
+                        border-radius: var(--radius-sm);
+                        cursor: pointer;
+                        transition: var(--transition);
+                    `;
+                    
+                    option.addEventListener('mouseenter', function() {
+                        this.style.background = 'var(--primary-light)';
+                        this.style.color = 'white';
+                    });
+                    
+                    option.addEventListener('mouseleave', function() {
+                        this.style.background = 'var(--gray-light)';
+                        this.style.color = 'var(--dark)';
+                    });
+                    
+                    option.addEventListener('click', function() {
+                        showNotification(`${App.config.currentLanguage === 'ar' ? 'تم تحديد' : 'Selected'} ${option.textContent}`);
+                        document.body.removeChild(attachmentMenu);
+                    });
+                });
+            }, 10);
+        }
+
+        function showEmojiPicker() {
+            showNotification(App.config.currentLanguage === 'ar' 
+                ? 'محدد الإيموجي قيد التطوير' 
+                : 'Emoji picker under development');
+        }
+
+        function makeCall() {
+            showNotification(App.config.currentLanguage === 'ar' 
+                ? 'جاري الاتصال...' 
+                : 'Calling...');
+        }
+
+        function makeVideoCall() {
+            showNotification(App.config.currentLanguage === 'ar' 
+                ? 'جاري الاتصال المرئي...' 
+                : 'Starting video call...');
+        }
+
+        function showChatMenu() {
+            const options = App.config.currentLanguage === 'ar' 
+                ? ['معلومات المجموعة', 'إعدادات الإشعارات', 'تصدير المحادثة', 'مسح المحادثة', 'الإبلاغ'] 
+                : ['Group Info', 'Notification Settings', 'Export Chat', 'Clear Chat', 'Report'];
+            
+            let optionsHTML = options.map(option => `<div class="chat-menu-option">${option}</div>`).join('');
+            
+            const chatMenu = document.createElement('div');
+            chatMenu.innerHTML = `
+                <div style="position: fixed; top: 100px; right: 16px; background: white; border-radius: var(--radius); box-shadow: var(--shadow-heavy); z-index: 1000; padding: 8px 0; min-width: 200px;">
+                    ${optionsHTML}
+                </div>
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 999;" id="chat-menu-overlay"></div>
+            `;
+            
+            document.body.appendChild(chatMenu);
+            
+            // إضافة أحداث
+            document.getElementById('chat-menu-overlay').addEventListener('click', () => {
+                document.body.removeChild(chatMenu);
+            });
+            
+            // إضافة أنماط للخيارات
+            setTimeout(() => {
+                const optionsElements = chatMenu.querySelectorAll('.chat-menu-option');
+                optionsElements.forEach(option => {
+                    option.style.cssText = `
+                        padding: 12px 16px;
+                        cursor: pointer;
+                        transition: var(--transition);
+                    `;
+                    
+                    option.addEventListener('mouseenter', function() {
+                        this.style.background = 'var(--gray-light)';
+                    });
+                    
+                    option.addEventListener('mouseleave', function() {
+                        this.style.background = 'transparent';
+                    });
+                    
+                    option.addEventListener('click', function() {
+                        showNotification(`${App.config.currentLanguage === 'ar' ? 'تم تحديد' : 'Selected'} ${option.textContent}`);
+                        document.body.removeChild(chatMenu);
+                    });
+                });
+            }, 10);
+        }
+
+        function showNewMessageIndicator() {
+            const indicator = document.getElementById('new-message-indicator');
+            indicator.style.display = 'block';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 5000);
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            document.getElementById('new-message-indicator').style.display = 'none';
+        }
+
+        // تهيئة النصوص عند التحميل
+        updateTexts();
     </script>
 </body>
 </html>
