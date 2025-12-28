@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circl Chat - منصة الدردشة المتطورة</title>
+    <title>Circl Chat - دردشة مباشرة احترافية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
             --primary-light: #818cf8;
             --primary-dark: #4f46e5;
             --secondary: #ec4899;
-            --secondary-light: #f472b6;
-            --secondary-dark: #db2777;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -31,21 +28,13 @@
             --admin: #059669;
             --moderator: #3b82f6;
             --vip: #f59e0b;
-            --user: #6b7280;
             --therapist: #8b5cf6;
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
-            --gradient-secondary: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
-            --gradient-dark: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            --gradient-therapist: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --radius-sm: 0.375rem;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --radius: 0.5rem;
             --radius-lg: 0.75rem;
             --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
         }
 
         * {
@@ -57,50 +46,46 @@
         body {
             font-family: 'Tajawal', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             color: #1f2937;
-            line-height: 1.6;
-            padding: 1rem;
         }
 
-        .container {
+        .chat-container {
             width: 100%;
-            max-width: 1800px;
+            max-width: 1600px;
             height: 95vh;
             background: white;
-            border-radius: var(--radius-2xl);
+            border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: var(--shadow-xl);
+            box-shadow: var(--shadow-lg);
             display: flex;
         }
 
-        /* شريط التنقل الجانبي */
         .sidebar {
-            width: 350px;
+            width: 380px;
             background: #111827;
             color: white;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
-            z-index: 100;
         }
 
         .user-profile {
             padding: 1.5rem;
+            text-align: center;
             border-bottom: 1px solid #374151;
             background: rgba(255, 255, 255, 0.05);
         }
 
         .user-avatar {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             overflow: hidden;
             margin: 0 auto 1rem;
-            border: 3px solid;
+            border: 4px solid var(--primary);
             position: relative;
         }
 
@@ -112,20 +97,23 @@
 
         .online-status {
             position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 15px;
-            height: 15px;
+            bottom: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
             background: var(--success);
             border-radius: 50%;
-            border: 2px solid #111827;
+            border: 3px solid #111827;
         }
 
         .username {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            text-align: center;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .user-role {
@@ -134,40 +122,85 @@
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 600;
-            margin: 0 auto;
+            text-transform: uppercase;
         }
 
         .role-owner { background: var(--owner); }
         .role-admin { background: var(--admin); }
         .role-moderator { background: var(--moderator); }
         .role-vip { background: var(--vip); }
-        .role-user { background: var(--user); }
+        .role-user { background: #6b7280; }
 
-        /* قائمة الغرف */
-        .rooms-section {
+        .level-container {
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid #374151;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #374151;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width 0.5s ease;
+        }
+
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .rooms-section, .users-section {
             padding: 1.5rem;
-            flex: 1;
             overflow-y: auto;
         }
 
-        .room-list {
+        .rooms-section {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .room-list, .user-list {
             list-style: none;
         }
 
         .room-item {
             display: flex;
             align-items: center;
-            padding: 0.75rem;
+            padding: 1rem;
             border-radius: var(--radius-lg);
             margin-bottom: 0.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             border: 1px solid transparent;
         }
 
         .room-item:hover {
             background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateX(-5px);
         }
 
         .room-item.active {
@@ -175,21 +208,145 @@
             border-right: 4px solid var(--primary);
         }
 
-        /* منطقة الدردشة الرئيسية */
+        .room-icon {
+            margin-left: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .room-info {
+            flex: 1;
+        }
+
+        .room-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .room-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .user-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-list-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-list-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 0.75rem;
+            border: 2px solid var(--primary);
+        }
+
+        .user-list-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-list-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-list-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.125rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.625rem;
+            font-weight: 600;
+        }
+
+        .owner-badge { background: var(--owner); color: white; }
+        .admin-badge { background: var(--admin); color: white; }
+        .moderator-badge { background: var(--moderator); color: white; }
+        .vip-badge { background: var(--vip); color: white; }
+
         .chat-main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+            background: #f9fafb;
         }
 
         .chat-header {
-            padding: 1rem 2rem;
+            padding: 1.25rem 2rem;
             background: white;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .current-room-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .room-avatar {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .room-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .room-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-action-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chat-action-btn:hover {
+            background: var(--primary);
+            color: white;
         }
 
         .messages-container {
@@ -200,133 +357,8 @@
 
         .message {
             display: flex;
-            margin-bottom: 1rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .message-content {
-            background: white;
-            padding: 1rem;
-            border-radius: var(--radius-lg);
-            max-width: 70%;
-            box-shadow: var(--shadow);
-        }
-
-        .message-input-container {
-            padding: 1rem 2rem;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        /* نوافذ التسجيل */
-        .auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .auth-box {
-            background: white;
-            padding: 2rem;
-            border-radius: var(--radius-2xl);
-            width: 90%;
-            max-width: 500px;
-            animation: popIn 0.3s ease;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            border-bottom-color: var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: var(--radius-lg);
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .btn-block {
-            width: 100%;
-        }
-
-        /* نافذة الإدارة */
-        .admin-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: white;
-            z-index: 2000;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .admin-panel.active {
-            display: block;
-        }
-
-        /* نافذة الثيرابيست */
-        .therapist-message {
-            background: var(--gradient-therapist);
-            color: white;
-            border-radius: var(--radius-lg);
-            padding: 1rem;
-            margin: 1rem 0;
-            animation: slideIn 0.3s ease;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.4s;
         }
 
         @keyframes fadeIn {
@@ -334,206 +366,397 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .message-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 1rem;
+            border: 3px solid var(--primary);
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            flex: 1;
+            background: white;
+            padding: 1.25rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            max-width: 75%;
+        }
+
+        .message.my-message {
+            flex-direction: row-reverse;
+        }
+
+        .message.my-message .message-avatar {
+            margin-left: 0;
+            margin-right: 1rem;
+        }
+
+        .message.my-message .message-content {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .message-text {
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .message-input-container {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f9fafb;
+            border-radius: var(--radius-xl);
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gradient-primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .login-overlay, .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box, .modal-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: popIn 0.6s;
+        }
+
         @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
+            from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .login-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* تصميم متجاوب */
-        @media (max-width: 1024px) {
-            .container {
-                height: 100vh;
-                border-radius: 0;
-            }
-            
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .gender-select {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .gender-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gender-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-google {
+            background: white;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .toggle-form {
+            margin-top: 1rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .toggle-form a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
             .sidebar {
-                position: absolute;
+                position: fixed;
                 left: -100%;
-                width: 300px;
+                width: 85%;
                 height: 100%;
+                z-index: 100;
+                transition: left 0.3s;
             }
             
             .sidebar.active {
                 left: 0;
             }
-        }
-
-        @media (max-width: 768px) {
-            .chat-header {
-                padding: 1rem;
-            }
             
-            .messages-container {
-                padding: 1rem;
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
             }
-            
-            .message-input-container {
-                padding: 1rem;
-            }
-        }
-
-        /* شريط التمرير المخصص */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
         }
     </style>
 </head>
 <body>
-    <!-- نافذة تسجيل الدخول -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-box">
-            <div class="tabs">
-                <div class="tab active" data-tab="login">تسجيل الدخول</div>
-                <div class="tab" data-tab="register">إنشاء حساب</div>
-            </div>
+    <div class="login-overlay" id="authOverlay">
+        <div class="login-box">
+            <div class="login-title" id="authTitle">🚀 مرحباً بك في Circl Chat</div>
             
-            <!-- نموذج تسجيل الدخول -->
-            <form id="loginForm" style="display: block;">
+            <div id="loginForm">
                 <div class="form-group">
-                    <input type="text" class="form-control" id="loginUsername" placeholder="اسم المستخدم" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" id="loginPassword" placeholder="كلمة المرور" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">دخول</button>
-                
-                <div style="text-align: center; margin-top: 1rem; color: #6b7280;">
-                    أو
+                    <label>اسم المستخدم</label>
+                    <input type="text" class="form-input" id="loginUsername" placeholder="أدخل اسم المستخدم">
                 </div>
                 
-                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-                    <button type="button" class="btn" style="flex: 1; background: #4285f4; color: white;" onclick="googleLogin()">
-                        <i class="fab fa-google"></i> جوجل
-                    </button>
-                    <button type="button" class="btn" style="flex: 1; background: #1877f2; color: white;">
-                        <i class="fab fa-facebook"></i> فيسبوك
-                    </button>
-                </div>
-            </form>
-            
-            <!-- نموذج التسجيل -->
-            <form id="registerForm" style="display: none;">
                 <div class="form-group">
-                    <input type="text" class="form-control" id="registerUsername" placeholder="اسم المستخدم" required>
+                    <label>كلمة المرور</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="أدخل كلمة المرور">
                 </div>
-                <div class="form-group">
-                    <input type="email" class="form-control" id="registerEmail" placeholder="البريد الإلكتروني" required>
+                
+                <button class="btn btn-primary" id="loginBtn">تسجيل الدخول</button>
+                
+                <div style="margin: 1.5rem 0; color: #9ca3af;">أو</div>
+                
+                <button class="btn btn-google" id="googleLoginBtn">
+                    <i class="fab fa-google"></i> تسجيل الدخول بحساب Google
+                </button>
+                
+                <div class="toggle-form">
+                    ليس لديك حساب؟ <a href="#" id="showRegister">إنشاء حساب جديد</a>
                 </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" id="registerPassword" placeholder="كلمة المرور" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" id="registerConfirmPassword" placeholder="تأكيد كلمة المرور" required>
-                </div>
-                <div class="form-group">
-                    <select class="form-control" id="registerGender" required>
-                        <option value="">اختر الجنس</option>
-                        <option value="male">ذكر</option>
-                        <option value="female">أنثى</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">إنشاء حساب</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- نافذة الإدارة -->
-    <div class="admin-panel" id="adminPanel">
-        <div style="padding: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>لوحة الإدارة</h2>
-                <button class="btn" onclick="closeAdminPanel()">إغلاق</button>
             </div>
             
-            <div class="tabs" style="margin-bottom: 2rem;">
-                <div class="tab active" data-admin-tab="users">المستخدمين</div>
-                <div class="tab" data-admin-tab="rooms">الغرف</div>
-                <div class="tab" data-admin-tab="reports">التقارير</div>
-                <div class="tab" data-admin-tab="settings">الإعدادات</div>
-            </div>
-            
-            <!-- إدارة المستخدمين -->
-            <div id="adminUsers" style="display: block;">
-                <div style="margin-bottom: 1rem;">
-                    <input type="text" class="form-control" placeholder="بحث عن مستخدم..." id="userSearch">
+            <div id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" class="form-input" id="regUsername" placeholder="اختر اسم مستخدم فريد">
                 </div>
-                <div id="usersList"></div>
-            </div>
-            
-            <!-- إدارة الغرف -->
-            <div id="adminRooms" style="display: none;">
-                <button class="btn btn-primary" onclick="createNewRoom()">إنشاء غرفة جديدة</button>
-                <div id="roomsList" style="margin-top: 1rem;"></div>
+                
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" class="form-input" id="regPassword" placeholder="أدخل كلمة مرور قوية">
+                </div>
+                
+                <div class="form-group">
+                    <label>الجنس</label>
+                    <div class="gender-select">
+                        <div class="gender-option" data-gender="male">
+                            <i class="fas fa-mars" style="font-size: 2rem; color: #3b82f6;"></i>
+                            <div>ذكر</div>
+                        </div>
+                        <div class="gender-option" data-gender="female">
+                            <i class="fas fa-venus" style="font-size: 2rem; color: #ec4899;"></i>
+                            <div>أنثى</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="registerBtn">إنشاء حساب</button>
+                
+                <div style="margin: 1.5rem 0; color: #9ca3af;">أو</div>
+                
+                <button class="btn btn-google" id="googleRegisterBtn">
+                    <i class="fab fa-google"></i> التسجيل بحساب Google
+                </button>
+                
+                <div class="toggle-form">
+                    لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- تطبيق الدردشة الرئيسي -->
-    <div class="container" id="chatContainer" style="display: none;">
-        <!-- الشريط الجانبي -->
-        <div class="sidebar" id="sidebar">
+    <div class="chat-container" id="chatContainer" style="display: none;">
+        <div class="sidebar">
             <div class="user-profile">
-                <div class="user-avatar" id="userAvatar">
+                <div class="user-avatar">
                     <img id="userAvatarImg" src="" alt="صورة المستخدم">
                     <div class="online-status"></div>
                 </div>
-                <div class="username" id="username"></div>
+                <div class="username">
+                    <span id="userDisplayName"></span>
+                    <i class="fas fa-check-circle" id="verifiedBadge" style="color: #3b82f6; display: none;"></i>
+                </div>
                 <div class="user-role" id="userRole">مستخدم</div>
             </div>
             
+            <div class="level-container">
+                <div class="level-info">
+                    <div style="color: #9ca3af; font-size: 0.875rem;">المستوى <span id="userLevel">1</span></div>
+                    <div style="font-weight: 600;" id="rankBadge">مبتدئ</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="levelProgress" style="width: 0%;"></div>
+                </div>
+                <div class="xp-info">
+                    <span id="currentXP">0 XP</span>
+                    <span id="nextLevelXP">100 XP</span>
+                </div>
+            </div>
+            
             <div class="rooms-section">
-                <h3 style="margin-bottom: 1rem; color: #9ca3af;">الغرف</h3>
-                <ul class="room-list" id="roomList">
-                    <!-- سيتم ملؤها ديناميكياً -->
-                </ul>
+                <div class="section-title">
+                    <span>الغرف</span>
+                    <span id="roomCount">0</span>
+                </div>
+                <ul class="room-list" id="roomList"></ul>
+            </div>
+            
+            <div class="users-section">
+                <div class="section-title">
+                    <span>المتصلون (<span id="onlineCount">0</span>)</span>
+                </div>
+                <ul class="user-list" id="userList"></ul>
             </div>
         </div>
         
-        <!-- منطقة الدردشة الرئيسية -->
         <div class="chat-main">
             <div class="chat-header">
-                <div>
-                    <h2 id="currentRoomTitle">عام</h2>
-                    <p id="currentRoomDesc" style="color: #6b7280;">الغرفة العامة</p>
+                <div class="current-room-info">
+                    <div class="room-avatar">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="room-title" id="currentRoomTitle">عام</div>
+                        <div class="room-desc" id="currentRoomDesc">غرفة عامة للجميع</div>
+                    </div>
                 </div>
                 
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn" id="menuBtn">
+                <div class="chat-actions">
+                    <button class="chat-action-btn" id="mobileMenuBtn" title="القائمة">
                         <i class="fas fa-bars"></i>
-                    </button>
-                    <button class="btn btn-primary" onclick="openAdminPanel()" id="adminBtn" style="display: none;">
-                        <i class="fas fa-cog"></i> الإدارة
                     </button>
                 </div>
             </div>
             
             <div class="messages-container" id="messagesContainer">
-                <!-- الرسائل ستظهر هنا -->
+                <div style="text-align: center; padding: 3rem; color: #6b7280;">
+                    <i class="fas fa-comments" style="font-size: 4rem; opacity: 0.3;"></i>
+                    <h3 style="margin-top: 1rem;">مرحباً بك!</h3>
+                    <p>ابدأ المحادثة الآن</p>
+                </div>
             </div>
             
             <div class="message-input-container">
-                <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" class="form-control" id="messageInput" placeholder="اكتب رسالتك..." autocomplete="off">
-                    <button class="btn btn-primary" id="sendBtn">
+                <div class="input-wrapper">
+                    <input type="text" class="message-input" id="messageInput" placeholder="اكتب رسالتك...">
+                    <button class="send-btn" id="sendBtn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -542,1061 +765,1284 @@
     </div>
 
     <script>
-        // نظام قاعدة البيانات المحلي
-        class Database {
-            constructor() {
-                this.dbName = 'circl_chat_db';
-                this.version = 3;
-                this.db = null;
-                this.init();
-            }
-
-            async init() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(this.dbName, this.version);
-                    
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => {
-                        this.db = request.result;
-                        resolve();
-                    };
-                    
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        
-                        // جدول المستخدمين
-                        if (!db.objectStoreNames.contains('users')) {
-                            const usersStore = db.createObjectStore('users', { keyPath: 'id' });
-                            usersStore.createIndex('username', 'username', { unique: true });
-                            usersStore.createIndex('email', 'email', { unique: true });
-                            usersStore.createIndex('role', 'role', { unique: false });
-                        }
-                        
-                        // جدول الغرف
-                        if (!db.objectStoreNames.contains('rooms')) {
-                            const roomsStore = db.createObjectStore('rooms', { keyPath: 'id' });
-                            roomsStore.createIndex('name', 'name', { unique: true });
-                            roomsStore.createIndex('type', 'type', { unique: false });
-                        }
-                        
-                        // جدول الرسائل
-                        if (!db.objectStoreNames.contains('messages')) {
-                            const messagesStore = db.createObjectStore('messages', { keyPath: 'id' });
-                            messagesStore.createIndex('roomId', 'roomId', { unique: false });
-                            messagesStore.createIndex('userId', 'userId', { unique: false });
-                            messagesStore.createIndex('timestamp', 'timestamp', { unique: false });
-                        }
-                        
-                        // جدول التذاكر (للثيرابيست)
-                        if (!db.objectStoreNames.contains('tickets')) {
-                            const ticketsStore = db.createObjectStore('tickets', { keyPath: 'id' });
-                            ticketsStore.createIndex('userId', 'userId', { unique: false });
-                            ticketsStore.createIndex('status', 'status', { unique: false });
-                            ticketsStore.createIndex('createdAt', 'createdAt', { unique: false });
-                        }
-                        
-                        // جدول المستويات والرتب
-                        if (!db.objectStoreNames.contains('levels')) {
-                            const levelsStore = db.createObjectStore('levels', { keyPath: 'userId' });
-                        }
-                        
-                        // جدول النقاط
-                        if (!db.objectStoreNames.contains('points')) {
-                            const pointsStore = db.createObjectStore('points', { keyPath: 'userId' });
-                        }
-                        
-                        // إنشاء المستخدم المالك الافتراضي
-                        setTimeout(() => {
-                            this.createDefaultUsers();
-                            this.createDefaultRooms();
-                        }, 100);
-                    };
-                });
-            }
-
-            async createDefaultUsers() {
-                const ownerUser = {
-                    id: 'owner-001',
-                    username: 'mvnnooo',
-                    email: 'owner@circlchat.com',
-                    password: 'mmmmnnnn11',
-                    role: 'owner',
-                    gender: 'male',
-                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=mvnnooo&backgroundColor=dc2626`,
-                    verified: true,
-                    points: 10000,
-                    level: 100,
-                    joinDate: new Date().toISOString(),
-                    permissions: ['all']
-                };
-                
-                await this.addUser(ownerUser);
-            }
-
-            async createDefaultRooms() {
-                const defaultRooms = [
-                    {
-                        id: 'room-1',
-                        name: 'عام',
-                        description: 'الغرفة العامة للجميع',
-                        type: 'public',
-                        maxUsers: 500,
-                        order: 1,
-                        createdBy: 'system'
-                    },
-                    {
-                        id: 'room-2',
-                        name: 'VIP',
-                        description: 'غرفة الأعضاء المميزين',
-                        type: 'vip',
-                        maxUsers: 100,
-                        order: 2,
-                        createdBy: 'system',
-                        password: '1218'
-                    },
-                    {
-                        id: 'room-3',
-                        name: 'ثرابيست',
-                        description: 'جلسات الدعم النفسي مع الذكاء الاصطناعي',
-                        type: 'therapist',
-                        maxUsers: 1,
-                        order: 3,
-                        createdBy: 'system',
-                        isBot: true
-                    },
-                    {
-                        id: 'room-4',
-                        name: 'الألعاب',
-                        description: 'مناقشة الألعاب والتحديات',
-                        type: 'public',
-                        maxUsers: 200,
-                        order: 4,
-                        createdBy: 'system'
-                    },
-                    {
-                        id: 'room-5',
-                        name: 'التكنولوجيا',
-                        description: 'أحدث التقنيات والبرمجة',
-                        type: 'public',
-                        maxUsers: 150,
-                        order: 5,
-                        createdBy: 'system'
-                    }
-                ];
-
-                for (const room of defaultRooms) {
-                    await this.addRoom(room);
-                }
-            }
-
-            // عمليات المستخدمين
-            async addUser(user) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readwrite');
-                    const store = transaction.objectStore('users');
-                    const request = store.add(user);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getUser(username) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readonly');
-                    const store = transaction.objectStore('users');
-                    const index = store.index('username');
-                    const request = index.get(username);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async updateUser(userId, updates) {
-                return new Promise(async (resolve, reject) => {
-                    const user = await this.getUserById(userId);
-                    if (!user) {
-                        reject(new Error('User not found'));
-                        return;
-                    }
-                    
-                    const updatedUser = { ...user, ...updates };
-                    const transaction = this.db.transaction(['users'], 'readwrite');
-                    const store = transaction.objectStore('users');
-                    const request = store.put(updatedUser);
-                    
-                    request.onsuccess = () => resolve(updatedUser);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getUserById(userId) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readonly');
-                    const store = transaction.objectStore('users');
-                    const request = store.get(userId);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllUsers() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readonly');
-                    const store = transaction.objectStore('users');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            // عمليات الغرف
-            async addRoom(room) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['rooms'], 'readwrite');
-                    const store = transaction.objectStore('rooms');
-                    const request = store.add(room);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getRoom(roomId) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['rooms'], 'readonly');
-                    const store = transaction.objectStore('rooms');
-                    const request = store.get(roomId);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllRooms() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['rooms'], 'readonly');
-                    const store = transaction.objectStore('rooms');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            // عمليات الرسائل
-            async addMessage(message) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['messages'], 'readwrite');
-                    const store = transaction.objectStore('messages');
-                    const request = store.add(message);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getRoomMessages(roomId, limit = 50) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['messages'], 'readonly');
-                    const store = transaction.objectStore('messages');
-                    const index = store.index('roomId');
-                    const request = index.getAll(roomId);
-                    
-                    request.onsuccess = () => {
-                        const messages = request.result
-                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                            .slice(0, limit)
-                            .reverse();
-                        resolve(messages);
-                    };
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            // عمليات التذاكر (للثيرابيست)
-            async createTicket(userId, issue) {
-                const ticket = {
-                    id: `ticket-${Date.now()}`,
-                    userId,
-                    issue,
-                    status: 'open',
-                    createdAt: new Date().toISOString(),
-                    responses: []
-                };
-                
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['tickets'], 'readwrite');
-                    const store = transaction.objectStore('tickets');
-                    const request = store.add(ticket);
-                    
-                    request.onsuccess = () => resolve(ticket);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addTicketResponse(ticketId, response) {
-                return new Promise(async (resolve, reject) => {
-                    const ticket = await this.getTicket(ticketId);
-                    if (!ticket) {
-                        reject(new Error('Ticket not found'));
-                        return;
-                    }
-                    
-                    ticket.responses.push({
-                        ...response,
-                        timestamp: new Date().toISOString()
-                    });
-                    
-                    const transaction = this.db.transaction(['tickets'], 'readwrite');
-                    const store = transaction.objectStore('tickets');
-                    const request = store.put(ticket);
-                    
-                    request.onsuccess = () => resolve(ticket);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getTicket(ticketId) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['tickets'], 'readonly');
-                    const store = transaction.objectStore('tickets');
-                    const request = store.get(ticketId);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getUserTickets(userId) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['tickets'], 'readonly');
-                    const store = transaction.objectStore('tickets');
-                    const index = store.index('userId');
-                    const request = index.getAll(userId);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-        }
-
-        // نظام الذكاء الاصطناعي للثيرابيست
-        class TherapistAI {
-            constructor() {
-                this.responses = {
-                    greetings: [
-                        "مرحباً! أنا مساعدك الذكي للدعم النفسي. كيف يمكنني مساعدتك اليوم؟",
-                        "أهلاً وسهلاً بك في جلسة الدعم النفسي. أنا هنا لأستمع إليك وأقدم لك الدعم.",
-                        "مرحباً بك! أنا بوت الدعم النفسي، هل لديك أي شيء تريد الحديث عنه؟"
-                    ],
-                    stress: [
-                        "أفهم أنك تشعر بالتوتر. حاول أن تأخذ نفساً عميقاً وتذكر أن كل شيء مؤقت.",
-                        "التوتر جزء من الحياة، ولكن يمكننا التعامل معه. هل تريد مشاركة ما يقلقك؟",
-                        "جرب تمارين التنفس العميق: شهيق لمدة 4 ثوان، احبس لمدة 7، زفير لمدة 8."
-                    ],
-                    anxiety: [
-                        "القلق طبيعي، لكن عندما يكون مفرطاً فهو يحتاج للاهتمام. هل تحدثت مع أحد عن هذا الشعور؟",
-                        "جرب كتابة ما يقلقك على ورقة، هذا يساعد في تنظيم الأفكار وتقليل القلق.",
-                        "تذكر أن معظم الأشياء التي تقلقنا لا تحدث أبداً. ركز على الحاضر."
-                    ],
-                    depression: [
-                        "أنا هنا لأستمع إليك. الاكتئاب ليس ضعفاً، وهو قابل للعلاج.",
-                        "هل فكرت في التحدث مع مختص نفسي؟ هذا قد يكون مفيداً جداً.",
-                        "حاول أن تبدأ بنشاطات صغيرة يومياً، حتى لو كانت بسيطة مثل المشي قليلاً."
-                    ],
-                    general: [
-                        "شكراً لمشاركتك هذا معي. تذكر أن طلب المساعدة علامة قوة، ليس ضعف.",
-                        "أنت لست وحدك في هذا. كثيرون مروا بتجارب مشابهة وتخطوها.",
-                        "الرعاية الذاتية مهمة. خصص وقتاً لنفسك كل يوم."
-                    ]
-                };
-            }
-
-            async generateResponse(userMessage) {
-                // محاكاة معالجة اللغة الطبيعية
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                const message = userMessage.toLowerCase();
-                let category = 'general';
-                
-                if (message.includes('مرحبا') || message.includes('اهلا') || message.includes('السلام')) {
-                    category = 'greetings';
-                } else if (message.includes('توتر') || message.includes('ضغط')) {
-                    category = 'stress';
-                } else if (message.includes('قلق') || message.includes('خوف')) {
-                    category = 'anxiety';
-                } else if (message.includes('اكتئاب') || message.includes('حزن')) {
-                    category = 'depression';
+        const DB = {
+            users: [],
+            rooms: [
+                { id: 1, name: 'عام', desc: 'غرفة عامة', icon: 'fa-users', limit: 500, users: [], order: 1 },
+                { id: 2, name: 'مصر 🇪🇬', desc: 'غرفة مصر', icon: 'fa-flag', limit: 500, users: [], order: 2 },
+                { id: 3, name: 'ثيرابيست', desc: 'جلسات استشارية', icon: 'fa-user-md', limit: 50, users: [], order: 3, isTherapist: true },
+                { id: 4, name: 'VIP', desc: 'غرفة VIP', icon: 'fa-crown', limit: 50, users: [], order: 4, password: '1218' }
+            ],
+            messages: [],
+            
+            init() {
+                const saved = localStorage.getItem('circl_db');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.users = data.users || [];
+                    this.messages = data.messages || [];
                 }
                 
-                const responses = this.responses[category];
-                return responses[Math.floor(Math.random() * responses.length)];
-            }
-        }
-
-        // التطبيق الرئيسي
-        class ChatApp {
-            constructor() {
-                this.db = new Database();
-                this.therapistAI = new TherapistAI();
-                this.currentUser = null;
-                this.currentRoom = null;
-                this.socket = null;
-                this.onlineUsers = new Map();
-                this.initialize();
-            }
-
-            async initialize() {
-                await this.db.init();
-                this.setupEventListeners();
-                this.checkAutoLogin();
-            }
-
-            setupEventListeners() {
-                // تبديل التبويبات
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        if (tab.dataset.tab === 'login') {
-                            document.getElementById('loginForm').style.display = 'block';
-                            document.getElementById('registerForm').style.display = 'none';
-                        } else {
-                            document.getElementById('loginForm').style.display = 'none';
-                            document.getElementById('registerForm').style.display = 'block';
-                        }
-                    });
-                });
-
-                // تسجيل الدخول
-                document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    await this.login();
-                });
-
-                // التسجيل
-                document.getElementById('registerForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    await this.register();
-                });
-
-                // إرسال الرسائل
-                document.getElementById('sendBtn').addEventListener('click', () => this.sendMessage());
-                document.getElementById('messageInput').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendMessage();
-                });
-
-                // زر القائمة للجوال
-                document.getElementById('menuBtn').addEventListener('click', () => {
-                    document.getElementById('sidebar').classList.toggle('active');
-                });
-
-                // تبويبات لوحة الإدارة
-                document.querySelectorAll('[data-admin-tab]').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        document.querySelectorAll('[data-admin-tab]').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        const tabId = tab.dataset.adminTab;
-                        document.querySelectorAll('#adminUsers, #adminRooms, #adminReports, #adminSettings')
-                            .forEach(el => el.style.display = 'none');
-                        document.getElementById(`admin${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).style.display = 'block';
-                        
-                        if (tabId === 'users') this.loadAdminUsers();
-                        else if (tabId === 'rooms') this.loadAdminRooms();
-                    });
-                });
-            }
-
-            checkAutoLogin() {
-                const savedUser = localStorage.getItem('currentUser');
-                if (savedUser) {
-                    this.currentUser = JSON.parse(savedUser);
-                    this.startApp();
-                }
-            }
-
-            async login() {
-                const username = document.getElementById('loginUsername').value;
-                const password = document.getElementById('loginPassword').value;
-
-                try {
-                    const user = await this.db.getUser(username);
-                    if (!user) {
-                        this.showNotification('المستخدم غير موجود', 'error');
-                        return;
-                    }
-
-                    if (user.password !== password) {
-                        this.showNotification('كلمة المرور غير صحيحة', 'error');
-                        return;
-                    }
-
-                    this.currentUser = user;
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-                    this.startApp();
-                    this.showNotification(`مرحباً بك ${user.username}!`, 'success');
-                } catch (error) {
-                    this.showNotification('حدث خطأ في تسجيل الدخول', 'error');
-                    console.error(error);
-                }
-            }
-
-            async register() {
-                const username = document.getElementById('registerUsername').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const confirmPassword = document.getElementById('registerConfirmPassword').value;
-                const gender = document.getElementById('registerGender').value;
-
-                if (password !== confirmPassword) {
-                    this.showNotification('كلمات المرور غير متطابقة', 'error');
-                    return;
-                }
-
-                if (!gender) {
-                    this.showNotification('الرجاء اختيار الجنس', 'error');
-                    return;
-                }
-
-                try {
-                    const existingUser = await this.db.getUser(username);
-                    if (existingUser) {
-                        this.showNotification('اسم المستخدم موجود بالفعل', 'error');
-                        return;
-                    }
-
-                    const newUser = {
-                        id: `user-${Date.now()}`,
-                        username,
-                        email,
-                        password,
-                        role: 'user',
-                        gender,
-                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=6366f1`,
-                        verified: false,
-                        points: 100,
-                        level: 1,
-                        joinDate: new Date().toISOString(),
-                        permissions: []
-                    };
-
-                    await this.db.addUser(newUser);
-                    this.showNotification('تم إنشاء الحساب بنجاح!', 'success');
-                    
-                    // تبديل إلى تسجيل الدخول تلقائياً
-                    document.querySelector('[data-tab="login"]').click();
-                    document.getElementById('loginUsername').value = username;
-                    document.getElementById('loginPassword').value = password;
-                } catch (error) {
-                    this.showNotification('حدث خطأ في إنشاء الحساب', 'error');
-                    console.error(error);
-                }
-            }
-
-            async googleLogin() {
-                // محاكاة تسجيل الدخول بجوجل
-                this.showNotification('جارٍ الاتصال بحساب جوجل...', 'info');
-                
-                // في التطبيق الحقيقي، استخدم Firebase أو Google OAuth
-                setTimeout(async () => {
-                    const googleUser = {
-                        id: `google-${Date.now()}`,
-                        username: `user_${Math.floor(Math.random() * 10000)}`,
-                        email: `user${Math.floor(Math.random() * 10000)}@gmail.com`,
-                        role: 'user',
-                        gender: Math.random() > 0.5 ? 'male' : 'female',
-                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=google${Date.now()}&backgroundColor=4285f4`,
+                if (!this.users.find(u => u.username === 'mvnnooo')) {
+                    this.users.push({
+                        id: 'owner-001',
+                        username: 'mvnnooo',
+                        password: 'mmmmnnnn11',
+                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=mvnnooo`,
+                        role: 'owner',
+                        gender: 'male',
+                        xp: 50000,
                         verified: true,
-                        points: 200,
-                        level: 1,
-                        joinDate: new Date().toISOString(),
-                        permissions: [],
-                        isGoogle: true
-                    };
-
-                    try {
-                        await this.db.addUser(googleUser);
-                        this.currentUser = googleUser;
-                        localStorage.setItem('currentUser', JSON.stringify(googleUser));
-                        this.startApp();
-                        this.showNotification('تم تسجيل الدخول بحساب جوجل بنجاح!', 'success');
-                    } catch (error) {
-                        this.showNotification('حدث خطأ في تسجيل الدخول', 'error');
-                    }
-                }, 1500);
-            }
-
-            startApp() {
-                document.getElementById('authOverlay').style.display = 'none';
-                document.getElementById('chatContainer').style.display = 'flex';
-                
-                this.updateUserProfile();
-                this.loadRooms();
-                this.connectToSocket();
-                
-                // إظهار زر الإدارة للمشرفين والمالك
-                if (this.currentUser.role === 'owner' || this.currentUser.role === 'admin') {
-                    document.getElementById('adminBtn').style.display = 'block';
+                        credits: 10000
+                    });
                 }
-            }
-
-            updateUserProfile() {
-                document.getElementById('username').textContent = this.currentUser.username;
-                document.getElementById('userAvatarImg').src = this.currentUser.avatar;
-                document.getElementById('userRole').textContent = this.getRoleText(this.currentUser.role);
-                document.getElementById('userRole').className = `user-role role-${this.currentUser.role}`;
-            }
-
-            getRoleText(role) {
-                const roles = {
-                    'owner': 'مالك',
-                    'admin': 'مشرف',
-                    'moderator': 'مراقب',
-                    'vip': 'عضو VIP',
-                    'user': 'مستخدم'
-                };
-                return roles[role] || 'مستخدم';
-            }
-
-            async loadRooms() {
-                const rooms = await this.db.getAllRooms();
-                const roomList = document.getElementById('roomList');
-                roomList.innerHTML = '';
-
-                // ترتيب الغرف حسب الترتيب المخصص
-                rooms.sort((a, b) => a.order - b.order);
-
-                for (const room of rooms) {
-                    const li = document.createElement('li');
-                    li.className = `room-item ${this.currentRoom?.id === room.id ? 'active' : ''}`;
-                    li.innerHTML = `
-                        <i class="fas ${room.type === 'vip' ? 'fa-crown' : room.type === 'therapist' ? 'fa-heart' : 'fa-hashtag'}" 
-                           style="margin-left: 0.5rem; color: ${room.type === 'vip' ? 'var(--vip)' : room.type === 'therapist' ? 'var(--therapist)' : '#9ca3af'}"></i>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600;">${room.name}</div>
-                            <div style="font-size: 0.8rem; color: #9ca3af;">${room.description}</div>
-                        </div>
-                        ${room.type === 'vip' ? '<span style="color: var(--vip);"><i class="fas fa-lock"></i></span>' : ''}
-                    `;
-
-                    li.addEventListener('click', () => this.joinRoom(room));
-                    roomList.appendChild(li);
-                }
-
-                // الانضمام تلقائياً للغرفة الأولى
-                if (rooms.length > 0 && !this.currentRoom) {
-                    await this.joinRoom(rooms[0]);
-                }
-            }
-
-            async joinRoom(room) {
-                // التحقق من صلاحيات الوصول للغرفة
-                if (room.type === 'vip' && this.currentUser.role !== 'vip' && 
-                    this.currentUser.role !== 'admin' && this.currentUser.role !== 'owner') {
-                    const password = prompt('هذه غرفة VIP. الرجاء إدخال كلمة المرور:');
-                    if (password !== room.password) {
-                        this.showNotification('كلمة المرور غير صحيحة', 'error');
-                        return;
-                    }
-                }
-
-                // تحديث الغرفة الحالية
-                this.currentRoom = room;
-                document.getElementById('currentRoomTitle').textContent = room.name;
-                document.getElementById('currentRoomDesc').textContent = room.description;
-                
-                // تحديث قائمة الغرف
-                this.loadRooms();
-                
-                // تحميل الرسائل
-                await this.loadMessages();
-                
-                // إذا كانت غرفة الثيرابيست، إظهار رسالة ترحيب
-                if (room.type === 'therapist') {
-                    await this.handleTherapistRoom();
-                }
-            }
-
-            async loadMessages() {
-                const messages = await this.db.getRoomMessages(this.currentRoom.id);
-                const container = document.getElementById('messagesContainer');
-                container.innerHTML = '';
-
-                if (messages.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 3rem; color: #6b7280;">
-                            <i class="fas fa-comments" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
-                            <p>لا توجد رسائل بعد. كن أول من يرسل رسالة!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                for (const message of messages) {
-                    await this.displayMessage(message);
-                }
-
-                container.scrollTop = container.scrollHeight;
-            }
-
-            async displayMessage(message) {
-                const container = document.getElementById('messagesContainer');
-                const isCurrentUser = message.userId === this.currentUser?.id;
-                const user = await this.db.getUserById(message.userId);
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${isCurrentUser ? 'my-message' : ''}`;
-                
-                const time = new Date(message.timestamp).toLocaleTimeString('ar-EG', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                messageDiv.innerHTML = `
-                    ${!isCurrentUser ? `
-                        <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; margin-left: 0.5rem;">
-                            <img src="${user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user&backgroundColor=ccc'}" 
-                                 style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                    ` : ''}
-                    
-                    <div class="message-content" style="background: ${isCurrentUser ? 'var(--gradient-primary)' : 'white'}; 
-                                                         color: ${isCurrentUser ? 'white' : 'inherit'};
-                                                         max-width: 70%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-weight: 600;">${user?.username || 'مستخدم'}</span>
-                                ${user?.role === 'owner' ? '<span style="background: var(--owner); color: white; padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.7rem;">مالك</span>' : ''}
-                                ${user?.role === 'admin' ? '<span style="background: var(--admin); color: white; padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.7rem;">مشرف</span>' : ''}
-                            </div>
-                            <span style="font-size: 0.8rem; opacity: 0.7;">${time}</span>
-                        </div>
-                        <div>${this.escapeHtml(message.text)}</div>
-                    </div>
-                    
-                    ${isCurrentUser ? `
-                        <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; margin-right: 0.5rem;">
-                            <img src="${this.currentUser.avatar}" 
-                                 style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                    ` : ''}
-                `;
-
-                container.appendChild(messageDiv);
-                container.scrollTop = container.scrollHeight;
-            }
-
-            async sendMessage() {
-                const input = document.getElementById('messageInput');
-                const text = input.value.trim();
-                
-                if (!text || !this.currentRoom || !this.currentUser) return;
-
-                // في غرفة الثيرابيست، معالجة خاصة
-                if (this.currentRoom.type === 'therapist') {
-                    await this.handleTherapistMessage(text);
-                    input.value = '';
-                    return;
-                }
-
-                const message = {
-                    id: `msg-${Date.now()}`,
-                    roomId: this.currentRoom.id,
-                    userId: this.currentUser.id,
-                    text: text,
-                    timestamp: new Date().toISOString()
-                };
-
-                await this.db.addMessage(message);
-                await this.displayMessage(message);
-                input.value = '';
-                
-                // إضافة نقاط للمستخدم
-                await this.addUserPoints(5);
-            }
-
-            async handleTherapistRoom() {
-                const container = document.getElementById('messagesContainer');
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #6b7280;">
-                        <i class="fas fa-heart" style="font-size: 3rem; color: var(--therapist); margin-bottom: 1rem;"></i>
-                        <h3 style="color: var(--therapist); margin-bottom: 1rem;">جلسة الدعم النفسي</h3>
-                        <p>مرحباً بك في جلسة الدعم النفسي. أنا مساعدك الذكي هنا لأستمع إليك وأقدم لك الدعم.</p>
-                        <p style="margin-top: 1rem; font-size: 0.9rem;">يمكنك مشاركة أي شيء يقلقك، وسأحاول مساعدتك.</p>
-                    </div>
-                `;
-            }
-
-            async handleTherapistMessage(userMessage) {
-                // إضافة رسالة المستخدم
-                const userMsg = {
-                    id: `msg-${Date.now()}`,
-                    roomId: this.currentRoom.id,
-                    userId: this.currentUser.id,
-                    text: userMessage,
-                    timestamp: new Date().toISOString()
-                };
-
-                await this.db.addMessage(userMsg);
-                await this.displayMessage(userMsg);
-
-                // إنشاء تذكرة جديدة أو تحديث التذكرة الحالية
-                const tickets = await this.db.getUserTickets(this.currentUser.id);
-                let openTicket = tickets.find(t => t.status === 'open');
-                
-                if (!openTicket) {
-                    openTicket = await this.db.createTicket(this.currentUser.id, userMessage);
-                }
-
-                // توليد رد الذكاء الاصطناعي
-                this.showNotification('جاري تحليل رسالتك...', 'info');
-                const aiResponse = await this.therapistAI.generateResponse(userMessage);
-                
-                // إضافة رد البوت
-                const botMessage = {
-                    id: `msg-${Date.now()}`,
-                    roomId: this.currentRoom.id,
-                    userId: 'therapist-bot',
-                    text: aiResponse,
-                    timestamp: new Date().toISOString()
-                };
-
-                await this.db.addMessage(botMessage);
-                await this.db.addTicketResponse(openTicket.id, {
-                    from: 'bot',
-                    message: aiResponse
-                });
-
-                // عرض رد البوت
-                await this.displayMessage(botMessage);
-                
-                // تحديث حالة التذكرة
-                await this.db.updateTicket(openTicket.id, { lastResponse: new Date().toISOString() });
-            }
-
-            async addUserPoints(points) {
-                if (!this.currentUser) return;
-                
-                this.currentUser.points += points;
-                this.currentUser.level = Math.floor(this.currentUser.points / 100) + 1;
-                
-                await this.db.updateUser(this.currentUser.id, {
-                    points: this.currentUser.points,
-                    level: this.currentUser.level
-                });
-                
-                // عرض إشعار للمستويات الكبيرة
-                if (points >= 50) {
-                    this.showNotification(`🎉 +${points} نقطة!`, 'success');
-                }
-            }
-
-            connectToSocket() {
-                // محاكاة اتصال السوكيت
-                this.showNotification('جارٍ الاتصال بالسيرفر...', 'info');
-                
-                setTimeout(() => {
-                    this.showNotification('تم الاتصال بنجاح', 'success');
-                    // هنا سيتم تنفيذ اتصال WebSocket الحقيقي
-                }, 1000);
-            }
-
-            async loadAdminUsers() {
-                const users = await this.db.getAllUsers();
-                const container = document.getElementById('usersList');
-                container.innerHTML = '';
-
-                for (const user of users) {
-                    const div = document.createElement('div');
-                    div.className = 'user-item';
-                    div.style.cssText = `
-                        padding: 1rem;
-                        border: 1px solid #e5e7eb;
-                        border-radius: var(--radius-lg);
-                        margin-bottom: 0.5rem;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    `;
-                    
-                    div.innerHTML = `
-                        <div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <img src="${user.avatar}" style="width: 40px; height: 40px; border-radius: 50%;">
-                                <div>
-                                    <div style="font-weight: 600;">${user.username}</div>
-                                    <div style="font-size: 0.8rem; color: #6b7280;">
-                                        ${this.getRoleText(user.role)} • المستوى ${user.level}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn" onclick="app.promoteUser('${user.id}')" 
-                                    ${this.currentUser?.role !== 'owner' ? 'disabled' : ''}>
-                                ترقية
-                            </button>
-                            <button class="btn" onclick="app.addPoints('${user.id}')"
-                                    ${!['owner', 'admin'].includes(this.currentUser?.role) ? 'disabled' : ''}>
-                                إضافة نقاط
-                            </button>
-                        </div>
-                    `;
-                    
-                    container.appendChild(div);
-                }
-            }
-
-            async loadAdminRooms() {
-                const rooms = await this.db.getAllRooms();
-                const container = document.getElementById('roomsList');
-                container.innerHTML = '';
-
-                for (const room of rooms) {
-                    const div = document.createElement('div');
-                    div.style.cssText = `
-                        padding: 1rem;
-                        border: 1px solid #e5e7eb;
-                        border-radius: var(--radius-lg);
-                        margin-bottom: 0.5rem;
-                    `;
-                    
-                    div.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-weight: 600;">${room.name}</div>
-                                <div style="font-size: 0.8rem; color: #6b7280;">${room.description}</div>
-                                <div style="font-size: 0.8rem; margin-top: 0.25rem;">
-                                    <span style="background: ${room.type === 'public' ? 'var(--primary)' : 
-                                                              room.type === 'vip' ? 'var(--vip)' : 
-                                                              'var(--therapist)'}; 
-                                           color: white; padding: 0.1rem 0.5rem; border-radius: 10px;">
-                                        ${room.type === 'public' ? 'عامة' : 
-                                          room.type === 'vip' ? 'VIP' : 'ثرابيست'}
-                                    </span>
-                                </div>
-                            </div>
-                            <div>
-                                <button class="btn" onclick="app.editRoom('${room.id}')">تعديل</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    container.appendChild(div);
-                }
-            }
-
-            async promoteUser(userId) {
-                if (this.currentUser?.role !== 'owner') {
-                    this.showNotification('ليس لديك صلاحية لهذا الإجراء', 'error');
-                    return;
-                }
-
-                const user = await this.db.getUserById(userId);
-                if (!user) return;
-
-                const newRole = prompt('اختر الرتبة الجديدة:', user.role);
-                if (!newRole || !['user', 'vip', 'moderator', 'admin', 'owner'].includes(newRole)) {
-                    this.showNotification('رتبة غير صالحة', 'error');
-                    return;
-                }
-
-                await this.db.updateUser(userId, { role: newRole });
-                this.showNotification(`تم ترقية ${user.username} إلى ${this.getRoleText(newRole)}`, 'success');
-                this.loadAdminUsers();
-            }
-
-            async addPoints(userId) {
-                if (!['owner', 'admin'].includes(this.currentUser?.role)) {
-                    this.showNotification('ليس لديك صلاحية لهذا الإجراء', 'error');
-                    return;
-                }
-
-                const points = parseInt(prompt('أدخل عدد النقاط:'));
-                if (isNaN(points) || points <= 0) {
-                    this.showNotification('عدد النقاط غير صالح', 'error');
-                    return;
-                }
-
-                const user = await this.db.getUserById(userId);
-                const newPoints = (user.points || 0) + points;
-                await this.db.updateUser(userId, { points: newPoints });
-                
-                this.showNotification(`تم إضافة ${points} نقطة لـ ${user.username}`, 'success');
-                this.loadAdminUsers();
-            }
-
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
-                    color: white;
-                    padding: 12px 24px;
-                    border-radius: var(--radius-lg);
-                    z-index: 10000;
-                    box-shadow: var(--shadow-lg);
-                    animation: slideIn 0.3s ease;
-                    font-family: 'Tajawal', sans-serif;
-                `;
-                
-                notification.textContent = message;
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
-            }
-        }
-
-        // وظائف عامة للوصول من الأزرار
-        function openAdminPanel() {
-            document.getElementById('adminPanel').classList.add('active');
-            app.loadAdminUsers();
-        }
-
-        function closeAdminPanel() {
-            document.getElementById('adminPanel').classList.remove('active');
-        }
-
-        function createNewRoom() {
-            const name = prompt('اسم الغرفة الجديدة:');
-            if (!name) return;
+            },
             
-            const description = prompt('وصف الغرفة:');
-            const type = prompt('نوع الغرفة (public/vip/therapist):', 'public');
+            save() {
+                localStorage.setItem('circl_db', JSON.stringify({
+                    users: this.users,
+                    messages: this.messages
+                }));
+            },
             
-            if (!['public', 'vip', 'therapist'].includes(type)) {
-                app.showNotification('نوع الغرفة غير صالح', 'error');
+            register(username, password, gender) {
+                if (this.users.find(u => u.username === username)) {
+                    return { success: false, message: 'اسم المستخدم موجود' };
+                }
+                
+                const user = {
+                    id: 'user-' + Date.now(),
+                    username,
+                    password,
+                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
+                    role: 'user',
+                    gender,
+                    xp: 0,
+                    verified: false,
+                    credits: 0
+                };
+                
+                this.users.push(user);
+                this.save();
+                return { success: true, user };
+            },
+            
+            login(username, password) {
+                const user = this.users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    return { success: true, user };
+                }
+                return { success: false, message: 'بيانات خاطئة' };
+            },
+            
+            addMessage(msg) {
+                this.messages.push(msg);
+                this.save();
+            }
+        };
+
+        let currentUser = null;
+        let currentRoom = 1;
+        let selectedGender = 'male';
+
+        DB.init();
+
+        document.getElementById('showRegister').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '📝 إنشاء حساب جديد';
+        };
+
+        document.getElementById('showLogin').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '🚀 مرحباً بك في Circl Chat';
+        };
+
+        document.querySelectorAll('.gender-option').forEach(opt => {
+            opt.onclick = () => {
+                document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedGender = opt.dataset.gender;
+            };
+        });
+
+        document.getElementById('registerBtn').onclick = () => {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            
+            if (!username || !password) {
+                alert('يرجى ملء جميع الحقول');
                 return;
             }
             
-            // هنا سيتم إضافة الغرفة الجديدة
-            app.showNotification('تم إنشاء الغرفة بنجاح', 'success');
-            app.loadAdminRooms();
+            const result = DB.register(username, password, selectedGender);
+            if (result.success) {
+                login(result.user);
+            } else {
+                alert(result.message);
+            }
+        };
+
+        document.getElementById('loginBtn').onclick = () => {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = DB.login(username, password);
+            if (result.success) {
+                login(result.user);
+            } else {
+                alert(result.message);
+            }
+        };
+
+        document.getElementById('googleLoginBtn').onclick = () => {
+            alert('سيتم ربط Google قريباً');
+        };
+
+        document.getElementById('googleRegisterBtn').onclick = () => {
+            alert('سيتم ربط Google قريباً');
+        };
+
+        function login(user) {
+            currentUser = user;
+            document.
+                <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circl Chat - دردشة مباشرة احترافية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #fbbf24;
+            --diamond: #60a5fa;
+            --king: #a855f7;
+            --queen: #ec4899;
+            --owner: #dc2626;
+            --admin: #059669;
+            --moderator: #3b82f6;
+            --vip: #f59e0b;
+            --therapist: #8b5cf6;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
         }
 
-        // تهيئة التطبيق
-        let app;
-        document.addEventListener('DOMContentLoaded', () => {
-            app = new ChatApp();
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #1f2937;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 1600px;
+            height: 95vh;
+            background: white;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+        }
+
+        .sidebar {
+            width: 380px;
+            background: #111827;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-profile {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #374151;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--primary);
+            position: relative;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .online-status {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 3px solid #111827;
+        }
+
+        .username {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-owner { background: var(--owner); }
+        .role-admin { background: var(--admin); }
+        .role-moderator { background: var(--moderator); }
+        .role-vip { background: var(--vip); }
+        .role-user { background: #6b7280; }
+
+        .level-container {
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid #374151;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #374151;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width 0.5s ease;
+        }
+
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .rooms-section, .users-section {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .rooms-section {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .room-list, .user-list {
+            list-style: none;
+        }
+
+        .room-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .room-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .room-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-right: 4px solid var(--primary);
+        }
+
+        .room-icon {
+            margin-left: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .room-info {
+            flex: 1;
+        }
+
+        .room-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .room-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .user-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-list-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-list-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 0.75rem;
+            border: 2px solid var(--primary);
+        }
+
+        .user-list-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-list-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-list-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.125rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.625rem;
+            font-weight: 600;
+        }
+
+        .owner-badge { background: var(--owner); color: white; }
+        .admin-badge { background: var(--admin); color: white; }
+        .moderator-badge { background: var(--moderator); color: white; }
+        .vip-badge { background: var(--vip); color: white; }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f9fafb;
+        }
+
+        .chat-header {
+            padding: 1.25rem 2rem;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .current-room-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .room-avatar {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .room-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .room-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-action-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chat-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 1rem;
+            border: 3px solid var(--primary);
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            flex: 1;
+            background: white;
+            padding: 1.25rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            max-width: 75%;
+        }
+
+        .message.my-message {
+            flex-direction: row-reverse;
+        }
+
+        .message.my-message .message-avatar {
+            margin-left: 0;
+            margin-right: 1rem;
+        }
+
+        .message.my-message .message-content {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .message-text {
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .message-input-container {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f9fafb;
+            border-radius: var(--radius-xl);
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gradient-primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .login-overlay, .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box, .modal-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: popIn 0.6s;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .login-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .gender-select {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .gender-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gender-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-google {
+            background: white;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .toggle-form {
+            margin-top: 1rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .toggle-form a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                width: 85%;
+                height: 100%;
+                z-index: 100;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-overlay" id="authOverlay">
+        <div class="login-box">
+            <div class="login-title" id="authTitle">🚀 مرحباً بك في Circl Chat</div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" class="form-input" id="loginUsername" placeholder="أدخل اسم المستخدم">
+                </div>
+                
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="أدخل كلمة المرور">
+                </div>
+                
+                <button class="btn btn-primary" id="loginBtn">تسجيل الدخول</button>
+                
+                <div style="margin: 1.5rem 0; color: #9ca3af;">أو</div>
+                
+                <button class="btn btn-google" id="googleLoginBtn">
+                    <i class="fab fa-google"></i> تسجيل الدخول بحساب Google
+                </button>
+                
+                <div class="toggle-form">
+                    ليس لديك حساب؟ <a href="#" id="showRegister">إنشاء حساب جديد</a>
+                </div>
+            </div>
+            
+            <div id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" class="form-input" id="regUsername" placeholder="اختر اسم مستخدم فريد">
+                </div>
+                
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" class="form-input" id="regPassword" placeholder="أدخل كلمة مرور قوية">
+                </div>
+                
+                <div class="form-group">
+                    <label>الجنس</label>
+                    <div class="gender-select">
+                        <div class="gender-option" data-gender="male">
+                            <i class="fas fa-mars" style="font-size: 2rem; color: #3b82f6;"></i>
+                            <div>ذكر</div>
+                        </div>
+                        <div class="gender-option" data-gender="female">
+                            <i class="fas fa-venus" style="font-size: 2rem; color: #ec4899;"></i>
+                            <div>أنثى</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="registerBtn">إنشاء حساب</button>
+                
+                <div style="margin: 1.5rem 0; color: #9ca3af;">أو</div>
+                
+                <button class="btn btn-google" id="googleRegisterBtn">
+                    <i class="fab fa-google"></i> التسجيل بحساب Google
+                </button>
+                
+                <div class="toggle-form">
+                    لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer" style="display: none;">
+        <div class="sidebar">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <img id="userAvatarImg" src="" alt="صورة المستخدم">
+                    <div class="online-status"></div>
+                </div>
+                <div class="username">
+                    <span id="userDisplayName"></span>
+                    <i class="fas fa-check-circle" id="verifiedBadge" style="color: #3b82f6; display: none;"></i>
+                </div>
+                <div class="user-role" id="userRole">مستخدم</div>
+            </div>
+            
+            <div class="level-container">
+                <div class="level-info">
+                    <div style="color: #9ca3af; font-size: 0.875rem;">المستوى <span id="userLevel">1</span></div>
+                    <div style="font-weight: 600;" id="rankBadge">مبتدئ</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="levelProgress" style="width: 0%;"></div>
+                </div>
+                <div class="xp-info">
+                    <span id="currentXP">0 XP</span>
+                    <span id="nextLevelXP">100 XP</span>
+                </div>
+            </div>
+            
+            <div class="rooms-section">
+                <div class="section-title">
+                    <span>الغرف</span>
+                    <span id="roomCount">0</span>
+                </div>
+                <ul class="room-list" id="roomList"></ul>
+            </div>
+            
+            <div class="users-section">
+                <div class="section-title">
+                    <span>المتصلون (<span id="onlineCount">0</span>)</span>
+                </div>
+                <ul class="user-list" id="userList"></ul>
+            </div>
+        </div>
+        
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="current-room-info">
+                    <div class="room-avatar">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="room-title" id="currentRoomTitle">عام</div>
+                        <div class="room-desc" id="currentRoomDesc">غرفة عامة للجميع</div>
+                    </div>
+                </div>
+                
+                <div class="chat-actions">
+                    <button class="chat-action-btn" id="mobileMenuBtn" title="القائمة">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <div style="text-align: center; padding: 3rem; color: #6b7280;">
+                    <i class="fas fa-comments" style="font-size: 4rem; opacity: 0.3;"></i>
+                    <h3 style="margin-top: 1rem;">مرحباً بك!</h3>
+                    <p>ابدأ المحادثة الآن</p>
+                </div>
+            </div>
+            
+            <div class="message-input-container">
+                <div class="input-wrapper">
+                    <input type="text" class="message-input" id="messageInput" placeholder="اكتب رسالتك...">
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DB = {
+            users: [],
+            rooms: [
+                { id: 1, name: 'عام', desc: 'غرفة عامة', icon: 'fa-users', limit: 500, users: [], order: 1 },
+                { id: 2, name: 'مصر 🇪🇬', desc: 'غرفة مصر', icon: 'fa-flag', limit: 500, users: [], order: 2 },
+                { id: 3, name: 'ثيرابيست', desc: 'جلسات استشارية', icon: 'fa-user-md', limit: 50, users: [], order: 3, isTherapist: true },
+                { id: 4, name: 'VIP', desc: 'غرفة VIP', icon: 'fa-crown', limit: 50, users: [], order: 4, password: '1218' }
+            ],
+            messages: [],
+            
+            init() {
+                const saved = localStorage.getItem('circl_db');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.users = data.users || [];
+                    this.messages = data.messages || [];
+                }
+                
+                if (!this.users.find(u => u.username === 'mvnnooo')) {
+                    this.users.push({
+                        id: 'owner-001',
+                        username: 'mvnnooo',
+                        password: 'mmmmnnnn11',
+                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=mvnnooo`,
+                        role: 'owner',
+                        gender: 'male',
+                        xp: 50000,
+                        verified: true,
+                        credits: 10000
+                    });
+                }
+            },
+            
+            save() {
+                localStorage.setItem('circl_db', JSON.stringify({
+                    users: this.users,
+                    messages: this.messages
+                }));
+            },
+            
+            register(username, password, gender) {
+                if (this.users.find(u => u.username === username)) {
+                    return { success: false, message: 'اسم المستخدم موجود' };
+                }
+                
+                const user = {
+                    id: 'user-' + Date.now(),
+                    username,
+                    password,
+                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
+                    role: 'user',
+                    gender,
+                    xp: 0,
+                    verified: false,
+                    credits: 0
+                };
+                
+                this.users.push(user);
+                this.save();
+                return { success: true, user };
+            },
+            
+            login(username, password) {
+                const user = this.users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    return { success: true, user };
+                }
+                return { success: false, message: 'بيانات خاطئة' };
+            },
+            
+            addMessage(msg) {
+                this.messages.push(msg);
+                this.save();
+            }
+        };
+
+        let currentUser = null;
+        let currentRoom = 1;
+        let selectedGender = 'male';
+
+        DB.init();
+
+        document.getElementById('showRegister').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '📝 إنشاء حساب جديد';
+        };
+
+        document.getElementById('showLogin').onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '🚀 مرحباً بك في Circl Chat';
+        };
+
+        document.querySelectorAll('.gender-option').forEach(opt => {
+            opt.onclick = () => {
+                document.querySelectorAll('.gender-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedGender = opt.dataset.gender;
+            };
         });
+
+        document.getElementById('registerBtn').onclick = () => {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            
+            if (!username || !password) {
+                alert('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            const result = DB.register(username, password, selectedGender);
+            if (result.success) {
+                login(result.user);
+            } else {
+                alert(result.message);
+            }
+        };
+
+        document.getElementById('loginBtn').onclick = () => {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = DB.login(username, password);
+            if (result.success) {
+                login(result.user);
+            } else {
+                alert(result.message);
+            }
+        };
+
+        document.getElementById('googleLoginBtn').onclick = () => {
+            alert('سيتم ربط Google قريباً');
+        };
+
+        document.getElementById('googleRegisterBtn').onclick = () => {
+            alert('سيتم ربط Google قريباً');
+        };
+
+        function login(user) {
+            currentUser = user;
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'flex';
+            document.getElementById('userDisplayName').textContent = user.username;
+            document.getElementById('userAvatarImg').src = user.avatar;
+            document.getElementById('userRole').textContent = getRoleText(user.role);
+            document.getElementById('userRole').className = `user-role role-${user.role}`;
+            
+            if (user.verified) {
+                document.getElementById('verifiedBadge').style.display = 'inline';
+            }
+            
+            updateLevel();
+            loadRooms();
+            loadUsers();
+            joinRoom(1);
+        }
+
+        function getRoleText(role) {
+            const roles = { owner: 'مالك', admin: 'مشرف', moderator: 'مراقب', vip: 'VIP', user: 'مستخدم' };
+            return roles[role] || 'مستخدم';
+        }
+
+        function updateLevel() {
+            const level = Math.floor(currentUser.xp / 100) + 1;
+            const progress = (currentUser.xp % 100);
+            
+            document.getElementById('userLevel').textContent = level;
+            document.getElementById('levelProgress').style.width = progress + '%';
+            document.getElementById('currentXP').textContent = currentUser.xp + ' XP';
+            document.getElementById('nextLevelXP').textContent = ((level * 100)) + ' XP';
+        }
+
+        function loadRooms() {
+            const list = document.getElementById('roomList');
+            list.innerHTML = '';
+            
+            DB.rooms.sort((a, b) => a.order - b.order).forEach(room => {
+                const li = document.createElement('li');
+                li.className = 'room-item' + (room.id === currentRoom ? ' active' : '');
+                li.innerHTML = `
+                    <i class="fas ${room.icon} room-icon"></i>
+                    <div class="room-info">
+                        <div class="room-name">${room.name}</div>
+                        <div class="room-stats">
+                            <span><i class="fas fa-users"></i> ${room.users.length}/${room.limit}</span>
+                        </div>
+                    </div>
+                `;
+                li.onclick = () => joinRoom(room.id);
+                list.appendChild(li);
+            });
+            
+            document.getElementById('roomCount').textContent = DB.rooms.length;
+        }
+
+        function loadUsers() {
+            const list = document.getElementById('userList');
+            const room = DB.rooms.find(r => r.id === currentRoom);
+            const users = DB.users.filter(u => room.users.includes(u.id));
+            
+            list.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'user-list-item';
+                li.innerHTML = `
+                    <div class="user-list-avatar">
+                        <img src="${user.avatar}" alt="${user.username}">
+                    </div>
+                    <div class="user-list-info">
+                        <div class="user-list-name">
+                            ${user.role === 'owner' ? '<span class="badge owner-badge">OWNER</span>' : ''}
+                            ${user.username}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            
+            document.getElementById('onlineCount').textContent = users.length;
+        }
+
+        function joinRoom(roomId) {
+            const room = DB.rooms.find(r => r.id === roomId);
+            if (!room) return;
+            
+            if (room.password && currentUser.role !== 'owner') {
+                const pass = prompt('أدخل كلمة المرور:');
+                if (pass !== room.password) {
+                    alert('كلمة مرور خاطئة');
+                    return;
+                }
+            }
+            
+            const oldRoom = DB.rooms.find(r => r.id === currentRoom);
+            if (oldRoom) {
+                oldRoom.users = oldRoom.users.filter(id => id !== currentUser.id);
+            }
+            
+            if (!room.users.includes(currentUser.id)) {
+                room.users.push(currentUser.id);
+            }
+            
+            currentRoom = roomId;
+            document.getElementById('currentRoomTitle').textContent = room.name;
+            document.getElementById('currentRoomDesc').textContent = room.desc;
+            
+            loadRooms();
+            loadUsers();
+            loadMessages();
+            
+            if (room.isTherapist) {
+                setTimeout(() => sendTherapistResponse(), 2000);
+            }
+        }
+
+        function loadMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            
+            const msgs = DB.messages.filter(m => m.roomId === currentRoom);
+            msgs.forEach(msg => addMessageToUI(msg));
+        }
+
+        function addMessageToUI(msg) {
+            const container = document.getElementById('messagesContainer');
+            const div = document.createElement('div');
+            div.className = 'message' + (msg.userId === currentUser.id ? ' my-message' : '');
+            
+            const time = new Date(msg.timestamp).toLocaleTimeString('ar-EG', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            div.innerHTML = `
+                <div class="message-avatar">
+                    <img src="${msg.avatar}" alt="${msg.username}">
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <div class="message-sender">${msg.username}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                    <div class="message-text">${escapeHtml(msg.text)}</div>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const msg = {
+                id: 'msg-' + Date.now(),
+                userId: currentUser.id,
+                username: currentUser.username,
+                avatar: currentUser.avatar,
+                text,
+                roomId: currentRoom,
+                timestamp: new Date().toISOString()
+            };
+            
+            DB.addMessage(msg);
+            addMessageToUI(msg);
+            input.value = '';
+            
+            currentUser.xp += 5;
+            updateLevel();
+            
+            const room = DB.rooms.find(r => r.id === currentRoom);
+            if (room && room.isTherapist) {
+                setTimeout(() => sendTherapistResponse(), 1500);
+            }
+        }
+
+        function sendTherapistResponse() {
+            const responses = [
+                'مرحباً، أنا هنا لمساعدتك. كيف يمكنني دعمك اليوم؟',
+                'أفهم مشاعرك. هل يمكنك إخباري بالمزيد؟',
+                'هذا طبيعي تماماً. دعنا نستكشف هذا معاً.',
+                'شكراً لمشاركتك. ما الذي تشعر به الآن؟',
+                'أقدر شجاعتك في الحديث عن هذا.'
+            ];
+            
+            const msg = {
+                id: 'msg-' + Date.now(),
+                userId: 'therapist-bot',
+                username: '🧠 ثيرابيست AI',
+                avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=therapist',
+                text: responses[Math.floor(Math.random() * responses.length)],
+                roomId: currentRoom,
+                timestamp: new Date().toISOString()
+            };
+            
+            DB.addMessage(msg);
+            addMessageToUI(msg);
+        }
+
+        document.getElementById('sendBtn').onclick = sendMessage;
+        document.getElementById('messageInput').onkeypress = (e) => {
+            if (e.key === 'Enter') sendMessage();
+        };
+
+        document.getElementById('mobileMenuBtn').onclick = () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+        };
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        setInterval(() => {
+            if (currentUser) {
+                const room = DB.rooms.find(r => r.id === currentRoom);
+                if (room && room.isTherapist && Math.random() > 0.7) {
+                    sendTherapistResponse();
+                }
+            }
+        }, 60000);
     </script>
 </body>
 </html>
