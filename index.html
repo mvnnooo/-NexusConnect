@@ -2,45 +2,28 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circl Chat - دردشة حقيقية متعددة المستخدمين</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سيرك - تطبيق الشات الجماعي | Circl - Group Chat App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --bronze: #cd7f32;
-            --silver: #c0c0c0;
-            --gold: #fbbf24;
-            --diamond: #60a5fa;
-            --king: #a855f7;
-            --queen: #ec4899;
-            --owner: #dc2626;
-            --admin: #059669;
-            --moderator: #3b82f6;
-            --vip: #f59e0b;
-            --therapist: #8b5cf6;
-            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
-            --gradient-secondary: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
-            --gradient-therapist: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            --radius: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
+            --primary: #6C63FF;
+            --primary-dark: #5A52D3;
+            --secondary: #FF6584;
+            --dark: #2A2D43;
+            --light: #F8F9FA;
+            --gray: #E0E0E0;
+            --gray-dark: #9E9E9E;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --transition: all 0.3s ease;
         }
 
         * {
@@ -50,2719 +33,1484 @@
         }
 
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #1f2937;
-            line-height: 1.6;
-            padding: 1rem;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1800px;
-            height: 95vh;
-            background: white;
-            border-radius: var(--radius-2xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-xl);
-            display: flex;
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+            height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
             position: relative;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* ========== الشريط الجانبي ========== */
-        .sidebar {
-            width: 350px;
-            background: #111827;
+        /* شريط الحالة العلوي */
+        .status-bar {
+            background-color: var(--dark);
             color: white;
+            padding: 8px 16px;
             display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
             z-index: 100;
         }
 
-        .user-profile {
-            padding: 1.5rem;
-            text-align: center;
-            border-bottom: 1px solid #374151;
-            background: rgba(255, 255, 255, 0.05);
+        .status-icons {
+            display: flex;
+            gap: 8px;
         }
 
-        .user-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto 1rem;
-            border: 4px solid var(--primary);
-            position: relative;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .online-status {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            width: 20px;
-            height: 20px;
-            background: var(--success);
-            border-radius: 50%;
-            border: 3px solid #111827;
-        }
-
-        .username {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .user-role {
-            display: inline-block;
-            padding: 0.25rem 1rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
+        .time-display {
             font-weight: 600;
-            text-transform: uppercase;
         }
 
-        .role-owner { background: var(--owner); }
-        .role-admin { background: var(--admin); }
-        .role-moderator { background: var(--moderator); }
-        .role-vip { background: var(--vip); }
-        .role-user { background: #6b7280; }
-
-        .level-container {
-            padding: 1rem 1.5rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid #374151;
-        }
-
-        .level-info {
+        /* رأس التطبيق */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 18px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.75rem;
+            position: sticky;
+            top: 44px;
+            z-index: 99;
         }
 
-        .progress-bar {
-            height: 8px;
-            background: #374151;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--gradient-primary);
-            transition: width 0.5s ease;
-        }
-
-        .rooms-section {
-            padding: 1.5rem;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .section-title {
-            font-size: 0.875rem;
-            color: #9ca3af;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .room-list {
-            list-style: none;
-        }
-
-        .room-item {
+        .app-header .logo {
             display: flex;
             align-items: center;
-            padding: 0.875rem;
-            border-radius: var(--radius-lg);
-            margin-bottom: 0.5rem;
+            gap: 10px;
+        }
+
+        .app-header .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .app-header .logo-icon {
+            font-size: 28px;
+            color: var(--secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .header-actions i {
+            font-size: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            transition: var(--transition);
         }
 
-        .room-item:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.2);
+        .header-actions i:hover {
+            transform: scale(1.1);
         }
 
-        .room-item.active {
-            background: rgba(99, 102, 241, 0.15);
-            border-right: 4px solid var(--primary);
+        /* التنقل السفلي */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            border-top-left-radius: var(--radius);
+            border-top-right-radius: var(--radius);
+            z-index: 100;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
-        .room-icon {
-            margin-left: 0.75rem;
-            font-size: 1.25rem;
-            color: #9ca3af;
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+            color: var(--gray-dark);
         }
 
-        .room-item.active .room-icon {
+        .nav-item.active {
             color: var(--primary);
         }
 
-        .room-info {
-            flex: 1;
+        .nav-item:hover {
+            transform: translateY(-2px);
         }
 
-        .room-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
+        .nav-item i {
+            font-size: 20px;
         }
 
-        .room-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            color: #9ca3af;
+        .nav-item span {
+            font-size: 12px;
+            font-weight: 500;
         }
 
-        .users-section {
-            padding: 1.5rem;
-            border-top: 1px solid #374151;
+        /* المحتوى الرئيسي */
+        .main-content {
+            padding: 16px;
+            padding-bottom: 80px;
+            min-height: calc(100vh - 130px);
+            overflow-y: auto;
+            background-color: #f5f7fb;
         }
 
-        .user-list {
-            list-style: none;
-        }
-
-        .user-list-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem;
-            border-radius: var(--radius);
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .user-list-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .user-list-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-left: 0.75rem;
-        }
-
-        .user-list-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ========== منطقة الدردشة الرئيسية ========== */
-        .chat-main {
-            flex: 1;
+        /* شاشة الدردشات */
+        .chats-container {
             display: flex;
             flex-direction: column;
-            background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+            gap: 12px;
+        }
+
+        .chat-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .chat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-card.unread::after {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        .chat-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 22px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
         }
 
         .chat-header {
-            padding: 1.25rem 2rem;
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--gray-dark);
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: var(--gray-dark);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .current-room-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .room-avatar {
-            width: 56px;
-            height: 56px;
-            background: var(--gradient-primary);
+        .unread-count {
+            background-color: var(--primary);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: 1rem;
-            color: white;
-            font-size: 1.5rem;
+            font-weight: 600;
         }
 
-        .room-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+        /* شاشة الدردشة */
+        .chat-screen {
+            display: none;
+            flex-direction: column;
+            height: calc(100vh - 130px);
         }
 
-        .room-desc {
-            font-size: 0.875rem;
-            color: #6b7280;
+        .chat-header-bar {
+            background-color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 44px;
+            z-index: 10;
         }
 
-        .messages-container {
+        .back-button {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             flex: 1;
-            padding: 1.5rem 2rem;
+        }
+
+        .chat-header-info .chat-avatar {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+        }
+
+        .chat-status {
+            font-size: 12px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+        }
+
+        .chat-messages {
+            flex: 1;
             overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .message {
             display: flex;
-            margin-bottom: 1rem;
+            max-width: 80%;
             animation: fadeIn 0.3s ease;
         }
 
+        .message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.sent .message-content {
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-content {
+            background-color: white;
+            color: var(--dark);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--gray-dark);
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+        }
+
+        .message.received .message-time {
+            text-align: left;
+        }
+
+        .message-input-container {
+            padding: 12px 16px;
+            background-color: white;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-top: 1px solid var(--gray);
+        }
+
+        .message-input {
+            flex: 1;
+            border: 1px solid var(--gray);
+            border-radius: 24px;
+            padding: 12px 18px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .message-input:focus {
+            border-color: var(--primary);
+        }
+
+        .send-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .send-button:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* شاشة المجموعات */
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .group-card {
+            background-color: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .group-banner {
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .group-avatar {
+            position: absolute;
+            bottom: -25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 3px solid white;
+        }
+
+        .group-info {
+            padding: 30px 16px 16px;
+        }
+
+        .group-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--dark);
+        }
+
+        .group-members {
+            font-size: 13px;
+            color: var(--gray-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* شاشة الإعدادات */
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .settings-section {
+            background-color: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .settings-item:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .settings-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(108, 99, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .settings-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+
+        .settings-text p {
+            font-size: 13px;
+            color: var(--gray-dark);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray);
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* شاشة الملف الشخصي */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border: 5px solid white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+
+        .profile-status {
+            font-size: 14px;
+            color: var(--gray-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-status::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: var(--success);
+            border-radius: 50%;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-dark);
+        }
+
+        /* لغة التطبيق */
+        .language-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .lang-btn {
+            padding: 10px 24px;
+            border-radius: 30px;
+            background-color: white;
+            border: 2px solid var(--gray);
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .lang-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* الرسوم المتحركة */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .message-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-left: 1rem;
-            flex-shrink: 0;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        .message-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* الطبقات المخفية */
+        .hidden {
+            display: none !important;
         }
 
-        .message-content {
-            flex: 1;
-            background: white;
-            padding: 1rem;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow);
-            max-width: 70%;
-        }
-
-        .message.my-message {
-            flex-direction: row-reverse;
-        }
-
-        .message.my-message .message-avatar {
-            margin-left: 0;
-            margin-right: 1rem;
-        }
-
-        .message.my-message .message-content {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .message-time {
-            font-size: 0.75rem;
-            color: #9ca3af;
-        }
-
-        .message.my-message .message-time {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .message-text {
-            line-height: 1.5;
-            word-break: break-word;
-        }
-
-        .message-input-container {
-            padding: 1.5rem 2rem;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            background: #f9fafb;
-            border-radius: var(--radius-xl);
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-        }
-
-        .message-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 0.75rem 1rem;
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            outline: none;
-            color: #1f2937;
-        }
-
-        .send-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: none;
-            background: var(--gradient-primary);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* ========== نافذة المصادقة ========== */
-        .auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .auth-box {
-            background: white;
-            padding: 2.5rem;
-            border-radius: var(--radius-2xl);
-            width: 90%;
-            max-width: 500px;
-            animation: popIn 0.3s ease;
-            box-shadow: var(--shadow-xl);
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .auth-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 1.75rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 1rem;
-            cursor: pointer;
-            font-weight: 600;
-            color: #6b7280;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--radius-lg);
-            font-family: 'Tajawal', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .gender-select {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .gender-option {
-            flex: 1;
-            text-align: center;
-            padding: 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .gender-option.selected {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .gender-option i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .btn {
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: white;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .google-btn {
-            background: white;
-            color: #374151;
-            border: 1px solid #e5e7eb;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .google-btn:hover {
-            background: #f9fafb;
-        }
-
-        /* ========== نافذة الإدارة ========== */
-        .admin-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: white;
-            z-index: 2000;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .admin-panel.active {
-            display: block;
-        }
-
-        .admin-header {
-            padding: 1.5rem 2rem;
-            background: #111827;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-content {
-            padding: 2rem;
-        }
-
-        .admin-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 1rem;
-        }
-
-        .admin-tab {
-            padding: 0.75rem 1.5rem;
-            background: #f3f4f6;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .admin-tab.active {
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        /* ========== نافذة VIP ========== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1500;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 2rem;
-            border-radius: var(--radius-xl);
-            width: 90%;
-            max-width: 400px;
-            animation: popIn 0.3s ease;
-        }
-
-        /* ========== نافذة الرسائل الخاصة ========== */
-        .pm-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1800;
-            backdrop-filter: blur(5px);
-        }
-
-        .pm-overlay.active {
-            display: flex;
-        }
-
-        .pm-box {
-            background: white;
-            width: 90%;
-            max-width: 600px;
-            height: 80vh;
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .pm-header {
-            padding: 1.5rem;
-            background: #111827;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pm-messages {
-            flex: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            background: #f9fafb;
-        }
-
-        .pm-input-container {
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        /* ========== التجاوب مع الشاشات ========== */
-        @media (max-width: 1200px) {
-            .container {
-                height: 100vh;
-                max-width: 100%;
+        /* التأكد من أن المحتوى مرئي على الأجهزة المحمولة */
+        @media (max-width: 500px) {
+            body {
+                border-radius: 0;
+            }
+            
+            .bottom-nav {
                 border-radius: 0;
             }
         }
 
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                position: absolute;
-                left: -100%;
-                width: 85%;
-                height: 100%;
-            }
-            
-            .sidebar.active {
-                left: 0;
-            }
-            
-            .chat-header {
-                padding: 1rem;
-            }
-            
-            .messages-container {
-                padding: 1rem;
-            }
-            
-            .message-input-container {
-                padding: 1rem;
-            }
-            
-            .message-content {
-                max-width: 85%;
-            }
-            
-            .auth-box {
-                padding: 1.5rem;
-                margin: 1rem;
-            }
-            
-            .pm-box {
-                width: 95%;
-                height: 90vh;
-            }
+        /* التأكد من دعم اللغة العربية */
+        [dir="rtl"] .message.sent .message-content {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 20px;
         }
 
-        /* ========== تخصيص شريط التمرير ========== */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-
-        .dark-scrollbar::-webkit-scrollbar-track {
-            background: #374151;
-        }
-
-        .dark-scrollbar::-webkit-scrollbar-thumb {
-            background: #4b5563;
-        }
-
-        /* ========== إضافات ========== */
-        .typing-indicator {
-            padding: 0.5rem 1rem;
-            background: white;
-            border-radius: var(--radius-lg);
-            margin: 0 2rem;
-            box-shadow: var(--shadow);
-            display: none;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.25rem;
-        }
-
-        .badge-owner { background: var(--owner); color: white; }
-        .badge-admin { background: var(--admin); color: white; }
-        .badge-moderator { background: var(--moderator); color: white; }
-        .badge-vip { background: var(--vip); color: white; }
-        .badge-verified { color: #3b82f6; }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--success);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 3000;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { top: -100px; opacity: 0; }
-            to { top: 20px; opacity: 1; }
-        }
-
-        .notification.error { background: var(--danger); }
-        .notification.warning { background: var(--warning); }
-        .notification.info { background: var(--info); }
-
-        /* ========== مؤشر الكتابة ========== */
-        .typing-dots {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
-        }
-
-        /* ========== مؤشر الاتصال ========== */
-        .connection-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 1000;
-        }
-
-        .connection-status.disconnected {
-            background: var(--danger);
-        }
-
-        /* ========== زر الرسائل الخاصة ========== */
-        .pm-btn {
-            background: transparent;
-            border: none;
-            color: #6b7280;
-            cursor: pointer;
-            font-size: 0.875rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-sm);
-            transition: all 0.3s ease;
-        }
-
-        .pm-btn:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary);
+        [dir="rtl"] .message.received .message-content {
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- مؤشر حالة الاتصال -->
-    <div class="connection-status" id="connectionStatus">
-        <i class="fas fa-wifi"></i>
-        <span>متصل</span>
+    <!-- شريط الحالة العلوي -->
+    <div class="status-bar">
+        <div class="time-display" id="current-time">09:45</div>
+        <div class="status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+        </div>
     </div>
 
-    <!-- نافذة المصادقة -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-box">
-            <div class="auth-title">🚀 مرحباً بك في Circl Chat</div>
-            
-            <div class="tabs">
-                <div class="tab active" data-tab="login">تسجيل الدخول</div>
-                <div class="tab" data-tab="register">إنشاء حساب</div>
+    <!-- رأس التطبيق -->
+    <header class="app-header">
+        <div class="logo">
+            <div class="logo-icon">○</div>
+            <h1>سيرك | Circl</h1>
+        </div>
+        <div class="header-actions">
+            <i class="fas fa-search" id="search-btn"></i>
+            <i class="fas fa-user-plus" id="add-contact-btn"></i>
+            <i class="fas fa-cog" id="settings-btn"></i>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content" id="main-content">
+        <!-- شاشة الدردشات (الرئيسية) -->
+        <div class="content-section active" id="chats-section">
+            <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 22px;">الدردشات</h2>
+            <div class="chats-container" id="chats-container">
+                <!-- سيتم ملء الدردشات بواسطة JavaScript -->
             </div>
-            
-            <!-- نموذج تسجيل الدخول -->
-            <div id="loginForm">
-                <div class="form-group">
-                    <input type="text" class="form-control" id="loginUsername" placeholder="اسم المستخدم" autocomplete="username">
-                </div>
-                
-                <div class="form-group">
-                    <input type="password" class="form-control" id="loginPassword" placeholder="كلمة المرور" autocomplete="current-password">
-                </div>
-                
-                <button class="btn btn-primary" id="loginBtn">دخول</button>
-                
-                <div style="text-align: center; margin: 1.5rem 0; color: #6b7280;">أو</div>
-                
-                <button class="btn google-btn" id="googleLoginBtn">
-                    <i class="fab fa-google"></i> تسجيل الدخول بحساب Google
-                </button>
+        </div>
+
+        <!-- شاشة المجموعات -->
+        <div class="content-section hidden" id="groups-section">
+            <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 22px;">المجموعات</h2>
+            <div class="groups-container" id="groups-container">
+                <!-- سيتم ملء المجموعات بواسطة JavaScript -->
             </div>
-            
-            <!-- نموذج التسجيل -->
-            <div id="registerForm" style="display: none;">
-                <div class="form-group">
-                    <input type="text" class="form-control" id="registerUsername" placeholder="اسم المستخدم" autocomplete="username">
+        </div>
+
+        <!-- شاشة الملف الشخصي -->
+        <div class="content-section hidden" id="profile-section">
+            <div class="profile-container">
+                <div class="profile-avatar" id="user-avatar">م</div>
+                <h2 class="profile-name" id="user-name">محمد أحمد</h2>
+                <div class="profile-status" id="user-status">متصل الآن</div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="friends-count">147</span>
+                        <span class="stat-label">الأصدقاء</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="groups-count">12</span>
+                        <span class="stat-label">المجموعات</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="messages-count">2.3k</span>
+                        <span class="stat-label">الرسائل</span>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <input type="password" class="form-control" id="registerPassword" placeholder="كلمة المرور" autocomplete="new-password">
+                <div class="language-switcher">
+                    <button class="lang-btn active" id="lang-ar">العربية</button>
+                    <button class="lang-btn" id="lang-en">English</button>
                 </div>
-                
-                <div class="form-group">
-                    <div class="gender-select">
-                        <div class="gender-option selected" data-gender="male">
-                            <i class="fas fa-mars"></i>
-                            <div>ذكر</div>
+            </div>
+        </div>
+
+        <!-- شاشة الإعدادات -->
+        <div class="content-section hidden" id="settings-section">
+            <h2 style="margin-bottom: 20px; color: var(--dark); font-size: 22px;">الإعدادات</h2>
+            <div class="settings-container">
+                <div class="settings-section">
+                    <div class="section-title">الحساب</div>
+                    <div class="settings-item" id="edit-profile-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>تعديل الملف الشخصي</h3>
+                                <p>تغيير الصورة والمعلومات الشخصية</p>
+                            </div>
                         </div>
-                        <div class="gender-option" data-gender="female">
-                            <i class="fas fa-venus"></i>
-                            <div>أنثى</div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="settings-item" id="privacy-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>الخصوصية</h3>
+                                <p>إدارة إعدادات الخصوصية والأمان</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">التطبيق</div>
+                    <div class="settings-item">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>الإشعارات</h3>
+                                <p>إدارة إشعارات التطبيق</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="notifications-toggle" checked>
+                            <label for="notifications-toggle" class="slider"></label>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>المظهر</h3>
+                                <p>تغيير سمة التطبيق</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>اللغة</h3>
+                                <p>تغيير لغة التطبيق</p>
+                            </div>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="language-toggle">
+                            <label for="language-toggle" class="slider"></label>
                         </div>
                     </div>
                 </div>
-                
-                <button class="btn btn-primary" id="registerBtn">إنشاء حساب</button>
-                
-                <div style="text-align: center; margin: 1.5rem 0; color: #6b7280;">أو</div>
-                
-                <button class="btn google-btn" id="googleRegisterBtn">
-                    <i class="fab fa-google"></i> التسجيل بحساب Google
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- نافذة VIP -->
-    <div class="modal-overlay" id="vipModal">
-        <div class="modal-box">
-            <h3 style="text-align: center; margin-bottom: 1rem;">
-                <i class="fas fa-crown" style="color: var(--vip);"></i>
-                غرفة VIP
-            </h3>
-            <p style="text-align: center; margin-bottom: 1.5rem; color: #6b7280;">
-                هذه الغرفة خاصة بالأعضاء المميزين. يرجى إدخال كلمة المرور:
-            </p>
-            <input type="password" class="form-control" id="vipPassword" placeholder="كلمة المرور" style="margin-bottom: 1rem;">
-            <div style="display: flex; gap: 0.5rem;">
-                <button class="btn" style="flex: 1; background: #f3f4f6;" onclick="closeVipModal()">إلغاء</button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="enterVipRoom()">دخول</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- نافذة الرسائل الخاصة -->
-    <div class="pm-overlay" id="pmOverlay">
-        <div class="pm-box">
-            <div class="pm-header">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div id="pmUserAvatar" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                        <img src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="settings-section">
+                    <div class="section-title">عام</div>
+                    <div class="settings-item" id="help-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>المساعدة والدعم</h3>
+                                <p>الدليل ومركز المساعدة</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
                     </div>
+                    <div class="settings-item" id="about-btn">
+                        <div class="settings-item-left">
+                            <div class="settings-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="settings-text">
+                                <h3>حول التطبيق</h3>
+                                <p>إصدار التطبيق والمعلومات</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- شاشة الدردشة الفردية -->
+        <div class="chat-screen hidden" id="chat-screen">
+            <div class="chat-header-bar">
+                <div class="back-button" id="back-to-chats">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="chat-header-info">
+                    <div class="chat-avatar" id="chat-with-avatar">م</div>
                     <div>
-                        <div id="pmUserName" style="font-weight: 600;"></div>
-                        <div id="pmUserStatus" style="font-size: 0.875rem; color: #9ca3af;">متصل الآن</div>
+                        <div class="chat-name" id="chat-with-name">محمد أحمد</div>
+                        <div class="chat-status" id="chat-with-status">متصل الآن</div>
                     </div>
                 </div>
-                <button class="btn" onclick="closePMModal()" style="background: #ef4444; color: white; padding: 0.5rem 1rem;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="pm-messages" id="pmMessages">
-                <!-- الرسائل الخاصة ستظهر هنا -->
-            </div>
-            
-            <div class="pm-input-container">
-                <div class="input-wrapper">
-                    <input type="text" class="message-input" id="pmInput" placeholder="اكتب رسالتك الخاصة..." autocomplete="off">
-                    <button class="send-btn" id="pmSendBtn">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                <div class="header-actions">
+                    <i class="fas fa-phone"></i>
+                    <i class="fas fa-video"></i>
+                    <i class="fas fa-ellipsis-v"></i>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- نافذة الإدارة -->
-    <div class="admin-panel" id="adminPanel">
-        <div class="admin-header">
-            <h2>لوحة الإدارة</h2>
-            <button class="btn" onclick="closeAdminPanel()" style="background: #ef4444; color: white;">إغلاق</button>
-        </div>
-        
-        <div class="admin-content">
-            <div class="admin-tabs">
-                <div class="admin-tab active" data-admin-tab="users">المستخدمين</div>
-                <div class="admin-tab" data-admin-tab="rooms">الغرف</div>
-                <div class="admin-tab" data-admin-tab="reports">التقارير</div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- سيتم ملء الرسائل بواسطة JavaScript -->
             </div>
-            
-            <div id="adminUsers">
-                <div style="margin-bottom: 1rem;">
-                    <input type="text" class="form-control" placeholder="بحث عن مستخدم..." id="adminUserSearch">
-                </div>
-                <div id="adminUsersList"></div>
-            </div>
-            
-            <div id="adminRooms" style="display: none;">
-                <div id="adminRoomsList"></div>
-            </div>
-            
-            <div id="adminReports" style="display: none;">
-                <p>قريباً: تقارير النظام</p>
-            </div>
-        </div>
-    </div>
 
-    <!-- تطبيق الدردشة الرئيسي -->
-    <div class="container" id="chatContainer" style="display: none;">
-        <!-- الشريط الجانبي -->
-        <div class="sidebar dark-scrollbar" id="sidebar">
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <img id="userAvatarImg" src="" alt="صورة المستخدم">
-                    <div class="online-status"></div>
-                </div>
-                <div class="username">
-                    <span id="userDisplayName"></span>
-                    <i class="fas fa-check-circle badge-verified" id="verifiedBadge" style="display: none;"></i>
-                </div>
-                <div class="user-role" id="userRole">مستخدم</div>
-            </div>
-            
-            <div class="level-container">
-                <div class="level-info">
-                    <div style="color: #9ca3af; font-size: 0.875rem;">المستوى <span id="userLevel">1</span></div>
-                    <div style="font-weight: 600; font-size: 0.875rem;" id="userRank">مبتدئ</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="levelProgress" style="width: 0%;"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #9ca3af;">
-                    <span id="currentXP">0 XP</span>
-                    <span id="nextLevelXP">100 XP</span>
-                </div>
-            </div>
-            
-            <div class="rooms-section dark-scrollbar">
-                <div class="section-title">
-                    <span>الغرف المتاحة</span>
-                    <span id="roomsCount">0</span>
-                </div>
-                <ul class="room-list" id="roomList"></ul>
-            </div>
-            
-            <div class="users-section dark-scrollbar">
-                <div class="section-title">
-                    <span>المستخدمون النشطون (<span id="onlineCount">0</span>)</span>
-                </div>
-                <ul class="user-list" id="userList"></ul>
-            </div>
-        </div>
-        
-        <!-- منطقة الدردشة الرئيسية -->
-        <div class="chat-main">
-            <div class="chat-header">
-                <div class="current-room-info">
-                    <div class="room-avatar">
-                        <i class="fas fa-users" id="roomIcon"></i>
-                    </div>
-                    <div>
-                        <div class="room-title" id="currentRoomTitle">عام</div>
-                        <div class="room-desc" id="currentRoomDesc">الغرفة العامة للجميع</div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn" id="mobileMenuBtn" style="display: none;">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <button class="btn btn-primary" id="adminBtn" style="display: none;">
-                        <i class="fas fa-cog"></i> الإدارة
-                    </button>
-                </div>
-            </div>
-            
-            <div class="messages-container" id="messagesContainer">
-                <div style="text-align: center; padding: 3rem; color: #6b7280;">
-                    <i class="fas fa-comments" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;"></i>
-                    <h3 style="margin-bottom: 0.5rem; color: #111827;">مرحباً بك!</h3>
-                    <p>اختر غرفة لبدء المحادثة</p>
-                </div>
-            </div>
-            
-            <div class="typing-indicator" id="typingIndicator" style="display: none;">
-                <span style="color: #6b7280; font-size: 0.875rem;">
-                    <i class="fas fa-pencil-alt" style="margin-left: 0.5rem;"></i>
-                    <span id="typingUser">مستخدم</span> يكتب الآن...
-                    <div class="typing-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </span>
-            </div>
-            
             <div class="message-input-container">
-                <div class="input-wrapper">
-                    <input type="text" class="message-input" id="messageInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-                    <button class="send-btn" id="sendBtn">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
+                <i class="fas fa-plus-circle" style="font-size: 24px; color: var(--primary); cursor: pointer;"></i>
+                <input type="text" class="message-input" id="message-input" placeholder="اكتب رسالة...">
+                <button class="send-button" id="send-message-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
-    </div>
+    </main>
+
+    <!-- التنقل السفلي -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" data-section="chats-section">
+            <i class="fas fa-comments"></i>
+            <span>الدردشات</span>
+        </div>
+        <div class="nav-item" data-section="groups-section">
+            <i class="fas fa-users"></i>
+            <span>المجموعات</span>
+        </div>
+        <div class="nav-item" data-section="profile-section">
+            <i class="fas fa-user"></i>
+            <span>الملف الشخصي</span>
+        </div>
+        <div class="nav-item" data-section="settings-section">
+            <i class="fas fa-cog"></i>
+            <span>الإعدادات</span>
+        </div>
+    </nav>
 
     <script>
-        // ========== نظام خادم WebSocket حقيقي ==========
-        // سنستخدم localStorage كمخزن مؤقت للبيانات المشتركة بين المتصفحات
-        class RealTimeServer {
-            constructor() {
-                this.storageKey = 'circl_chat_server';
-                this.initializeServer();
-                this.setupStorageListener();
-            }
-
-            initializeServer() {
-                let serverData = localStorage.getItem(this.storageKey);
-                if (!serverData) {
-                    serverData = {
-                        users: {},
-                        rooms: {
-                            'room-1': { id: 'room-1', name: 'عام', description: 'الغرفة العامة للجميع', type: 'public', icon: 'fa-users', order: 1, users: [], messages: [] },
-                            'room-2': { id: 'room-2', name: 'VIP', description: 'غرفة الأعضاء المميزين', type: 'vip', icon: 'fa-crown', order: 2, password: '1218', users: [], messages: [] },
-                            'room-3': { id: 'room-3', name: 'ثرابيست', description: 'جلسات الدعم النفسي مع الذكاء الاصطناعي', type: 'therapist', icon: 'fa-user-md', order: 3, isBot: true, users: [], messages: [] },
-                            'room-4': { id: 'room-4', name: 'مصر 🇪🇬', description: 'غرفة مصر المميزة', type: 'public', icon: 'fa-flag', order: 4, users: [], messages: [] },
-                            'room-5': { id: 'room-5', name: 'الألعاب', description: 'مناقشة الألعاب والتحديات', type: 'public', icon: 'fa-gamepad', order: 5, users: [], messages: [] }
-                        },
-                        privateMessages: {},
-                        lastUpdate: Date.now()
-                    };
-                    localStorage.setItem(this.storageKey, JSON.stringify(serverData));
+        // البيانات الأولية للتطبيق
+        const appData = {
+            currentLanguage: 'ar',
+            currentUser: {
+                name: 'محمد أحمد',
+                avatar: 'م',
+                status: 'متصل الآن'
+            },
+            chats: [
+                {
+                    id: 1,
+                    name: 'مجموعة العائلة',
+                    avatar: 'ع',
+                    lastMessage: 'متى اجتماع العائلة؟',
+                    time: '09:30',
+                    unread: 5,
+                    isGroup: true,
+                    members: 12
+                },
+                {
+                    id: 2,
+                    name: 'أحمد خالد',
+                    avatar: 'أ',
+                    lastMessage: 'شكرًا على المساعدة!',
+                    time: 'أمس',
+                    unread: 0,
+                    isGroup: false
+                },
+                {
+                    id: 3,
+                    name: 'فريق العمل',
+                    avatar: 'ف',
+                    lastMessage: 'الاجتماع في الساعة 2',
+                    time: 'الجمعة',
+                    unread: 12,
+                    isGroup: true,
+                    members: 8
+                },
+                {
+                    id: 4,
+                    name: 'سارة محمد',
+                    avatar: 'س',
+                    lastMessage: 'هل رأيت الفيلم الجديد؟',
+                    time: 'الخميس',
+                    unread: 0,
+                    isGroup: false
+                },
+                {
+                    id: 5,
+                    name: 'أصدقاء الجامعة',
+                    avatar: 'ص',
+                    lastMessage: 'نلتقي في المطعم الساعة 7',
+                    time: 'الأربعاء',
+                    unread: 3,
+                    isGroup: true,
+                    members: 20
                 }
-            }
-
-            setupStorageListener() {
-                // الاستماع لتغييرات localStorage من المتصفحات الأخرى
-                window.addEventListener('storage', (event) => {
-                    if (event.key === this.storageKey) {
-                        this.onServerUpdate();
-                    }
-                });
-            }
-
-            getServerData() {
-                const data = localStorage.getItem(this.storageKey);
-                return data ? JSON.parse(data) : null;
-            }
-
-            updateServerData(updater) {
-                const data = this.getServerData();
-                if (data) {
-                    updater(data);
-                    data.lastUpdate = Date.now();
-                    localStorage.setItem(this.storageKey, JSON.stringify(data));
-                    
-                    // إشعار جميع النوافذ بالتحديث
-                    window.dispatchEvent(new StorageEvent('storage', {
-                        key: this.storageKey,
-                        newValue: JSON.stringify(data)
-                    }));
+            ],
+            groups: [
+                {
+                    id: 1,
+                    name: 'مجموعة العائلة',
+                    avatar: 'ع',
+                    members: 12,
+                    color: '#6C63FF'
+                },
+                {
+                    id: 2,
+                    name: 'فريق العمل',
+                    avatar: 'ف',
+                    members: 8,
+                    color: '#FF6584'
+                },
+                {
+                    id: 3,
+                    name: 'أصدقاء الجامعة',
+                    avatar: 'ص',
+                    members: 20,
+                    color: '#4CAF50'
+                },
+                {
+                    id: 4,
+                    name: 'نادي القراءة',
+                    avatar: 'ن',
+                    members: 15,
+                    color: '#FF9800'
+                },
+                {
+                    id: 5,
+                    name: 'مشروع التخرج',
+                    avatar: 'م',
+                    members: 5,
+                    color: '#9C27B0'
+                },
+                {
+                    id: 6,
+                    name: 'السفر والسياحة',
+                    avatar: 'س',
+                    members: 25,
+                    color: '#2196F3'
                 }
-            }
-
-            // إدارة المستخدمين
-            addUser(user) {
-                this.updateServerData((data) => {
-                    data.users[user.id] = {
-                        ...user,
-                        lastSeen: Date.now(),
-                        status: 'online',
-                        currentRoom: null
-                    };
-                });
-            }
-
-            updateUserStatus(userId, status) {
-                this.updateServerData((data) => {
-                    if (data.users[userId]) {
-                        data.users[userId].status = status;
-                        data.users[userId].lastSeen = Date.now();
-                    }
-                });
-            }
-
-            updateUserRoom(userId, roomId) {
-                this.updateServerData((data) => {
-                    if (data.users[userId]) {
-                        data.users[userId].currentRoom = roomId;
-                    }
-                });
-            }
-
-            // إدارة الغرف
-            joinRoom(userId, roomId, password = null) {
-                const result = { success: false, error: null, room: null, messages: [] };
-                
-                this.updateServerData((data) => {
-                    const room = data.rooms[roomId];
-                    if (!room) {
-                        result.error = 'الغرفة غير موجودة';
-                        return;
-                    }
-
-                    if (room.type === 'vip' && room.password && room.password !== password) {
-                        result.error = 'كلمة المرور غير صحيحة';
-                        return;
-                    }
-
-                    // مغادرة الغرف الأخرى
-                    Object.values(data.rooms).forEach(r => {
-                        const index = r.users.indexOf(userId);
-                        if (index > -1) {
-                            r.users.splice(index, 1);
-                        }
-                    });
-
-                    // الانضمام للغرفة الجديدة
-                    if (!room.users.includes(userId)) {
-                        room.users.push(userId);
-                    }
-
-                    // تحديث حالة المستخدم
-                    if (data.users[userId]) {
-                        data.users[userId].currentRoom = roomId;
-                    }
-
-                    result.success = true;
-                    result.room = { ...room };
-                    result.messages = room.messages.slice(-50);
-                });
-
-                return result;
-            }
-
-            sendMessage(userId, roomId, messageData) {
-                const result = { success: false, error: null, message: null };
-                
-                this.updateServerData((data) => {
-                    const room = data.rooms[roomId];
-                    const user = data.users[userId];
-                    
-                    if (!room || !user) {
-                        result.error = 'الغرفة أو المستخدم غير موجود';
-                        return;
-                    }
-
-                    if (!room.users.includes(userId)) {
-                        result.error = 'المستخدم ليس في هذه الغرفة';
-                        return;
-                    }
-
-                    const message = {
-                        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        ...messageData,
-                        userId,
-                        roomId,
-                        timestamp: Date.now()
-                    };
-
-                    room.messages.push(message);
-                    
-                    // حفظ فقط آخر 100 رسالة
-                    if (room.messages.length > 100) {
-                        room.messages = room.messages.slice(-100);
-                    }
-
-                    result.success = true;
-                    result.message = message;
-                });
-
-                return result;
-            }
-
-            sendPrivateMessage(senderId, receiverId, messageData) {
-                const result = { success: false, error: null, message: null };
-                
-                this.updateServerData((data) => {
-                    const sender = data.users[senderId];
-                    const receiver = data.users[receiverId];
-                    
-                    if (!sender || !receiver) {
-                        result.error = 'المستخدم غير موجود';
-                        return;
-                    }
-
-                    const conversationKey = [senderId, receiverId].sort().join('_');
-                    if (!data.privateMessages[conversationKey]) {
-                        data.privateMessages[conversationKey] = [];
-                    }
-
-                    const message = {
-                        id: `pm-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        ...messageData,
-                        senderId,
-                        receiverId,
-                        timestamp: Date.now(),
-                        read: false
-                    };
-
-                    data.privateMessages[conversationKey].push(message);
-                    
-                    // حفظ فقط آخر 50 رسالة
-                    if (data.privateMessages[conversationKey].length > 50) {
-                        data.privateMessages[conversationKey] = data.privateMessages[conversationKey].slice(-50);
-                    }
-
-                    result.success = true;
-                    result.message = message;
-                });
-
-                return result;
-            }
-
-            getPrivateMessages(userId1, userId2) {
-                const data = this.getServerData();
-                if (!data) return [];
-                
-                const conversationKey = [userId1, userId2].sort().join('_');
-                return data.privateMessages[conversationKey] || [];
-            }
-
-            getOnlineUsers() {
-                const data = this.getServerData();
-                if (!data) return [];
-                
-                const now = Date.now();
-                return Object.values(data.users).filter(user => 
-                    user.status === 'online' && (now - user.lastSeen) < 30000
-                );
-            }
-
-            getRoomUsers(roomId) {
-                const data = this.getServerData();
-                if (!data || !data.rooms[roomId]) return [];
-                
-                const room = data.rooms[roomId];
-                return room.users.map(userId => data.users[userId]).filter(Boolean);
-            }
-
-            getAllRooms() {
-                const data = this.getServerData();
-                if (!data) return [];
-                
-                return Object.values(data.rooms).map(room => ({
-                    ...room,
-                    userCount: room.users.length
-                }));
-            }
-
-            onServerUpdate() {
-                // سيتم استدعاء هذه الدالة عند تحديث البيانات من متصفح آخر
-                window.dispatchEvent(new CustomEvent('server-update'));
-            }
-        }
-
-        // ========== نظام قاعدة البيانات المحلي ==========
-        class LocalDatabase {
-            constructor() {
-                this.dbName = 'circl_chat_local';
-                this.version = 3;
-                this.db = null;
-                this.init();
-            }
-
-            async init() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(this.dbName, this.version);
-                    
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => {
-                        this.db = request.result;
-                        resolve();
-                    };
-                    
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        
-                        if (!db.objectStoreNames.contains('users')) {
-                            const usersStore = db.createObjectStore('users', { keyPath: 'id' });
-                            usersStore.createIndex('username', 'username', { unique: true });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('settings')) {
-                            db.createObjectStore('settings', { keyPath: 'key' });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('notifications')) {
-                            db.createObjectStore('notifications', { keyPath: 'id' });
-                        }
-                    };
-                });
-            }
-
-            async saveUser(user) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readwrite');
-                    const store = transaction.objectStore('users');
-                    const request = store.put(user);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getUser(username) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readonly');
-                    const store = transaction.objectStore('users');
-                    const index = store.index('username');
-                    const request = index.get(username);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getUserById(userId) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['users'], 'readonly');
-                    const store = transaction.objectStore('users');
-                    const request = store.get(userId);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async saveSetting(key, value) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['settings'], 'readwrite');
-                    const store = transaction.objectStore('settings');
-                    const request = store.put({ key, value });
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getSetting(key) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['settings'], 'readonly');
-                    const store = transaction.objectStore('settings');
-                    const request = store.get(key);
-                    
-                    request.onsuccess = () => resolve(request.result?.value);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addNotification(notification) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['notifications'], 'readwrite');
-                    const store = transaction.objectStore('notifications');
-                    const request = store.add(notification);
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-        }
-
-        // ========== نظام الذكاء الاصطناعي للثيرابيست ==========
-        class TherapistAI {
-            constructor() {
-                this.responses = {
-                    greetings: [
-                        "مرحباً! أنا مساعدك الذكي للدعم النفسي. كيف يمكنني مساعدتك اليوم؟",
-                        "أهلاً وسهلاً بك في جلسة الدعم النفسي. أنا هنا لأستمع إليك وأقدم لك الدعم.",
-                        "مرحباً بك! أنا بوت الدعم النفسي، هل لديك أي شيء تريد الحديث عنه؟"
-                    ],
-                    stress: [
-                        "أفهم أنك تشعر بالتوتر. حاول أن تأخذ نفساً عميقاً وتذكر أن كل شيء مؤقت.",
-                        "التوتر جزء من الحياة، ولكن يمكننا التعامل معه. هل تريد مشاركة ما يقلقك؟",
-                        "جرب تمارين التنفس العميق: شهيق لمدة 4 ثوان، احبس لمدة 7، زفير لمدة 8."
-                    ],
-                    anxiety: [
-                        "القلق طبيعي، لكن عندما يكون مفرطاً فهو يحتاج للاهتمام. هل تحدثت مع أحد عن هذا الشعور؟",
-                        "جرب كتابة ما يقلقك على ورقة، هذا يساعد في تنظيم الأفكار وتقليل القلق.",
-                        "تذكر أن معظم الأشياء التي تقلقنا لا تحدث أبداً. ركز على الحاضر."
-                    ],
-                    depression: [
-                        "أنا هنا لأستمع إليك. الاكتئاب ليس ضعفاً، وهو قابل للعلاج.",
-                        "هل فكرت في التحدث مع مختص نفسي؟ هذا قد يكون مفيداً جداً.",
-                        "حاول أن تبدأ بنشاطات صغيرة يومياً، حتى لو كانت بسيطة مثل المشي قليلاً."
-                    ],
-                    general: [
-                        "شكراً لمشاركتك هذا معي. تذكر أن طلب المساعدة علامة قوة، ليس ضعف.",
-                        "أنت لست وحدك في هذا. كثيرون مروا بتجارب مشابهة وتخطوها.",
-                        "الرعاية الذاتية مهمة. خصص وقتاً لنفسك كل يوم."
-                    ]
-                };
-            }
-
-            generateResponse(userMessage) {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        const message = userMessage.toLowerCase();
-                        let category = 'general';
-                        
-                        if (message.includes('مرحبا') || message.includes('اهلا') || message.includes('السلام')) {
-                            category = 'greetings';
-                        } else if (message.includes('توتر') || message.includes('ضغط') || message.includes('متوتر')) {
-                            category = 'stress';
-                        } else if (message.includes('قلق') || message.includes('خوف') || message.includes('قلقان')) {
-                            category = 'anxiety';
-                        } else if (message.includes('اكتئاب') || message.includes('حزن') || message.includes('مكتئب')) {
-                            category = 'depression';
-                        }
-                        
-                        const responses = this.responses[category];
-                        resolve(responses[Math.floor(Math.random() * responses.length)]);
-                    }, 800);
-                });
-            }
-        }
-
-        // ========== تطبيق الدردشة الرئيسي ==========
-        class ChatApp {
-            constructor() {
-                this.server = new RealTimeServer();
-                this.localDb = new LocalDatabase();
-                this.therapistAI = new TherapistAI();
-                this.currentUser = null;
-                this.currentRoom = null;
-                this.socket = null;
-                this.typingTimeout = null;
-                this.onlineUsers = new Map();
-                this.rooms = [];
-                this.pmTargetUser = null;
-                this.updateInterval = null;
-                this.initialize();
-            }
-
-            async initialize() {
-                try {
-                    await this.localDb.init();
-                    this.setupEventListeners();
-                    this.checkAutoLogin();
-                    this.startUpdateInterval();
-                } catch (error) {
-                    console.error('خطأ في تهيئة التطبيق:', error);
-                    this.showNotification('خطأ في تهيئة التطبيق', 'error');
+            ],
+            messages: [
+                {
+                    id: 1,
+                    chatId: 1,
+                    sender: 'الأم',
+                    content: 'مرحبًا جميعًا، متى اجتماع العائلة القادم؟',
+                    time: '09:15',
+                    sent: false
+                },
+                {
+                    id: 2,
+                    chatId: 1,
+                    sender: 'أنت',
+                    content: 'أقترح يوم السعة القادم',
+                    time: '09:20',
+                    sent: true
+                },
+                {
+                    id: 3,
+                    chatId: 1,
+                    sender: 'الأخ',
+                    content: 'أنا موافق، عندي إجازة نهاية الأسبوع',
+                    time: '09:25',
+                    sent: false
+                },
+                {
+                    id: 4,
+                    chatId: 1,
+                    sender: 'الأخت',
+                    content: 'أي مطعم تفضلون؟',
+                    time: '09:30',
+                    sent: false
                 }
+            ],
+            currentChatId: null,
+            englishData: {
+                appName: 'Circl',
+                chats: 'Chats',
+                groups: 'Groups',
+                profile: 'Profile',
+                settings: 'Settings',
+                online: 'Online',
+                typeMessage: 'Type a message...',
+                editProfile: 'Edit Profile',
+                privacy: 'Privacy',
+                notifications: 'Notifications',
+                appearance: 'Appearance',
+                language: 'Language',
+                help: 'Help & Support',
+                about: 'About',
+                friends: 'Friends',
+                messages: 'Messages'
             }
-
-            setupEventListeners() {
-                // تبديل تبويبات المصادقة
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        const tabId = tab.dataset.tab;
-                        if (tabId === 'login') {
-                            document.getElementById('loginForm').style.display = 'block';
-                            document.getElementById('registerForm').style.display = 'none';
-                        } else {
-                            document.getElementById('loginForm').style.display = 'none';
-                            document.getElementById('registerForm').style.display = 'block';
-                        }
-                    });
-                });
-
-                // اختيار الجنس
-                document.querySelectorAll('.gender-option').forEach(option => {
-                    option.addEventListener('click', () => {
-                        document.querySelectorAll('.gender-option').forEach(opt => opt.classList.remove('selected'));
-                        option.classList.add('selected');
-                    });
-                });
-
-                // تسجيل الدخول
-                document.getElementById('loginBtn').addEventListener('click', () => this.login());
-                document.getElementById('loginUsername').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.login();
-                });
-                document.getElementById('loginPassword').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.login();
-                });
-
-                // التسجيل
-                document.getElementById('registerBtn').addEventListener('click', () => this.register());
-                document.getElementById('registerUsername').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.register();
-                });
-                document.getElementById('registerPassword').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.register();
-                });
-
-                // تسجيل الدخول بـ Google
-                document.getElementById('googleLoginBtn').addEventListener('click', () => this.googleLogin());
-                document.getElementById('googleRegisterBtn').addEventListener('click', () => this.googleRegister());
-
-                // إرسال الرسائل
-                document.getElementById('sendBtn').addEventListener('click', () => this.sendMessage());
-                document.getElementById('messageInput').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        this.sendMessage();
-                    }
-                });
-
-                // إرسال الرسائل الخاصة
-                document.getElementById('pmSendBtn').addEventListener('click', () => this.sendPrivateMessage());
-                document.getElementById('pmInput').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        this.sendPrivateMessage();
-                    }
-                });
-
-                // الكتابة النشطة
-                document.getElementById('messageInput').addEventListener('input', () => {
-                    this.signalTyping();
-                });
-
-                // زر القائمة للجوال
-                document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-                    document.getElementById('sidebar').classList.toggle('active');
-                });
-
-                // زر الإدارة
-                document.getElementById('adminBtn').addEventListener('click', () => {
-                    this.openAdminPanel();
-                });
-
-                // تبويبات لوحة الإدارة
-                document.querySelectorAll('.admin-tab').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        
-                        const tabId = tab.dataset.adminTab;
-                        document.querySelectorAll('#adminUsers, #adminRooms, #adminReports')
-                            .forEach(el => el.style.display = 'none');
-                        document.getElementById(`admin${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).style.display = 'block';
-                        
-                        if (tabId === 'users') this.loadAdminUsers();
-                        else if (tabId === 'rooms') this.loadAdminRooms();
-                    });
-                });
-
-                // بحث المستخدمين في لوحة الإدارة
-                document.getElementById('adminUserSearch').addEventListener('input', (e) => {
-                    this.filterAdminUsers(e.target.value);
-                });
-
-                // تحديث القائمة عند تغيير حجم النافذة
-                window.addEventListener('resize', () => {
-                    this.handleResponsiveDesign();
-                });
-
-                // الاستماع لتحديثات الخادم
-                window.addEventListener('server-update', () => {
-                    this.onServerUpdate();
-                });
-
-                // تحديث حالة الاتصال
-                window.addEventListener('online', () => {
-                    this.updateConnectionStatus(true);
-                });
-
-                window.addEventListener('offline', () => {
-                    this.updateConnectionStatus(false);
-                });
-
-                // تحديث حالة المستخدم عند إغلاق النافذة
-                window.addEventListener('beforeunload', () => {
-                    if (this.currentUser) {
-                        this.server.updateUserStatus(this.currentUser.id, 'offline');
-                    }
-                });
-            }
-
-            startUpdateInterval() {
-                // تحديث البيانات كل 2 ثانية
-                this.updateInterval = setInterval(() => {
-                    if (this.currentUser) {
-                        this.server.updateUserStatus(this.currentUser.id, 'online');
-                        this.updateOnlineUsers();
-                        if (this.currentRoom) {
-                            this.updateRoomUsers();
-                        }
-                    }
-                }, 2000);
-            }
-
-            onServerUpdate() {
-                if (this.currentUser) {
-                    this.updateOnlineUsers();
-                    if (this.currentRoom) {
-                        this.updateRoomMessages();
-                        this.updateRoomUsers();
-                    }
-                }
-            }
-
-            checkAutoLogin() {
-                const savedUser = localStorage.getItem('circl_current_user');
-                if (savedUser) {
-                    try {
-                        this.currentUser = JSON.parse(savedUser);
-                        this.startApp();
-                    } catch (error) {
-                        localStorage.removeItem('circl_current_user');
-                    }
-                }
-            }
-
-            async login() {
-                const username = document.getElementById('loginUsername').value.trim();
-                const password = document.getElementById('loginPassword').value;
-
-                if (!username || !password) {
-                    this.showNotification('يرجى ملء جميع الحقول', 'error');
-                    return;
-                }
-
-                try {
-                    // للمالك الخاص
-                    if (username === 'mvnnooo' && password === 'mmmmnnnn11') {
-                        const ownerUser = {
-                            id: 'owner-001',
-                            username: 'mvnnooo',
-                            password: 'mmmmnnnn11',
-                            role: 'owner',
-                            gender: 'male',
-                            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=mvnnooo&backgroundColor=dc2626`,
-                            verified: true,
-                            points: 10000,
-                            level: 100
-                        };
-                        
-                        await this.localDb.saveUser(ownerUser);
-                        await this.completeLogin(ownerUser);
-                        return;
-                    }
-
-                    const user = await this.localDb.getUser(username);
-                    if (!user) {
-                        this.showNotification('اسم المستخدم غير موجود', 'error');
-                        return;
-                    }
-
-                    if (user.password !== password) {
-                        this.showNotification('كلمة المرور غير صحيحة', 'error');
-                        return;
-                    }
-
-                    await this.completeLogin(user);
-                } catch (error) {
-                    console.error('خطأ في تسجيل الدخول:', error);
-                    this.showNotification('حدث خطأ في تسجيل الدخول', 'error');
-                }
-            }
-
-            async register() {
-                const username = document.getElementById('registerUsername').value.trim();
-                const password = document.getElementById('registerPassword').value;
-                const gender = document.querySelector('.gender-option.selected')?.dataset.gender;
-
-                if (!username || !password) {
-                    this.showNotification('يرجى ملء جميع الحقول', 'error');
-                    return;
-                }
-
-                if (!gender) {
-                    this.showNotification('يرجى اختيار الجنس', 'error');
-                    return;
-                }
-
-                if (password.length < 4) {
-                    this.showNotification('كلمة المرور يجب أن تكون 4 أحرف على الأقل', 'error');
-                    return;
-                }
-
-                try {
-                    const existingUser = await this.localDb.getUser(username);
-                    if (existingUser) {
-                        this.showNotification('اسم المستخدم موجود بالفعل', 'error');
-                        return;
-                    }
-
-                    const newUser = {
-                        id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        username,
-                        password,
-                        role: 'user',
-                        gender,
-                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=6366f1`,
-                        verified: false,
-                        points: 100,
-                        level: 1,
-                        joinDate: new Date().toISOString()
-                    };
-
-                    await this.localDb.saveUser(newUser);
-                    await this.completeLogin(newUser);
-                    this.showNotification('تم إنشاء الحساب بنجاح!', 'success');
-                } catch (error) {
-                    console.error('خطأ في التسجيل:', error);
-                    this.showNotification('حدث خطأ في إنشاء الحساب', 'error');
-                }
-            }
-
-            async googleLogin() {
-                this.showNotification('جارٍ تسجيل الدخول بحساب Google...', 'info');
-                
-                setTimeout(async () => {
-                    const username = `user_${Math.floor(Math.random() * 10000)}`;
-                    const googleUser = {
-                        id: `google-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        username,
-                        password: 'google_auth',
-                        role: 'user',
-                        gender: Math.random() > 0.5 ? 'male' : 'female',
-                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=google${Date.now()}`,
-                        verified: true,
-                        points: 200,
-                        level: 1,
-                        joinDate: new Date().toISOString(),
-                        isGoogle: true
-                    };
-
-                    try {
-                        await this.localDb.saveUser(googleUser);
-                        await this.completeLogin(googleUser);
-                        this.showNotification('تم تسجيل الدخول بحساب Google بنجاح!', 'success');
-                    } catch (error) {
-                        this.showNotification('حدث خطأ في تسجيل الدخول', 'error');
-                    }
-                }, 1500);
-            }
-
-            async googleRegister() {
-                this.googleLogin();
-            }
-
-            async completeLogin(user) {
-                this.currentUser = user;
-                localStorage.setItem('circl_current_user', JSON.stringify(user));
-                
-                // إضافة المستخدم للخادم
-                this.server.addUser(user);
-                this.server.updateUserStatus(user.id, 'online');
-                
-                // إخفاء نافذة المصادقة
-                document.getElementById('authOverlay').style.display = 'none';
-                
-                // بدء التطبيق
-                await this.startApp();
-                
-                this.showNotification(`مرحباً بك ${user.username}!`, 'success');
-            }
-
-            async startApp() {
-                // إظهار واجهة الدردشة
-                document.getElementById('chatContainer').style.display = 'flex';
-                
-                // تحديث معلومات المستخدم
-                this.updateUserProfile();
-                
-                // تحميل الغرف
-                await this.loadRooms();
-                
-                // الانضمام للغرفة العامة تلقائياً
-                await this.joinRoom('room-1');
-                
-                // إظهار زر الإدارة للمشرفين والمالك
-                if (['owner', 'admin'].includes(this.currentUser.role)) {
-                    document.getElementById('adminBtn').style.display = 'block';
-                }
-                
-                // التحقق من التصميم المتجاوب
-                this.handleResponsiveDesign();
-                
-                // تحديث حالة الاتصال
-                this.updateConnectionStatus(navigator.onLine);
-            }
-
-            updateUserProfile() {
-                document.getElementById('userDisplayName').textContent = this.currentUser.username;
-                document.getElementById('userAvatarImg').src = this.currentUser.avatar;
-                document.getElementById('userRole').textContent = this.getRoleText(this.currentUser.role);
-                document.getElementById('userRole').className = `user-role role-${this.currentUser.role}`;
-                
-                // تحديث شارة التحقق
-                if (this.currentUser.verified) {
-                    document.getElementById('verifiedBadge').style.display = 'inline';
-                }
-                
-                // تحديث المستوى والنقاط
-                this.updateLevelInfo();
-            }
-
-            getRoleText(role) {
-                const roles = {
-                    'owner': 'مالك',
-                    'admin': 'مشرف',
-                    'moderator': 'مراقب',
-                    'vip': 'VIP',
-                    'user': 'مستخدم'
-                };
-                return roles[role] || 'مستخدم';
-            }
-
-            updateLevelInfo() {
-                const level = this.currentUser.level || 1;
-                const points = this.currentUser.points || 0;
-                const currentLevelPoints = points % 100;
-                const progress = (currentLevelPoints / 100) * 100;
-                
-                document.getElementById('userLevel').textContent = level;
-                document.getElementById('userRank').textContent = this.getRankFromLevel(level);
-                document.getElementById('levelProgress').style.width = `${progress}%`;
-                document.getElementById('currentXP').textContent = `${points} XP`;
-                document.getElementById('nextLevelXP').textContent = `${(level * 100)} XP`;
-            }
-
-            getRankFromLevel(level) {
-                if (level >= 50) return 'ملك';
-                if (level >= 40) return 'ماسي';
-                if (level >= 30) return 'ذهبي';
-                if (level >= 20) return 'فضي';
-                if (level >= 10) return 'برونزي';
-                return 'مبتدئ';
-            }
-
-            async loadRooms() {
-                try {
-                    this.rooms = this.server.getAllRooms();
-                    
-                    // ترتيب الغرف حسب الأولوية
-                    this.rooms.sort((a, b) => a.order - b.order);
-                    
-                    const roomList = document.getElementById('roomList');
-                    roomList.innerHTML = '';
-                    
-                    for (const room of this.rooms) {
-                        const li = document.createElement('li');
-                        li.className = 'room-item';
-                        if (this.currentRoom && room.id === this.currentRoom.id) {
-                            li.classList.add('active');
-                        }
-                        
-                        li.innerHTML = `
-                            <i class="fas ${room.icon} room-icon"></i>
-                            <div class="room-info">
-                                <div class="room-name">${room.name}</div>
-                                <div class="room-stats">
-                                    <span>${room.description}</span>
-                                    <span>(${room.userCount} مستخدم)</span>
-                                </div>
-                            </div>
-                            ${room.type === 'vip' ? '<i class="fas fa-lock" style="color: var(--vip);"></i>' : ''}
-                        `;
-                        
-                        li.addEventListener('click', () => this.joinRoom(room.id));
-                        roomList.appendChild(li);
-                    }
-                    
-                    document.getElementById('roomsCount').textContent = this.rooms.length;
-                } catch (error) {
-                    console.error('خطأ في تحميل الغرف:', error);
-                }
-            }
-
-            async joinRoom(roomId) {
-                try {
-                    const room = this.rooms.find(r => r.id === roomId);
-                    if (!room) {
-                        this.showNotification('الغرفة غير موجودة', 'error');
-                        return;
-                    }
-
-                    // التحقق من صلاحيات الوصول للغرفة VIP
-                    if (room.type === 'vip' && !['owner', 'admin', 'vip'].includes(this.currentUser.role)) {
-                        this.showVipModal(room);
-                        return;
-                    }
-
-                    const result = this.server.joinRoom(this.currentUser.id, roomId);
-                    
-                    if (!result.success) {
-                        this.showNotification(result.error, 'error');
-                        return;
-                    }
-
-                    // تحديث الغرفة الحالية
-                    this.currentRoom = result.room;
-                    
-                    // تحديث واجهة المستخدم
-                    document.getElementById('currentRoomTitle').textContent = room.name;
-                    document.getElementById('currentRoomDesc').textContent = `${room.description} (${result.room.userCount} مستخدم)`;
-                    document.getElementById('roomIcon').className = `fas ${room.icon}`;
-                    
-                    // تحديث قائمة الغرف
-                    await this.loadRooms();
-                    
-                    // تحميل الرسائل
-                    await this.loadMessages(result.messages);
-                    
-                    // تحديث قائمة المستخدمين النشطين
-                    await this.updateRoomUsers();
-                    
-                    // إذا كانت غرفة ثيرابيست، إظهار رسالة ترحيبية
-                    if (room.type === 'therapist') {
-                        this.handleTherapistRoom();
-                    }
-                } catch (error) {
-                    console.error('خطأ في الانضمام للغرفة:', error);
-                    this.showNotification('حدث خطأ في الانضمام للغرفة', 'error');
-                }
-            }
-
-            showVipModal(room) {
-                window.currentVipRoom = room;
-                document.getElementById('vipModal').classList.add('active');
-            }
-
-            async enterVipRoom() {
-                const password = document.getElementById('vipPassword').value;
-                const room = window.currentVipRoom;
-                
-                if (password === room.password) {
-                    // ترقية المستخدم إلى VIP
-                    this.currentUser.role = 'vip';
-                    await this.localDb.saveUser(this.currentUser);
-                    this.updateUserProfile();
-                    
-                    // إغلاق النافذة والدخول للغرفة
-                    this.closeVipModal();
-                    await this.joinRoom(room.id);
-                    this.showNotification('تم ترقيتك إلى عضو VIP!', 'success');
-                } else {
-                    this.showNotification('كلمة المرور غير صحيحة', 'error');
-                }
-            }
-
-            closeVipModal() {
-                document.getElementById('vipModal').classList.remove('active');
-                document.getElementById('vipPassword').value = '';
-            }
-
-            async loadMessages(messages = []) {
-                const container = document.getElementById('messagesContainer');
-                container.innerHTML = '';
-                
-                if (messages.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 3rem; color: #6b7280;">
-                            <i class="fas fa-comments" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;"></i>
-                            <h3 style="margin-bottom: 0.5rem; color: #111827;">مرحباً بك في ${this.currentRoom.name}!</h3>
-                            <p>كن أول من يرسل رسالة في هذه الغرفة</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                for (const message of messages) {
-                    await this.displayMessage(message);
-                }
-                
-                // التمرير لآخر رسالة
-                container.scrollTop = container.scrollHeight;
-            }
-
-            async displayMessage(message) {
-                const container = document.getElementById('messagesContainer');
-                const isCurrentUser = message.userId === this.currentUser.id;
-                
-                // الحصول على معلومات المستخدم
-                let user;
-                try {
-                    user = await this.localDb.getUserById(message.userId);
-                } catch (error) {
-                    user = null;
-                }
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${isCurrentUser ? 'my-message' : ''}`;
-                
-                const time = new Date(message.timestamp).toLocaleTimeString('ar-EG', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                messageDiv.innerHTML = `
-                    ${!isCurrentUser ? `
-                        <div class="message-avatar">
-                            <img src="${message.avatar || user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" 
-                                 alt="${message.username || user?.username || 'مستخدم'}">
-                        </div>
-                    ` : ''}
-                    
-                    <div class="message-content">
-                        <div class="message-header">
-                            <div class="message-sender">
-                                ${message.username || user?.username || 'مستخدم'}
-                                ${isCurrentUser ? '' : `
-                                    <button class="pm-btn" onclick="app.openPrivateChat('${message.userId}', '${message.username || user?.username || 'مستخدم'}', '${message.avatar || user?.avatar || ''}')">
-                                        <i class="fas fa-comment-dots"></i>
-                                    </button>
-                                `}
-                            </div>
-                            <div class="message-time">${time}</div>
-                        </div>
-                        <div class="message-text">${this.escapeHtml(message.text)}</div>
-                    </div>
-                    
-                    ${isCurrentUser ? `
-                        <div class="message-avatar">
-                            <img src="${this.currentUser.avatar}" alt="${this.currentUser.username}">
-                        </div>
-                    ` : ''}
-                `;
-                
-                container.appendChild(messageDiv);
-                container.scrollTop = container.scrollHeight;
-            }
-
-            async sendMessage() {
-                const input = document.getElementById('messageInput');
-                const text = input.value.trim();
-                
-                if (!text || !this.currentRoom || !this.currentUser) return;
-
-                try {
-                    const messageData = {
-                        username: this.currentUser.username,
-                        avatar: this.currentUser.avatar,
-                        text: text
-                    };
-
-                    const result = this.server.sendMessage(this.currentUser.id, this.currentRoom.id, messageData);
-                    
-                    if (!result.success) {
-                        this.showNotification(result.error, 'error');
-                        return;
-                    }
-
-                    // عرض الرسالة فوراً للمستخدم الحالي
-                    await this.displayMessage(result.message);
-                    
-                    // مسح حقل الإدخال
-                    input.value = '';
-                    
-                    // إخفاء مؤشر الكتابة
-                    this.clearTyping();
-                    
-                    // إضافة نقاط
-                    await this.addUserPoints(5);
-                    
-                } catch (error) {
-                    console.error('خطأ في إرسال الرسالة:', error);
-                    this.showNotification('حدث خطأ في إرسال الرسالة', 'error');
-                }
-            }
-
-            async updateRoomMessages() {
-                if (!this.currentRoom) return;
-                
-                try {
-                    const serverData = this.server.getServerData();
-                    if (serverData && serverData.rooms[this.currentRoom.id]) {
-                        const messages = serverData.rooms[this.currentRoom.id].messages;
-                        const container = document.getElementById('messagesContainer');
-                        const currentMessageCount = container.querySelectorAll('.message').length;
-                        
-                        // إذا كان هناك رسائل جديدة
-                        if (messages.length > currentMessageCount) {
-                            const newMessages = messages.slice(currentMessageCount);
-                            for (const message of newMessages) {
-                                await this.displayMessage(message);
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.error('خطأ في تحديث الرسائل:', error);
-                }
-            }
-
-            async updateRoomUsers() {
-                if (!this.currentRoom) return;
-                
-                try {
-                    const users = this.server.getRoomUsers(this.currentRoom.id);
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = '';
-                    
-                    for (const user of users) {
-                        if (user.id === this.currentUser.id) continue;
-                        
-                        const li = document.createElement('li');
-                        li.className = 'user-list-item';
-                        li.innerHTML = `
-                            <div class="user-list-avatar">
-                                <img src="${user.avatar}" alt="${user.username}">
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    ${user.username}
-                                    <button class="pm-btn" onclick="app.openPrivateChat('${user.id}', '${user.username}', '${user.avatar}')">
-                                        <i class="fas fa-comment-dots"></i>
-                                    </button>
-                                </div>
-                                <div style="font-size: 0.75rem; color: #9ca3af;">${this.getRoleText(user.role)}</div>
-                            </div>
-                        `;
-                        userList.appendChild(li);
-                    }
-                    
-                    document.getElementById('onlineCount').textContent = users.length;
-                } catch (error) {
-                    console.error('خطأ في تحديث المستخدمين:', error);
-                }
-            }
-
-            async updateOnlineUsers() {
-                try {
-                    const onlineUsers = this.server.getOnlineUsers();
-                    this.onlineUsers = new Map(onlineUsers.map(user => [user.id, user]));
-                    
-                    // تحديث عدد المستخدمين المتصلين
-                    document.getElementById('onlineCount').textContent = onlineUsers.length;
-                } catch (error) {
-                    console.error('خطأ في تحديث المستخدمين المتصلين:', error);
-                }
-            }
-
-            async openPrivateChat(userId, username, avatar) {
-                this.pmTargetUser = { id: userId, username, avatar };
-                
-                document.getElementById('pmUserName').textContent = username;
-                document.getElementById('pmUserAvatar').querySelector('img').src = avatar;
-                document.getElementById('pmOverlay').classList.add('active');
-                document.getElementById('pmInput').focus();
-                
-                // تحميل الرسائل الخاصة
-                await this.loadPrivateMessages(userId);
-            }
-
-            async loadPrivateMessages(targetUserId) {
-                const container = document.getElementById('pmMessages');
-                container.innerHTML = '';
-                
-                const messages = this.server.getPrivateMessages(this.currentUser.id, targetUserId);
-                
-                if (messages.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 2rem; color: #6b7280;">
-                            <i class="fas fa-comments" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
-                            <p>ابدأ محادثة خاصة مع ${this.pmTargetUser.username}</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                for (const message of messages) {
-                    await this.displayPrivateMessage(message);
-                }
-                
-                // التمرير لآخر رسالة
-                container.scrollTop = container.scrollHeight;
-            }
-
-            async displayPrivateMessage(message) {
-                const container = document.getElementById('pmMessages');
-                const isCurrentUser = message.senderId === this.currentUser.id;
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${isCurrentUser ? 'my-message' : ''}`;
-                messageDiv.style.marginBottom = '0.75rem';
-                
-                const time = new Date(message.timestamp).toLocaleTimeString('ar-EG', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
-                messageDiv.innerHTML = `
-                    ${!isCurrentUser ? `
-                        <div class="message-avatar" style="width: 36px; height: 36px;">
-                            <img src="${message.senderAvatar || this.pmTargetUser.avatar}" 
-                                 alt="${message.senderUsername || this.pmTargetUser.username}">
-                        </div>
-                    ` : ''}
-                    
-                    <div class="message-content" style="padding: 0.75rem; max-width: 80%;">
-                        <div class="message-header">
-                            <div class="message-sender" style="font-size: 0.8rem;">
-                                ${message.senderUsername || this.pmTargetUser.username}
-                            </div>
-                            <div class="message-time" style="font-size: 0.7rem;">${time}</div>
-                        </div>
-                        <div class="message-text" style="font-size: 0.9rem;">${this.escapeHtml(message.text)}</div>
-                    </div>
-                    
-                    ${isCurrentUser ? `
-                        <div class="message-avatar" style="width: 36px; height: 36px;">
-                            <img src="${this.currentUser.avatar}" alt="${this.currentUser.username}">
-                        </div>
-                    ` : ''}
-                `;
-                
-                container.appendChild(messageDiv);
-                container.scrollTop = container.scrollHeight;
-            }
-
-            async sendPrivateMessage() {
-                if (!this.pmTargetUser) return;
-                
-                const input = document.getElementById('pmInput');
-                const text = input.value.trim();
-                
-                if (!text) return;
-
-                try {
-                    const messageData = {
-                        senderUsername: this.currentUser.username,
-                        senderAvatar: this.currentUser.avatar,
-                        text: text
-                    };
-
-                    const result = this.server.sendPrivateMessage(
-                        this.currentUser.id,
-                        this.pmTargetUser.id,
-                        messageData
-                    );
-                    
-                    if (!result.success) {
-                        this.showNotification(result.error, 'error');
-                        return;
-                    }
-
-                    // عرض الرسالة فوراً
-                    await this.displayPrivateMessage(result.message);
-                    
-                    // مسح حقل الإدخال
-                    input.value = '';
-                    
-                    // إضافة نقاط
-                    await this.addUserPoints(3);
-                    
-                } catch (error) {
-                    console.error('خطأ في إرسال الرسالة الخاصة:', error);
-                    this.showNotification('حدث خطأ في إرسال الرسالة', 'error');
-                }
-            }
-
-            closePMModal() {
-                document.getElementById('pmOverlay').classList.remove('active');
-                document.getElementById('pmInput').value = '';
-                this.pmTargetUser = null;
-            }
-
-            async handleTherapistRoom() {
-                const container = document.getElementById('messagesContainer');
-                
-                // إضافة رسالة ترحيب من البوت
-                const welcomeMessage = {
-                    id: `msg-${Date.now()}`,
-                    userId: 'therapist-bot',
-                    username: '🧠 ثيرابيست AI',
-                    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=therapist&backgroundColor=8b5cf6',
-                    text: 'مرحباً! أنا مساعدك الذكي للدعم النفسي. كيف يمكنني مساعدتك اليوم؟',
-                    timestamp: Date.now(),
-                    type: 'system'
-                };
-
-                this.server.sendMessage('therapist-bot', this.currentRoom.id, {
-                    username: welcomeMessage.username,
-                    avatar: welcomeMessage.avatar,
-                    text: welcomeMessage.text
-                });
-            }
-
-            async addUserPoints(points) {
-                if (!this.currentUser) return;
-                
-                try {
-                    this.currentUser.points = (this.currentUser.points || 0) + points;
-                    this.currentUser.level = Math.floor(this.currentUser.points / 100) + 1;
-                    
-                    await this.localDb.saveUser(this.currentUser);
-                    this.updateLevelInfo();
-                    
-                    if (points >= 10) {
-                        this.showNotification(`🎉 +${points} نقطة!`, 'success');
-                    }
-                } catch (error) {
-                    console.error('خطأ في إضافة النقاط:', error);
-                }
-            }
-
-            signalTyping() {
-                if (!this.currentRoom || !this.currentUser) return;
-                
-                // إظهار مؤشر الكتابة
-                document.getElementById('typingIndicator').style.display = 'block';
-                document.getElementById('typingUser').textContent = this.currentUser.username;
-                
-                // إخفاء المؤشر بعد 3 ثوان
-                clearTimeout(this.typingTimeout);
-                this.typingTimeout = setTimeout(() => {
-                    document.getElementById('typingIndicator').style.display = 'none';
-                }, 3000);
-            }
-
-            clearTyping() {
-                document.getElementById('typingIndicator').style.display = 'none';
-                clearTimeout(this.typingTimeout);
-            }
-
-            updateConnectionStatus(connected) {
-                const statusEl = document.getElementById('connectionStatus');
-                if (connected) {
-                    statusEl.classList.remove('disconnected');
-                    statusEl.innerHTML = `
-                        <i class="fas fa-wifi"></i>
-                        <span>متصل</span>
-                    `;
-                } else {
-                    statusEl.classList.add('disconnected');
-                    statusEl.innerHTML = `
-                        <i class="fas fa-wifi-slash"></i>
-                        <span>غير متصل</span>
-                    `;
-                }
-            }
-
-            async openAdminPanel() {
-                document.getElementById('adminPanel').classList.add('active');
-                await this.loadAdminUsers();
-            }
-
-            closeAdminPanel() {
-                document.getElementById('adminPanel').classList.remove('active');
-            }
-
-            async loadAdminUsers() {
-                try {
-                    const onlineUsers = this.server.getOnlineUsers();
-                    const container = document.getElementById('adminUsersList');
-                    container.innerHTML = '';
-                    
-                    for (const user of onlineUsers) {
-                        const div = document.createElement('div');
-                        div.className = 'user-admin-item';
-                        div.style.cssText = `
-                            padding: 1rem;
-                            border: 1px solid #e5e7eb;
-                            border-radius: var(--radius);
-                            margin-bottom: 0.5rem;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        `;
-                        
-                        div.innerHTML = `
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="${user.avatar}" style="width: 48px; height: 48px; border-radius: 50%;">
-                                <div>
-                                    <div style="font-weight: 600;">${user.username}</div>
-                                    <div style="font-size: 0.875rem; color: #6b7280;">
-                                        ${this.getRoleText(user.role)} • ${user.currentRoom || 'غير متصل'}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button class="btn" onclick="app.promoteUser('${user.id}')" 
-                                        style="background: #f3f4f6; padding: 0.5rem 1rem; font-size: 0.875rem;"
-                                        ${this.currentUser.role !== 'owner' ? 'disabled' : ''}>
-                                    ترقية
-                                </button>
-                            </div>
-                        `;
-                        
-                        container.appendChild(div);
-                    }
-                } catch (error) {
-                    console.error('خطأ في تحميل المستخدمين للإدارة:', error);
-                }
-            }
-
-            async loadAdminRooms() {
-                try {
-                    const rooms = this.server.getAllRooms();
-                    const container = document.getElementById('adminRoomsList');
-                    container.innerHTML = '';
-                    
-                    for (const room of rooms) {
-                        const div = document.createElement('div');
-                        div.style.cssText = `
-                            padding: 1rem;
-                            border: 1px solid #e5e7eb;
-                            border-radius: var(--radius);
-                            margin-bottom: 0.5rem;
-                        `;
-                        
-                        div.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                <div style="font-weight: 600;">${room.name}</div>
-                                <span style="background: ${room.type === 'public' ? 'var(--primary)' : 
-                                                          room.type === 'vip' ? 'var(--vip)' : 
-                                                          'var(--therapist)'}; 
-                                       color: white; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem;">
-                                    ${room.type === 'public' ? 'عامة' : 
-                                      room.type === 'vip' ? 'VIP' : 'ثرابيست'}
-                                </span>
-                            </div>
-                            <div style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">${room.description}</div>
-                            <div style="font-size: 0.875rem;">
-                                <span style="color: #6b7280;">المستخدمون:</span> ${room.userCount} | 
-                                <span style="color: #6b7280;">الترتيب:</span> ${room.order}
-                            </div>
-                        `;
-                        
-                        container.appendChild(div);
-                    }
-                } catch (error) {
-                    console.error('خطأ في تحميل الغرف للإدارة:', error);
-                }
-            }
-
-            async promoteUser(userId) {
-                if (this.currentUser.role !== 'owner') {
-                    this.showNotification('ليس لديك صلاحية لترقية المستخدمين', 'error');
-                    return;
-                }
-
-                try {
-                    const roles = ['user', 'vip', 'moderator', 'admin'];
-                    const user = this.onlineUsers.get(userId);
-                    if (!user) return;
-                    
-                    const currentIndex = roles.indexOf(user.role);
-                    const nextRole = roles[Math.min(currentIndex + 1, roles.length - 1)];
-                    
-                    user.role = nextRole;
-                    
-                    // تحديث في قاعدة البيانات المحلية
-                    const localUser = await this.localDb.getUserById(userId);
-                    if (localUser) {
-                        localUser.role = nextRole;
-                        await this.localDb.saveUser(localUser);
-                    }
-                    
-                    this.showNotification(`تم ترقية ${user.username} إلى ${this.getRoleText(nextRole)}`, 'success');
-                    await this.loadAdminUsers();
-                } catch (error) {
-                    console.error('خطأ في ترقية المستخدم:', error);
-                    this.showNotification('حدث خطأ في ترقية المستخدم', 'error');
-                }
-            }
-
-            filterAdminUsers(searchTerm) {
-                const items = document.querySelectorAll('.user-admin-item');
-                items.forEach(item => {
-                    const username = item.querySelector('div > div:nth-child(2) > div:nth-child(1)').textContent.toLowerCase();
-                    if (username.includes(searchTerm.toLowerCase())) {
-                        item.style.display = 'flex';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-
-            handleResponsiveDesign() {
-                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-                if (window.innerWidth <= 768) {
-                    mobileMenuBtn.style.display = 'block';
-                    document.getElementById('sidebar').classList.remove('active');
-                } else {
-                    mobileMenuBtn.style.display = 'none';
-                    document.getElementById('sidebar').classList.add('active');
-                }
-            }
-
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.textContent = message;
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.style.animation = 'slideUp 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
-                
-                // إضافة أنيميشن الإخفاء
-                if (!document.querySelector('#notification-styles')) {
-                    const style = document.createElement('style');
-                    style.id = 'notification-styles';
-                    style.textContent = `
-                        @keyframes slideUp {
-                            from { top: 20px; opacity: 1; }
-                            to { top: -100px; opacity: 0; }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
-            }
-
-            logout() {
-                if (this.currentUser) {
-                    this.server.updateUserStatus(this.currentUser.id, 'offline');
-                }
-                
-                if (this.updateInterval) {
-                    clearInterval(this.updateInterval);
-                }
-                
-                this.currentUser = null;
-                this.currentRoom = null;
-                localStorage.removeItem('circl_current_user');
-                
-                document.getElementById('chatContainer').style.display = 'none';
-                document.getElementById('authOverlay').style.display = 'flex';
-                
-                this.showNotification('تم تسجيل الخروج بنجاح', 'info');
-            }
-        }
-
-        // ========== تهيئة التطبيق ==========
-        let app;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            app = new ChatApp();
+        };
+
+        // تهيئة التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // تحديث الوقت
+            updateTime();
+            setInterval(updateTime, 60000);
             
-            // تعيين الوظائف العامة للوصول من الأزرار
-            window.app = app;
-            window.enterVipRoom = () => app.enterVipRoom();
-            window.closeVipModal = () => app.closeVipModal();
-            window.closeAdminPanel = () => app.closeAdminPanel();
-            window.closePMModal = () => app.closePMModal();
+            // تحميل الدردشات
+            loadChats();
+            
+            // تحميل المجموعات
+            loadGroups();
+            
+            // إعداد معالجات الأحداث
+            setupEventListeners();
+            
+            // إعداد معالج اللغة
+            setupLanguageSwitcher();
         });
 
-        // إضافة زر تسجيل الخروج
-        document.addEventListener('DOMContentLoaded', () => {
-            const logoutBtn = document.createElement('button');
-            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-            logoutBtn.title = 'تسجيل الخروج';
-            logoutBtn.style.cssText = `
-                position: fixed;
-                bottom: 80px;
-                left: 20px;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background: var(--danger);
-                color: white;
-                border: none;
-                cursor: pointer;
-                z-index: 1000;
-                display: none;
-                box-shadow: var(--shadow);
-                transition: all 0.3s ease;
-            `;
-            logoutBtn.onmouseenter = () => {
-                logoutBtn.style.transform = 'scale(1.1)';
-                logoutBtn.style.boxShadow = 'var(--shadow-lg)';
-            };
-            logoutBtn.onmouseleave = () => {
-                logoutBtn.style.transform = 'scale(1)';
-                logoutBtn.style.boxShadow = 'var(--shadow)';
-            };
-            logoutBtn.onclick = () => app.logout();
-            document.body.appendChild(logoutBtn);
+        // تحديث الوقت الحالي
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('current-time').textContent = timeString;
+        }
 
-            // إظهار زر تسجيل الخروج عند تسجيل الدخول
-            const observer = new MutationObserver(() => {
-                if (document.getElementById('chatContainer').style.display !== 'none') {
-                    logoutBtn.style.display = 'block';
-                } else {
-                    logoutBtn.style.display = 'none';
+        // تحميل قائمة الدردشات
+        function loadChats() {
+            const chatsContainer = document.getElementById('chats-container');
+            chatsContainer.innerHTML = '';
+            
+            appData.chats.forEach(chat => {
+                const chatElement = document.createElement('div');
+                chatElement.className = `chat-card ${chat.unread > 0 ? 'unread' : ''}`;
+                chatElement.dataset.chatId = chat.id;
+                
+                chatElement.innerHTML = `
+                    <div class="chat-avatar" style="background: ${getAvatarColor(chat.name)};">${chat.avatar}</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">${chat.name}</div>
+                            <div class="chat-time">${chat.time}</div>
+                        </div>
+                        <div class="chat-preview">
+                            <span>${chat.lastMessage}</span>
+                            ${chat.unread > 0 ? `<span class="unread-count">${chat.unread}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                chatElement.addEventListener('click', () => openChat(chat.id));
+                chatsContainer.appendChild(chatElement);
+            });
+        }
+
+        // تحميل قائمة المجموعات
+        function loadGroups() {
+            const groupsContainer = document.getElementById('groups-container');
+            groupsContainer.innerHTML = '';
+            
+            appData.groups.forEach(group => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'group-card';
+                groupElement.dataset.groupId = group.id;
+                
+                groupElement.innerHTML = `
+                    <div class="group-banner" style="background: ${group.color};">
+                        <div class="group-avatar">${group.avatar}</div>
+                    </div>
+                    <div class="group-info">
+                        <div class="group-name">${group.name}</div>
+                        <div class="group-members">
+                            <i class="fas fa-users"></i>
+                            ${group.members} أعضاء
+                        </div>
+                    </div>
+                `;
+                
+                groupElement.addEventListener('click', () => openGroup(group.id));
+                groupsContainer.appendChild(groupElement);
+            });
+        }
+
+        // فتح دردشة معينة
+        function openChat(chatId) {
+            const chat = appData.chats.find(c => c.id === chatId);
+            if (!chat) return;
+            
+            // حفظ معرف الدردشة الحالية
+            appData.currentChatId = chatId;
+            
+            // تحديث معلومات الدردشة في الشاشة
+            document.getElementById('chat-with-avatar').textContent = chat.avatar;
+            document.getElementById('chat-with-avatar').style.background = getAvatarColor(chat.name);
+            document.getElementById('chat-with-name').textContent = chat.name;
+            
+            // تحميل الرسائل
+            loadMessages(chatId);
+            
+            // تبديل الشاشة
+            document.getElementById('chats-section').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+        }
+
+        // تحميل رسائل دردشة معينة
+        function loadMessages(chatId) {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = '';
+            
+            // تصفية الرسائل الخاصة بهذه الدردشة
+            const chatMessages = appData.messages.filter(m => m.chatId === chatId);
+            
+            // إضافة رسائل الترحيب إذا لم تكن هناك رسائل
+            if (chatMessages.length === 0) {
+                const welcomeMessage = {
+                    id: 0,
+                    chatId: chatId,
+                    sender: 'النظام',
+                    content: 'هذه بداية المحادثة. أرسل رسالة لبدء الدردشة!',
+                    time: 'الآن',
+                    sent: false
+                };
+                chatMessages.push(welcomeMessage);
+            }
+            
+            // عرض الرسائل
+            chatMessages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.sent ? 'sent' : 'received'}`;
+                
+                messageElement.innerHTML = `
+                    <div class="message-content">
+                        ${!message.sent && message.sender !== 'النظام' ? `<div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">${message.sender}</div>` : ''}
+                        <div>${message.content}</div>
+                        <span class="message-time">${message.time}</span>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageElement);
+            });
+            
+            // التمرير إلى الأسفل لرؤية أحدث الرسائل
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // فتح مجموعة معينة
+        function openGroup(groupId) {
+            const group = appData.groups.find(g => g.id === groupId);
+            if (!group) return;
+            
+            // في تطبيق حقيقي، هنا ستنتقل إلى شاشة المجموعة
+            // للتبسيط، سنفتحها كدردشة
+            openChat(groupId);
+        }
+
+        // إعداد معالجات الأحداث
+        function setupEventListeners() {
+            // التنقل السفلي
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetSection = this.dataset.section;
+                    
+                    // تحديث العنصر النشط
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // إخفاء جميع الأقسام
+                    document.querySelectorAll('.content-section').forEach(section => {
+                        section.classList.add('hidden');
+                    });
+                    
+                    // إظهار القسم المطلوب
+                    document.getElementById(targetSection).classList.remove('hidden');
+                    
+                    // إخفاء شاشة الدردشة إذا كانت مفتوحة
+                    document.getElementById('chat-screen').classList.add('hidden');
+                    
+                    // إظهار شاشة الدردشات إذا لزم الأمر
+                    if (targetSection === 'chats-section') {
+                        document.getElementById('chats-section').classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // زر العودة من شاشة الدردشة
+            document.getElementById('back-to-chats').addEventListener('click', function() {
+                document.getElementById('chat-screen').classList.add('hidden');
+                document.getElementById('chats-section').classList.remove('hidden');
+            });
+            
+            // إرسال رسالة
+            document.getElementById('send-message-btn').addEventListener('click', sendMessage);
+            document.getElementById('message-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
                 }
             });
-
-            observer.observe(document.getElementById('chatContainer'), {
-                attributes: true,
-                attributeFilter: ['style']
+            
+            // أزرار الإعدادات
+            document.getElementById('edit-profile-btn').addEventListener('click', function() {
+                alert('ميزة تعديل الملف الشخصي قيد التطوير');
             });
-        });
+            
+            document.getElementById('privacy-btn').addEventListener('click', function() {
+                alert('ميزة الخصوصية قيد التطوير');
+            });
+            
+            document.getElementById('help-btn').addEventListener('click', function() {
+                alert('مركز المساعدة قيد التطوير');
+            });
+            
+            document.getElementById('about-btn').addEventListener('click', function() {
+                alert('سيرك v1.0\nتطبيق شات جماعي\nالإصدار: 1.0.0\n© 2023 جميع الحقوق محفوظة');
+            });
+            
+            // أزرار رأس التطبيق
+            document.getElementById('search-btn').addEventListener('click', function() {
+                alert('ميزة البحث قيد التطوير');
+            });
+            
+            document.getElementById('add-contact-btn').addEventListener('click', function() {
+                alert('ميزة إضافة جهة اتصال قيد التطوير');
+            });
+            
+            document.getElementById('settings-btn').addEventListener('click', function() {
+                // التبديل إلى شاشة الإعدادات
+                navItems.forEach(nav => nav.classList.remove('active'));
+                document.querySelector('.nav-item[data-section="settings-section"]').classList.add('active');
+                
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                document.getElementById('settings-section').classList.remove('hidden');
+                document.getElementById('chat-screen').classList.add('hidden');
+            });
+        }
 
-        // تحديث حالة الاتصال
-        setInterval(() => {
-            const statusEl = document.getElementById('connectionStatus');
-            if (navigator.onLine) {
-                statusEl.classList.remove('disconnected');
-                statusEl.innerHTML = `
-                    <i class="fas fa-wifi"></i>
-                    <span>متصل</span>
-                `;
+        // إرسال رسالة جديدة
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const messageText = input.value.trim();
+            
+            if (!messageText) return;
+            
+            // إنشاء رسالة جديدة
+            const newMessage = {
+                id: appData.messages.length + 1,
+                chatId: appData.currentChatId,
+                sender: 'أنت',
+                content: messageText,
+                time: 'الآن',
+                sent: true
+            };
+            
+            // إضافة الرسالة إلى البيانات
+            appData.messages.push(newMessage);
+            
+            // إضافة رد تلقائي (محاكاة)
+            setTimeout(() => {
+                const autoReply = {
+                    id: appData.messages.length + 1,
+                    chatId: appData.currentChatId,
+                    sender: 'النظام',
+                    content: 'تم استلام رسالتك. سيرد عليك قريبًا!',
+                    time: 'الآن',
+                    sent: false
+                };
+                
+                appData.messages.push(autoReply);
+                
+                // تحديث الرسائل إذا كانت هذه الدردشة مفتوحة
+                if (appData.currentChatId) {
+                    loadMessages(appData.currentChatId);
+                }
+            }, 1000);
+            
+            // تحديث الرسائل على الشاشة
+            loadMessages(appData.currentChatId);
+            
+            // مسح حقل الإدخال
+            input.value = '';
+            input.focus();
+        }
+
+        // إعداد مبدل اللغة
+        function setupLanguageSwitcher() {
+            document.getElementById('lang-ar').addEventListener('click', function() {
+                if (appData.currentLanguage !== 'ar') {
+                    switchLanguage('ar');
+                }
+            });
+            
+            document.getElementById('lang-en').addEventListener('click', function() {
+                if (appData.currentLanguage !== 'en') {
+                    switchLanguage('en');
+                }
+            });
+        }
+
+        // تبديل لغة التطبيق
+        function switchLanguage(lang) {
+            appData.currentLanguage = lang;
+            
+            // تحديث أزرار اللغة
+            document.getElementById('lang-ar').classList.toggle('active', lang === 'ar');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            
+            // تغيير اتجاه الصفحة
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+            
+            // تحديث النصوص حسب اللغة
+            if (lang === 'en') {
+                // تحديث النصوص إلى الإنجليزية
+                document.querySelector('.logo h1').textContent = 'Circl';
+                document.querySelector('.nav-item[data-section="chats-section"] span').textContent = 'Chats';
+                document.querySelector('.nav-item[data-section="groups-section"] span').textContent = 'Groups';
+                document.querySelector('.nav-item[data-section="profile-section"] span').textContent = 'Profile';
+                document.querySelector('.nav-item[data-section="settings-section"] span').textContent = 'Settings';
+                document.getElementById('chats-section').querySelector('h2').textContent = 'Chats';
+                document.getElementById('groups-section').querySelector('h2').textContent = 'Groups';
+                document.getElementById('settings-section').querySelector('h2').textContent = 'Settings';
+                document.getElementById('message-input').placeholder = 'Type a message...';
+                document.getElementById('user-status').textContent = 'Online now';
+                document.getElementById('user-status').innerHTML = '<div style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background-color: var(--success); border-radius: 50%;"></div> Online now</div>';
+                document.querySelectorAll('.stat-label')[0].textContent = 'Friends';
+                document.querySelectorAll('.stat-label')[1].textContent = 'Groups';
+                document.querySelectorAll('.stat-label')[2].textContent = 'Messages';
+                document.querySelector('.section-title').textContent = 'Account';
+                document.querySelectorAll('.settings-text h3')[0].textContent = 'Edit Profile';
+                document.querySelectorAll('.settings-text p')[0].textContent = 'Change photo and personal info';
+                document.querySelectorAll('.settings-text h3')[1].textContent = 'Privacy';
+                document.querySelectorAll('.settings-text p')[1].textContent = 'Manage privacy and security settings';
+                document.querySelectorAll('.section-title')[1].textContent = 'App';
+                document.querySelectorAll('.settings-text h3')[2].textContent = 'Notifications';
+                document.querySelectorAll('.settings-text p')[2].textContent = 'Manage app notifications';
+                document.querySelectorAll('.settings-text h3')[3].textContent = 'Appearance';
+                document.querySelectorAll('.settings-text p')[3].textContent = 'Change app theme';
+                document.querySelectorAll('.settings-text h3')[4].textContent = 'Language';
+                document.querySelectorAll('.settings-text p')[4].textContent = 'Change app language';
+                document.querySelectorAll('.section-title')[2].textContent = 'General';
+                document.querySelectorAll('.settings-text h3')[5].textContent = 'Help & Support';
+                document.querySelectorAll('.settings-text p')[5].textContent = 'Guide and help center';
+                document.querySelectorAll('.settings-text h3')[6].textContent = 'About';
+                document.querySelectorAll('.settings-text p')[6].textContent = 'App version and info';
             } else {
-                statusEl.classList.add('disconnected');
-                statusEl.innerHTML = `
-                    <i class="fas fa-wifi-slash"></i>
-                    <span>غير متصل</span>
-                `;
+                // تحديث النصوص إلى العربية
+                document.querySelector('.logo h1').textContent = 'سيرك | Circl';
+                document.querySelector('.nav-item[data-section="chats-section"] span').textContent = 'الدردشات';
+                document.querySelector('.nav-item[data-section="groups-section"] span').textContent = 'المجموعات';
+                document.querySelector('.nav-item[data-section="profile-section"] span').textContent = 'الملف الشخصي';
+                document.querySelector('.nav-item[data-section="settings-section"] span').textContent = 'الإعدادات';
+                document.getElementById('chats-section').querySelector('h2').textContent = 'الدردشات';
+                document.getElementById('groups-section').querySelector('h2').textContent = 'المجموعات';
+                document.getElementById('settings-section').querySelector('h2').textContent = 'الإعدادات';
+                document.getElementById('message-input').placeholder = 'اكتب رسالة...';
+                document.getElementById('user-status').textContent = 'متصل الآن';
+                document.getElementById('user-status').innerHTML = '<div style="display: flex; align-items: center; gap: 6px;"><div style="width: 10px; height: 10px; background-color: var(--success); border-radius: 50%;"></div> متصل الآن</div>';
+                document.querySelectorAll('.stat-label')[0].textContent = 'الأصدقاء';
+                document.querySelectorAll('.stat-label')[1].textContent = 'المجموعات';
+                document.querySelectorAll('.stat-label')[2].textContent = 'الرسائل';
             }
-        }, 5000);
+        }
+
+        // الحصول على لون للصورة الرمزية بناءً على النص
+        function getAvatarColor(name) {
+            const colors = [
+                'linear-gradient(135deg, #6C63FF, #5A52D3)',
+                'linear-gradient(135deg, #FF6584, #E05572)',
+                'linear-gradient(135deg, #4CAF50, #3D8B40)',
+                'linear-gradient(135deg, #FF9800, #E68900)',
+                'linear-gradient(135deg, #2196F3, #0B7DDA)',
+                'linear-gradient(135deg, #9C27B0, #7B1FA2)'
+            ];
+            
+            // توليد رقم فريد من النص
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // استخدام القيمة المطلقة والقياس
+            const index = Math.abs(hash) % colors.length;
+            return colors[index];
+        }
     </script>
 </body>
 </html>
